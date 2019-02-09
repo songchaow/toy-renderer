@@ -4,6 +4,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (toytracer "toy_tracer.cpp" "toy_tracer.h")
+file(GLOB TRACER_SOURCE "*.cpp" "*.h" "*.hpp")
+add_executable (toytracer ${TRACER_SOURCE})
 
 # TODO: 如有需要，请添加测试并安装目标。
