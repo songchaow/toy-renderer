@@ -958,72 +958,19 @@ Float SampledSpectrum::Illum_Red[nSpectrralSamples];
 Float SampledSpectrum::Illum_Green[nSpectrralSamples];
 Float SampledSpectrum::Illum_Blue[nSpectrralSamples];
 
-void SampledSpectrum::Initialize()
-{
-    // generate resampled SPDs for some standard colors
-    ReSample(RGB2SpectLambda,RGBRefl2SpectWhite,nRGB2SpectSamples,nSpectrralSamples,Refl_White);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectCyan,nRGB2SpectSamples,nSpectrralSamples,Refl_Cyan);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectMagenta,nRGB2SpectSamples,nSpectrralSamples,Refl_Magenta);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectYellow,nRGB2SpectSamples,nSpectrralSamples,Refl_Yellow);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectRed,nRGB2SpectSamples,nSpectrralSamples,Refl_Red);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectGreen,nRGB2SpectSamples,nSpectrralSamples,Refl_Green);
-    ReSample(RGB2SpectLambda,RGBRefl2SpectBlue,nRGB2SpectSamples,nSpectrralSamples,Refl_Blue);
-
-    ReSample(RGB2SpectLambda,RGBIllum2SpectWhite,nRGB2SpectSamples,nSpectrralSamples,Illum_White);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectCyan,nRGB2SpectSamples,nSpectrralSamples,Illum_Cyan);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectMagenta,nRGB2SpectSamples,nSpectrralSamples,Illum_Magenta);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectYellow,nRGB2SpectSamples,nSpectrralSamples,Illum_Yellow);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectRed,nRGB2SpectSamples,nSpectrralSamples,Illum_Red);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectGreen,nRGB2SpectSamples,nSpectrralSamples,Illum_Green);
-    ReSample(RGB2SpectLambda,RGBIllum2SpectBlue,nRGB2SpectSamples,nSpectrralSamples,Illum_Blue);
-    // generate CIE X,Y,Z matching functions
-    ReSample(CIE_lambda,CIE_X,nCIESamples,nSpectrralSamples,CIE_X_Resampled);
-    ReSample(CIE_lambda,CIE_Y,nCIESamples,nSpectrralSamples,CIE_Y_Resampled);
-    ReSample(CIE_lambda,CIE_Z,nCIESamples,nSpectrralSamples,CIE_Z_Resampled);
-
-}
-
-SampledSpectrum SampledSpectrum::operator*(SampledSpectrum &s) const
-{
-    SampledSpectrum ret;
-    for (int i = 0; i < nSpectrralSamples; i++)
-        ret[i] = (*this)[i] * s[i];
-}
-
-SampledSpectrum SampledSpectrum::operator*(Float s) const
-{
-    SampledSpectrum ret;
-    for(int i=0;i<nSpectrralSamples;i++)
-        ret[i] *= s;
-}
-
-void SortSpectrumSamples(Float *lambda, Float *vals, int n)
-{
-    std::vector<std::pair<Float, Float>> sortVec;
-    sortVec.reserve(n);
-    for (int i = 0; i < n; ++i)
-        sortVec.push_back(std::make_pair(lambda[i], vals[i]));
-    std::sort(sortVec.begin(), sortVec.end());
-    for (int i = 0; i < n; ++i)
-    {
-        lambda[i] = sortVec[i].first;
-        vals[i] = sortVec[i].second;
-    }
-}
-
 void SortSpectrumSamples(std::vector<Float> &lambda, std::vector<Float> &vals)
 {
-    assert(lambda.size()==vals.size());
-    std::vector<std::pair<Float, Float>> sortVec;
-    sortVec.reserve(lambda.size());
-    for (int i = 0; i < lambda.size(); ++i)
-        sortVec.push_back(std::make_pair(lambda[i], vals[i]));
-    std::sort(sortVec.begin(), sortVec.end());
-    for (int i = 0; i < lambda.size(); ++i)
-    {
-        lambda[i] = sortVec[i].first;
-        vals[i] = sortVec[i].second;
-    }
+	assert(lambda.size() == vals.size());
+	std::vector<std::pair<Float, Float>> sortVec;
+	sortVec.reserve(lambda.size());
+	for (int i = 0; i < lambda.size(); ++i)
+		sortVec.push_back(std::make_pair(lambda[i], vals[i]));
+	std::sort(sortVec.begin(), sortVec.end());
+	for (int i = 0; i < lambda.size(); ++i)
+	{
+		lambda[i] = sortVec[i].first;
+		vals[i] = sortVec[i].second;
+	}
 }
 
 void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int new_size, Float *sampled)
@@ -1087,12 +1034,69 @@ void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int
     }
 }
 
+void SampledSpectrum::Initialize()
+{
+    // generate resampled SPDs for some standard colors
+    ReSample(RGB2SpectLambda,RGBRefl2SpectWhite,nRGB2SpectSamples,nSpectrralSamples,Refl_White);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectCyan,nRGB2SpectSamples,nSpectrralSamples,Refl_Cyan);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectMagenta,nRGB2SpectSamples,nSpectrralSamples,Refl_Magenta);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectYellow,nRGB2SpectSamples,nSpectrralSamples,Refl_Yellow);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectRed,nRGB2SpectSamples,nSpectrralSamples,Refl_Red);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectGreen,nRGB2SpectSamples,nSpectrralSamples,Refl_Green);
+    ReSample(RGB2SpectLambda,RGBRefl2SpectBlue,nRGB2SpectSamples,nSpectrralSamples,Refl_Blue);
+
+    ReSample(RGB2SpectLambda,RGBIllum2SpectWhite,nRGB2SpectSamples,nSpectrralSamples,Illum_White);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectCyan,nRGB2SpectSamples,nSpectrralSamples,Illum_Cyan);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectMagenta,nRGB2SpectSamples,nSpectrralSamples,Illum_Magenta);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectYellow,nRGB2SpectSamples,nSpectrralSamples,Illum_Yellow);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectRed,nRGB2SpectSamples,nSpectrralSamples,Illum_Red);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectGreen,nRGB2SpectSamples,nSpectrralSamples,Illum_Green);
+    ReSample(RGB2SpectLambda,RGBIllum2SpectBlue,nRGB2SpectSamples,nSpectrralSamples,Illum_Blue);
+    // generate CIE X,Y,Z matching functions
+    ReSample(CIE_lambda,CIE_X,nCIESamples,nSpectrralSamples,CIE_X_Resampled);
+    ReSample(CIE_lambda,CIE_Y,nCIESamples,nSpectrralSamples,CIE_Y_Resampled);
+    ReSample(CIE_lambda,CIE_Z,nCIESamples,nSpectrralSamples,CIE_Z_Resampled);
+
+}
+
+SampledSpectrum SampledSpectrum::operator*(SampledSpectrum &s) const
+{
+    SampledSpectrum ret;
+    for (int i = 0; i < nSpectrralSamples; i++)
+        ret[i] = (*this)[i] * s[i];
+	return ret;
+}
+
+SampledSpectrum SampledSpectrum::operator*(Float s) const
+{
+    SampledSpectrum ret;
+    for(int i=0;i<nSpectrralSamples;i++)
+        ret[i] *= s;
+	return ret;
+}
+
+void SortSpectrumSamples(Float *lambda, Float *vals, int n)
+{
+    std::vector<std::pair<Float, Float>> sortVec;
+    sortVec.reserve(n);
+    for (int i = 0; i < n; ++i)
+        sortVec.push_back(std::make_pair(lambda[i], vals[i]));
+    std::sort(sortVec.begin(), sortVec.end());
+    for (int i = 0; i < n; ++i)
+    {
+        lambda[i] = sortVec[i].first;
+        vals[i] = sortVec[i].second;
+    }
+}
+
+
+
 void SampledSpectrum::FromSampled(Float lambdas[], Float values[], int n, SampledSpectrum* s)
 {
     ReSample(lambdas,values,n,nSpectrralSamples,s->GetAddr());
 }
 
-void SampledSpectrum::FromRGB(Float rgb[], SampledSpectrum *s, SpectrumType type = SpectrumType::Illuminance)
+void SampledSpectrum::FromRGB(Float rgb[], SampledSpectrum *s, SpectrumType type)
 {
     /* TODO: May add RGB values to spectrum. */
     *s = SampledSpectrum();
