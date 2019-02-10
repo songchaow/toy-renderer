@@ -1087,6 +1087,11 @@ void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int
     }
 }
 
+void SampledSpectrum::FromSampled(Float lambdas[], Float values[], int n, SampledSpectrum* s)
+{
+    ReSample(lambdas,values,n,nSpectrralSamples,s->GetAddr());
+}
+
 void SampledSpectrum::FromRGB(Float rgb[], SampledSpectrum *s, SpectrumType type = SpectrumType::Illuminance)
 {
     /* TODO: May add RGB values to spectrum. */

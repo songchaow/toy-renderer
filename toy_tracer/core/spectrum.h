@@ -62,12 +62,14 @@ public:
     // Operations on coefficients
     void AddFromArray(Float coeff[]) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=coeff[i];}
     void AddFromArray(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; }
+    Float* GetAddr() {return c;}
     SampledSpectrum operator *(SampledSpectrum& s) const;
     SampledSpectrum operator *(Float s) const;
     SampledSpectrum& operator *=(Float s) { for(int i=0;i<nSpectrralSamples;i++) c[i]*=s; return *this; }
     SampledSpectrum& operator +=(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; return *this; }
     // ctors
     SampledSpectrum() = default;
+    SampledSpectrum(const Float* samples) { for(int i=0;i<nSpectrralSamples;i++) c[i]=samples[i]; }
     // ToXYZ
     void ToXYZ(Float xyz[3]) const;
 
