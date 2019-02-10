@@ -19,7 +19,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_executable (toytracer ${TRACER_LIB} ${TRACER_EXE})
 
 # TODO: 如有需要，请添加测试并安装目标。
+ENABLE_TESTING()
+
 file(GLOB TRACER_TEST
     tests/*.cpp
 )
-add_test(tracer_unit_test ${TRACER_TEST} ${TRACER_LIB})
+
+add_executable(tracer_test ${TRACER_TEST} ${TRACER_LIB})
+
+add_test(tracer_unit_test tracer_test)
