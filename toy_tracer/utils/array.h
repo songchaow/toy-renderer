@@ -1,7 +1,7 @@
 /*  array.h
     A light-weight array with operaters overloaded.
  */
-#include "../common.h"
+#include "core/common.h"
 template<unsigned int N>
 struct ArrayF
 {

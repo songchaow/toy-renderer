@@ -1,5 +1,5 @@
-#include "common.h"
-#include "array.h"
+#include "core/common.h"
+#include "utils/array.h"
 
 static const int nCIESamples = 471;
 extern const Float CIE_X[nCIESamples];

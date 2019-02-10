@@ -2,8 +2,8 @@
 #include <cassert>
 #include <utility>
 #include <algorithm>
-#include "spectrum.h"
-#include "utils.h"
+#include "core/spectrum.h"
+#include "utils/utils.h"
 
 // CIE X,Y,Z matching functions
 const Float CIE_X[nCIESamples] = {
