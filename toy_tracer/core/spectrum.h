@@ -33,8 +33,8 @@ class SampledSpectrum
 {
 public:
     static const int nSpectrralSamples = 60;
-    static const int startLambda = 300;
-    static const int endLambda = 600;
+    static const int startLambda = 400;
+    static const int endLambda = 700;
     static const int lambdaSlice = (endLambda-startLambda)/nSpectrralSamples;
     static Float CIE_X_Resampled[nSpectrralSamples];
     static Float CIE_Y_Resampled[nSpectrralSamples];

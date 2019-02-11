@@ -980,8 +980,8 @@ void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int
     lambdas.reserve(size);values.reserve(size);
     for(int i=0;i<size;i++)
     {
-        lambdas[i]=lambdas_cst[i];
-        values[i]=values_cst[i];
+        lambdas.push_back(lambdas_cst[i]);
+        values.push_back(values_cst[i]);
     }
     if (!IsAscending(lambdas_cst, size))
         SortSpectrumSamples(lambdas, values);
@@ -1005,8 +1005,18 @@ void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int
         // If there's no sample points before `startLambda`,
         // assume value of `startLambda` to be that of the smallest sample point.
         // Same for `endLambda`
-        else if (cover_start == 0) // there's certainly no other sample points before
-            startCutValue = values[0];
+		else if (cover_start == 0) // there's certainly no other sample points before
+		{
+			if(lambdas[0]>=startLambda)
+				startCutValue = values[0];
+			else // find correct cover_start
+			{
+				cover_start++;
+				while(true) { if (lambdas[cover_start] >= startLambda && lambdas[cover_start-1] < startLambda) break; cover_start++; }
+				startCutValue = Lerp((startLambda - lambdas[cover_start - 1]) / (lambdas[cover_start] - lambdas[cover_start - 1]), values[cover_start - 1], values[cover_start]);
+			}
+
+		}
         else
             /* TODO: calculate startCutValue */
             startCutValue = Lerp((startLambda - lambdas[cover_start - 1]) / (lambdas[cover_start] - lambdas[cover_start - 1]), values[cover_start - 1], values[cover_start]);
@@ -1017,18 +1027,31 @@ void ReSample(const Float lambdas_cst[], const Float values_cst[], int size, int
                 break;
         if (cover_end == size)
             endCutValue = values[size - 1];
-        else
-            /* TODO: calculate endCutValue */
-            endCutValue = Lerp((endLambda - lambdas[cover_end - 1]) / (lambdas[cover_end] - lambdas[cover_end - 1]), values[cover_end - 1], values[cover_end]);
-        float sum = 0.0;
-        // startLambda -> cover_start
-        sum += (startCutValue + values[cover_start]) / 2 * (lambdas[cover_start] - startLambda);
-        for (int i = cover_start; i < cover_end - 1; i++)
-            sum += (values[i] + values[i + 1]) / 2 * (lambdas[i + 1] - lambdas[i]);
-        // cover_end-1 -> endLambda
-        sum += (values[cover_end - 1] + endCutValue) / 2 * (endLambda - lambdas[cover_end - 1]);
+		else
+		{
+			if (cover_end == 0)
+				endCutValue = values[0];
+			else
+			/* TODO: calculate endCutValue */
+				endCutValue = Lerp((endLambda - lambdas[cover_end - 1]) / (lambdas[cover_end] - lambdas[cover_end - 1]), values[cover_end - 1], values[cover_end]);
+		}
+            
+        Float sum = 0.0;
+		Float slice = (SampledSpectrum::endLambda - SampledSpectrum::startLambda) / new_size;
+		if (cover_start == cover_end)
+			sum = (startCutValue + endCutValue) / 2;
+		else
+		{
+			// startLambda -> cover_start
+			sum += (startCutValue + values[cover_start]) / 2 * (lambdas[cover_start] - startLambda);
+			for (int i = cover_start; i < cover_end - 1; i++)
+				sum += (values[i] + values[i + 1]) / 2 * (lambdas[i + 1] - lambdas[i]);
+			// cover_end-1 -> endLambda
+			sum += (values[cover_end - 1] + endCutValue) / 2 * (endLambda - lambdas[cover_end - 1]);
 
-        sum /= (endCutValue - startCutValue);
+			sum /= slice;
+		}
+        
         lastCutValue = endCutValue;
         sampled[i] = sum;
     }
