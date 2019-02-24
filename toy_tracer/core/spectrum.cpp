@@ -1206,7 +1206,7 @@ void SampledSpectrum::ToXYZ(Float xyz[3]) const
     }
     for(int d=0;d<3;d++)
     {
-        xyz[d] /= lambdaSlice;
+        xyz[d] *= lambdaSlice;
         xyz[d] /= CIE_Y_integral;
     }
     
