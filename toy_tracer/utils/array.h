@@ -1,6 +1,7 @@
 /*  array.h
     A light-weight array with operaters overloaded.
  */
+#pragma once
 #include "core/common.h"
 template<unsigned int N>
 struct ArrayF
