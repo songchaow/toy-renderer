@@ -77,11 +77,15 @@ public:
     void AddFromArray(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; }
     Float* GetAddr() {return c;}
     SampledSpectrum operator *(SampledSpectrum& s) const;
-    SampledSpectrum operator *(Float s) const;
+    SampledSpectrum operator -(Float s) const;
+    SampledSpectrum operator -() const;
+    SampledSpectrum operator /(Float s) const;
     SampledSpectrum& operator *=(Float s) { for(int i=0;i<nSpectrralSamples;i++) c[i]*=s; return *this; }
     SampledSpectrum& operator +=(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; return *this; }
     // ctors
     SampledSpectrum() = default;
+    SampledSpectrum(Float val) { for (int i = 0; i < nSpectrralSamples; i++) c[i] = val; }
+    SampledSpectrum(int val) { for (int i = 0; i < nSpectrralSamples; i++) c[i] = (Float)(val); }
     SampledSpectrum(const Float* samples) { for(int i=0;i<nSpectrralSamples;i++) c[i]=samples[i]; }
     // ToXYZ
     void ToXYZ(Float xyz[3]) const;
@@ -92,3 +96,10 @@ private:
     bool fromRGB = false;
     Float rgb[3]; // available if generated from RGB
 };
+
+SampledSpectrum operator*(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
+SampledSpectrum operator+(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
+SampledSpectrum operator-(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
+SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
+
+typedef SampledSpectrum Spectrum;

@@ -1090,13 +1090,56 @@ SampledSpectrum SampledSpectrum::operator*(SampledSpectrum &s) const
 	return ret;
 }
 
-SampledSpectrum SampledSpectrum::operator*(Float s) const
+SampledSpectrum operator*(const SampledSpectrum& lhs, const SampledSpectrum& rhs)
 {
     SampledSpectrum ret;
-    for(int i=0;i<nSpectrralSamples;i++)
-        ret[i] *= s;
+    for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+          ret[i] = lhs[i] * rhs[i];
 	return ret;
 }
+
+SampledSpectrum operator+(const SampledSpectrum& lhs, const SampledSpectrum& rhs)
+{
+      SampledSpectrum ret;
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+            ret[i] = lhs[i] + rhs[i];
+      return ret;
+}
+
+SampledSpectrum operator-(const SampledSpectrum& lhs, const SampledSpectrum& rhs) {
+      SampledSpectrum ret;
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+            ret[i] = lhs[i] - rhs[i];
+      return ret;
+}
+
+SampledSpectrum operator /(const SampledSpectrum& lhs, const SampledSpectrum& rhs) {
+      SampledSpectrum ret;
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+            ret[i] = lhs[i] / rhs[i];
+      return ret;
+}
+
+SampledSpectrum SampledSpectrum::operator-() const {
+      SampledSpectrum ret;
+      for (int i = 0; i < nSpectrralSamples; i++)
+            ret[i] = -(*this)[i];
+      return ret;
+}
+
+SampledSpectrum SampledSpectrum::operator -(Float s) const {
+      SampledSpectrum ret;
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+            ret[i] = c[i] - s;
+      return ret;
+}
+SampledSpectrum SampledSpectrum::operator /(Float s) const {
+      SampledSpectrum ret;
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
+            ret[i] = c[i] / s;
+      return ret;
+}
+
 
 void SortSpectrumSamples(Float *lambda, Float *vals, int n)
 {
