@@ -3,4 +3,6 @@
 typedef float Float;
 
 // constants
-#define Pi 3.14159265359
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
+constexpr Float Pi = 3.14159265358979323846;

@@ -1,0 +1,51 @@
+#pragma once
+#include "core/common.h"
+#include "core/material.h"
+#include "core/geometry.h"
+
+class MicrofacetDistribution {
+  public:
+    virtual ~MicrofacetDistribution() {}
+    virtual Float D(const Vector3f &wh) const = 0;
+    virtual Float Lambda(const Vector3f &w) const = 0;
+    Float G1(const Vector3f &w) const {
+        //    if (Dot(w, wh) * CosTheta(w) < 0.) return 0.;
+        return 1 / (1 + Lambda(w));
+    }
+    virtual Float G(const Vector3f &wo, const Vector3f &wi) const {
+        return 1 / (1 + Lambda(wo) + Lambda(wi));
+    }
+};
+
+class BeckmannDistribution : public MicrofacetDistribution {
+public:
+      // BeckmannDistribution Public Methods
+      static Float RoughnessToAlpha(Float roughness) {
+            roughness = std::max(roughness, (Float)1e-3);
+            Float x = std::log(roughness);
+            return 1.62142f + 0.819955f * x + 0.1734f * x * x +
+                  0.0171201f * x * x * x + 0.000640711f * x * x * x * x;
+      }
+      BeckmannDistribution(Float alphax, Float alphay, bool samplevis = true)
+            : alphax(alphax), alphay(alphay) {}
+      Float D(const Vector3f &wh) const;
+      // Vector3f Sample_wh(const Vector3f &wo, const Point2f &u) const;
+
+private:
+      // BeckmannDistribution Private Methods
+      Float Lambda(const Vector3f &w) const;
+
+      // BeckmannDistribution Private Data
+      const Float alphax, alphay;
+};
+
+
+
+class TorranceSparrow : public GlossMaterial
+{
+    const std::shared_ptr<const ObjectMedium> medium;
+    const std::shared_ptr<const MicrofacetDistribution> distribution;
+public:
+    TorranceSparrow(const Spectrum& R, const ObjectMedium* medium,const MicrofacetDistribution* dist) :GlossMaterial(R),medium(medium),distribution(dist) {}
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material, bool exit) const override;
+};
