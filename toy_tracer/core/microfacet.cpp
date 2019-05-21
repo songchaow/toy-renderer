@@ -8,11 +8,29 @@ Float BeckmannDistribution::D(const Vector3f &wh) const {
             Sin2Phi(wh) / (alpha * alpha))) /
             (Pi * alpha * alpha * cos4Theta);
 }
-Point2f BeckmannDistribution::Sample_wh(const Point2f & sample) const
+Float BeckmannDistribution::D(const Float tan2Theta) const
+{
+      if (std::isinf(tan2Theta)) return 0.;
+      Float divcos2Theta = 1 + tan2Theta;
+      Float divcos4Theta = divcos2Theta * divcos2Theta;
+      //Float cos4Theta = Cos2Theta(wh) * Cos2Theta(wh);
+      /*return std::exp(-tan2Theta * (Cos2Phi(wh) / (alpha * alpha) +
+            Sin2Phi(wh) / (alpha * alpha))) /
+            (Pi * alpha * alpha * cos4Theta);*/
+      return std::exp(-tan2Theta / alpha / alpha) / Pi / (alpha*alpha)*divcos4Theta;
+}
+Point2f BeckmannDistribution::Sample_wh(const Point2f & sample, Float * pdf) const
 {
       Float phi = sample[0] * 2 * Pi;
-      Float theta2 = -alpha * alpha* std::log(sample[1]);
-      return { phi,theta2 };
+      Float tan2theta = -alpha * alpha* std::log(sample[1]);
+      if (pdf) *pdf = Pdf_wh({ phi,tan2theta });
+      return { phi,tan2theta };
+}
+Float BeckmannDistribution::Pdf_wh(const Point2f & phi_tan2) const
+{
+      Float divcos2Theta = 1 + phi_tan2[1];
+      Float divcosTheta = std::sqrt(divcos2Theta);
+      return std::exp(-phi_tan2[1] / alpha / alpha) / Pi / (alpha*alpha)*divcos2Theta*divcosTheta;
 }
 Float BeckmannDistribution::Lambda(const Vector3f &w) const {
       Float absTanTheta = std::abs(TanTheta(w));
@@ -71,10 +89,11 @@ Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, 
 {
       // wo and others should be in the correct coordinate!
       // sample wh
-      Point2f theta2phi = distribution->Sample_wh(random);
+      Float p_wh;
+      Point2f theta2phi = distribution->Sample_wh(random, &p_wh);
       Vector3f wh = Sphere2Vector({ std::atan(theta2phi[0]),theta2phi[1] });
       wi = Reflect(wo, wh);
-
+      
       // evaluate f given wh
       // calculate p(wi) according to p(wh)
       return Spectrum();

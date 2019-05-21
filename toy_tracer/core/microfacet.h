@@ -8,7 +8,9 @@ class MicrofacetDistribution {
     virtual ~MicrofacetDistribution() {}
     virtual Float D(const Vector3f &wh) const = 0;
     virtual Float Lambda(const Vector3f &w) const = 0;
-    virtual Point2f Sample_wh(const Point2f& sample) const = 0;
+    virtual Point2f Sample_wh(const Point2f& sample, Float* pdf) const = 0;
+    // Probability distribution of omega_h
+    virtual Float Pdf_wh(const Point2f& phi_tan2) const = 0;
     Float G1(const Vector3f &w) const {
         //    if (Dot(w, wh) * CosTheta(w) < 0.) return 0.;
         return 1 / (1 + Lambda(w));
@@ -29,9 +31,11 @@ public:
       }
       BeckmannDistribution(Float alpha, bool samplevis = true)
             : alpha(alpha) {}
-      Float D(const Vector3f &wh) const;
+      Float D(const Vector3f &wh) const override;
+      Float D(const Float tan2Thetah) const;
 
-      virtual Point2f Sample_wh(const Point2f& sample) const override;
+      virtual Point2f Sample_wh(const Point2f& sample, Float* pdf) const override;
+      virtual Float Pdf_wh(const Point2f& phi_tan2) const override;
 
 private:
       // BeckmannDistribution Private Methods
