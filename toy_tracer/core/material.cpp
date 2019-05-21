@@ -30,23 +30,7 @@ Spectrum Dielectric::Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt
 
 
 
-inline Vector3f Reflect(const Vector3f &wo, const Vector3f &n) {
-    return -wo + 2 * Dot(wo, n) * n;
-}
 
-inline bool Refract(const Vector3f &wi, const Vector3f &n, Float eta,
-    Vector3f &wt) {
-    // Compute $\cos \theta_\roman{t}$ using Snell's law
-    Float cosThetaI = Dot(n, wi);
-    Float sin2ThetaI = std::max(Float(0), Float(1 - cosThetaI * cosThetaI));
-    Float sin2ThetaT = eta * eta * sin2ThetaI;
-
-    // Handle total internal reflection for transmission
-    if (sin2ThetaT >= 1) return false;
-    Float cosThetaT = std::sqrt(1 - sin2ThetaT);
-    wt = eta * -wi + (eta * cosThetaI - cosThetaT) * Vector3f(n);
-    return true;
-}
 
 Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f& n, SimpleMaterial* out_material, bool reflect) const
 {

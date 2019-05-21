@@ -19,7 +19,12 @@ public:
     virtual Spectrum Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt = 0) const = 0;
 };
 
-class SimpleMaterial
+class Material
+{
+
+};
+
+class SimpleMaterial : public Material
 {
     
 public:
@@ -115,6 +120,30 @@ inline Float CosDPhi(const Vector3f &wa, const Vector3f &wb) {
         (wa.x * wb.x + wa.y * wb.y) / std::sqrt((wa.x * wa.x + wa.y * wa.y) *
         (wb.x * wb.x + wb.y * wb.y)),
         -1, 1);
+}
+
+// coord: {theta, phi}
+// output: x, y, z = sintheta cosphi, sintheta sinphi, costheta
+Vector3f Sphere2Vector(const Point2f& coord) {
+      return { std::sin(coord[0])*std::cos(coord[1]),std::sin(coord[0])*std::sin(coord[1]),std::cos(coord[0]) };
+}
+
+inline Vector3f Reflect(const Vector3f &wo, const Vector3f &n) {
+      return -wo + 2 * Dot(wo, n) * n;
+}
+
+inline bool Refract(const Vector3f &wi, const Vector3f &n, Float eta,
+      Vector3f &wt) {
+      // Compute $\cos \theta_\roman{t}$ using Snell's law
+      Float cosThetaI = Dot(n, wi);
+      Float sin2ThetaI = std::max(Float(0), Float(1 - cosThetaI * cosThetaI));
+      Float sin2ThetaT = eta * eta * sin2ThetaI;
+
+      // Handle total internal reflection for transmission
+      if (sin2ThetaT >= 1) return false;
+      Float cosThetaT = std::sqrt(1 - sin2ThetaT);
+      wt = eta * -wi + (eta * cosThetaI - cosThetaT) * Vector3f(n);
+      return true;
 }
 
 /*  Other material classes

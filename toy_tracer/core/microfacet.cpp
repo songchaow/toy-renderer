@@ -4,16 +4,22 @@ Float BeckmannDistribution::D(const Vector3f &wh) const {
       Float tan2Theta = Tan2Theta(wh);
       if (std::isinf(tan2Theta)) return 0.;
       Float cos4Theta = Cos2Theta(wh) * Cos2Theta(wh);
-      return std::exp(-tan2Theta * (Cos2Phi(wh) / (alphax * alphax) +
-            Sin2Phi(wh) / (alphay * alphay))) /
-            (Pi * alphax * alphay * cos4Theta);
+      return std::exp(-tan2Theta * (Cos2Phi(wh) / (alpha * alpha) +
+            Sin2Phi(wh) / (alpha * alpha))) /
+            (Pi * alpha * alpha * cos4Theta);
+}
+Point2f BeckmannDistribution::Sample_wh(const Point2f & sample) const
+{
+      Float phi = sample[0] * 2 * Pi;
+      Float theta2 = -alpha * alpha* std::log(sample[1]);
+      return { phi,theta2 };
 }
 Float BeckmannDistribution::Lambda(const Vector3f &w) const {
       Float absTanTheta = std::abs(TanTheta(w));
       if (std::isinf(absTanTheta)) return 0.;
       // Compute _alpha_ for direction _w_
       Float alpha =
-            std::sqrt(Cos2Phi(w) * alphax * alphax + Sin2Phi(w) * alphay * alphay);
+            std::sqrt(Cos2Phi(w) * alpha * alpha + Sin2Phi(w) * alpha * alpha);
       Float a = 1 / (alpha * absTanTheta);
       if (a >= 1.6f) return 0;
       return (1 - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
@@ -59,4 +65,17 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Vector
 
     }
     ;
+}
+
+Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const Vector3f & n, const FlatMaterial * out_material) const
+{
+      // wo and others should be in the correct coordinate!
+      // sample wh
+      Point2f theta2phi = distribution->Sample_wh(random);
+      Vector3f wh = Sphere2Vector({ std::atan(theta2phi[0]),theta2phi[1] });
+      wi = Reflect(wo, wh);
+
+      // evaluate f given wh
+      // calculate p(wi) according to p(wh)
+      return Spectrum();
 }

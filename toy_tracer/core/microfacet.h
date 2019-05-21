@@ -8,6 +8,7 @@ class MicrofacetDistribution {
     virtual ~MicrofacetDistribution() {}
     virtual Float D(const Vector3f &wh) const = 0;
     virtual Float Lambda(const Vector3f &w) const = 0;
+    virtual Point2f Sample_wh(const Point2f& sample) const = 0;
     Float G1(const Vector3f &w) const {
         //    if (Dot(w, wh) * CosTheta(w) < 0.) return 0.;
         return 1 / (1 + Lambda(w));
@@ -26,17 +27,18 @@ public:
             return 1.62142f + 0.819955f * x + 0.1734f * x * x +
                   0.0171201f * x * x * x + 0.000640711f * x * x * x * x;
       }
-      BeckmannDistribution(Float alphax, Float alphay, bool samplevis = true)
-            : alphax(alphax), alphay(alphay) {}
+      BeckmannDistribution(Float alpha, bool samplevis = true)
+            : alpha(alpha) {}
       Float D(const Vector3f &wh) const;
-      // Vector3f Sample_wh(const Vector3f &wo, const Point2f &u) const;
+
+      virtual Point2f Sample_wh(const Point2f& sample) const override;
 
 private:
       // BeckmannDistribution Private Methods
       Float Lambda(const Vector3f &w) const;
 
       // BeckmannDistribution Private Data
-      const Float alphax, alphay;
+      const Float alpha;
 };
 
 
@@ -48,4 +50,5 @@ class TorranceSparrow : public GlossMaterial
 public:
     TorranceSparrow(const Spectrum& R, const ObjectMedium* medium,const MicrofacetDistribution* dist) :GlossMaterial(R),medium(medium),distribution(dist) {}
     virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material, bool exit) const override;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material) const override;
 };
