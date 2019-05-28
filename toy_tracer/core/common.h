@@ -6,3 +6,4 @@ typedef float Float;
 #define _USE_MATH_DEFINES // for C++
 #include <cmath>
 constexpr Float Pi = 3.14159265358979323846;
+constexpr Float invPi = 1.f / Pi;

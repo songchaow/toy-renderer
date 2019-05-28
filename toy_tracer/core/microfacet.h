@@ -53,6 +53,6 @@ class TorranceSparrow : public GlossMaterial
     const std::shared_ptr<const MicrofacetDistribution> distribution;
 public:
     TorranceSparrow(const Spectrum& R, const ObjectMedium* medium,const MicrofacetDistribution* dist) :GlossMaterial(R),medium(medium),distribution(dist) {}
-    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material, bool exit) const override;
-    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material) const override;
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const override;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material, Float *pdf) const override;
 };

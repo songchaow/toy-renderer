@@ -7,7 +7,8 @@ struct Interaction {
       Primitive* pFrom;
       Primitive* pTo;
       Float u, v;
+      Normal3f n;
       Vector3f dpdu, dpdv;
       Vector3f wo;
-
+      Float t;
 };

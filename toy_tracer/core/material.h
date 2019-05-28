@@ -53,8 +53,8 @@ class GlossMaterial : public SimpleMaterial
     
 public:
     GlossMaterial(const Spectrum& R) : SimpleMaterial(Gloss, R) {}
-    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material, bool exit = false) const = 0;
-    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material) const = 0;
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const = 0;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material, Float* pdf) const = 0;
 };
 
 /*  Dielectric
@@ -128,6 +128,11 @@ Vector3f Sphere2Vector(const Point2f& coord) {
       return { std::sin(coord[0])*std::cos(coord[1]),std::sin(coord[0])*std::sin(coord[1]),std::cos(coord[0]) };
 }
 
+// Assume wh and wo are normalized
+inline Float PdfFromWh2Wi(Float p_wh, const Vector3f& wh, const Vector3f& wo) {
+      return p_wh / Dot(wh, wo) / 4;
+}
+
 inline Vector3f Reflect(const Vector3f &wo, const Vector3f &n) {
       return -wo + 2 * Dot(wo, n) * n;
 }
@@ -146,6 +151,6 @@ inline bool Refract(const Vector3f &wi, const Vector3f &n, Float eta,
       return true;
 }
 
-/*  Other material classes
-    may have eta varying with lambda, AND texture coordinates
- */
+inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {
+      return Dot(n, wi) > 0;
+}

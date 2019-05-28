@@ -85,6 +85,6 @@ Spectrum FlatMaterial::f(const Vector3f& wo, const Vector3f& wi, const Vector3f&
             return 0;
       }
       // both reflection and transmission will be delegated to GlossMaterial::f
-      out_material->f(wo, wi, n, this, true);
+      out_material->f(wo, wi, n, this);
       
 }

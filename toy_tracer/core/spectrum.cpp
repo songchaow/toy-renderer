@@ -1252,6 +1252,12 @@ void SampledSpectrum::ToXYZ(Float xyz[3]) const
         xyz[d] *= lambdaSlice;
         xyz[d] /= CIE_Y_integral;
     }
-    
+}
 
+void SampledSpectrum::ToRGB(Float rgb[3]) const
+{
+      ToXYZ(rgb);
+      Float xyz[3];
+      std::memcpy(xyz, rgb, sizeof(Float) * 3);
+      XYZToRGB(xyz, rgb);
 }

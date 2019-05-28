@@ -82,6 +82,7 @@ struct Transform {
       Point3f operator() (const Point3f& o) const;
       Ray operator()(const Ray& r) const;
       Vector3f operator() (const Vector3f& o) const;
+      Normal3f operator() (const Normal3f& o) const;
 
 };
 

@@ -43,10 +43,11 @@ Float BeckmannDistribution::Lambda(const Vector3f &w) const {
       return (1 - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
 }
 
-// wo and wi need to be normalized
+// wo and wi need to be normalized, but not necessary to be the correct frame
 // while wh is not required, if D(wh) is irrelevant with wh's length
-Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const FlatMaterial* out_material, bool exit) const {
-    // determine whether reflection or refraction happens.
+Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const {
+    bool exit = SameOpposition(n, wi);
+      // determine whether reflection or refraction happens.
     if (Dot(wo, n) * Dot(wi, n) > 0) { // reflection
         const Vector3f wh = wo + wi;
         // theta_o, theta_i
@@ -56,7 +57,8 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Vector
         Spectrum fr;
         if (exit)
               fr = out_material->medium->Fr(cosLocalWi, medium.get());
-        else fr = medium->Fr(cosLocalWi, out_material->medium);
+        else
+              fr = medium->Fr(cosLocalWi, out_material->medium);
         return distribution->G(wo, wi)*distribution->D(wh)*fr / cosWo / cosWi / 4;
     }
     else { // transmission
@@ -85,16 +87,15 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Vector
     ;
 }
 
-Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const Vector3f & n, const FlatMaterial * out_material) const
+Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const Normal3f & n, const FlatMaterial * out_material, Float* pdf) const
 {
-      // wo and others should be in the correct coordinate!
+      // wo and wi should be in the correct coordinate!
       // sample wh
       Float p_wh;
       Point2f theta2phi = distribution->Sample_wh(random, &p_wh);
       Vector3f wh = Sphere2Vector({ std::atan(theta2phi[0]),theta2phi[1] });
       wi = Reflect(wo, wh);
-      
+      *pdf = PdfFromWh2Wi(p_wh, wh, wo);
       // evaluate f given wh
-      // calculate p(wi) according to p(wh)
-      return Spectrum();
+      return f(wo, wi, n, out_material);
 }

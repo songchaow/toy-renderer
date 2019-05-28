@@ -89,6 +89,7 @@ public:
     SampledSpectrum(const Float* samples) { for(int i=0;i<nSpectrralSamples;i++) c[i]=samples[i]; }
     // ToXYZ
     void ToXYZ(Float xyz[3]) const;
+    void ToRGB(Float rgb[3]) const;
 
 
 private:
@@ -103,3 +104,7 @@ SampledSpectrum operator-(const SampledSpectrum& lhs, const SampledSpectrum& rhs
 SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
 
 typedef SampledSpectrum Spectrum;
+
+struct RGBSpectrum {
+      Float rgb[3];
+};
