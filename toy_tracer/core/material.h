@@ -30,7 +30,7 @@ class SimpleMaterial : public Material
 public:
       enum SurfaceType {Flat, Gloss};
       SimpleMaterial(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type), R(R) {}
-
+      bool isFlatSurface() const { return m_surface == Flat; }
       const SurfaceType m_surface;
 private:
       const Spectrum R;
@@ -42,7 +42,7 @@ class FlatMaterial : public SimpleMaterial
 public:
     const ObjectMedium* medium;
     FlatMaterial(const ObjectMedium* medium, const Spectrum& R) :medium(medium), SimpleMaterial(SimpleMaterial::SurfaceType::Flat, R) {}
-    // wo, wi, n should be normalized
+    // wo, wi, n should be normalized, but needn't to be in reflection coordinate
     Spectrum delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f& n, SimpleMaterial* out_material, bool reflect) const;
     // only valid when out_material is glossy
     Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossMaterial* out_material) const;
@@ -66,10 +66,13 @@ public:
     Dielectric(Float eta) : ObjectMedium(ObjectType::Dielectric), eta(eta) {}
     Float GetEta() const {return eta;}
     // `out` here just means the outter substance. Not means scatterring into
+    // Re-calculate cosWt if the argument is 0
     virtual Spectrum Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt=0) const;
     Spectrum Fr_fromT(Float cosWo, Float cosWi, const ObjectMedium* out_medium) const;
 private:
     Float eta;
+    Spectrum r_mask = 1.f;
+    Spectrum t_mask = 1.f;
 
 };
 

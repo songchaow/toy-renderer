@@ -62,17 +62,23 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f
         // wo known; wi=wo; calculate wt;
         wi = Reflect(wo, n);
         Vector3f wt;
-        Refract(wi, n, eta_in / eta_out, wt);
+        Spectrum fr;
         Float cosThetaI = Dot(wi, n);
-        // wt is in the other half sphere, so revert the returned value
-        Float cosThetaT = -Dot(wt, n);
-        auto fr = medium->Fr(cosThetaI, out_medium, cosThetaT);
+        if (!Refract(wi, n, eta_in / eta_out, wt))
+              fr = 1.f;
+        else {
+              // wt is in the other half sphere, so revert the returned value
+              Float cosThetaT = -Dot(wt, n);
+              fr = medium->Fr(cosThetaI, out_medium, cosThetaT);
+        }
+        
         return fr / cosThetaI;
     }
     else
     {
         // wt known; wo=wt; calculate wi;
-        Refract(wo, n, eta_out / eta_in, wi);
+        if(!Refract(wo, n, eta_out / eta_in, wi))
+              return 0;
         Float cosThetaI = std::abs(Dot(wi, n));
         auto fr = medium->Fr(cosThetaI, out_medium, cosWo);
         return (- fr + 1.f) / cosThetaI * eta_in*eta_in / eta_out / eta_out;

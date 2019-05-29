@@ -3,7 +3,7 @@
 #include "core/spectrum.h"
 class PathTracer {
       Scene* scene;
-      int maxSegment;
+      int maxSegment = 10;
 public:
       Spectrum Li(Ray& wo);
 };

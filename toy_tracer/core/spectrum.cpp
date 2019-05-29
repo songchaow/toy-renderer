@@ -1090,6 +1090,13 @@ SampledSpectrum SampledSpectrum::operator*(SampledSpectrum &s) const
 	return ret;
 }
 
+SampledSpectrum SampledSpectrum::operator*=(SampledSpectrum &s)
+{
+      SampledSpectrum ret;
+      for (int i = 0; i < nSpectrralSamples; i++)
+            (*this)[i] *= s[i];
+}
+
 SampledSpectrum operator*(const SampledSpectrum& lhs, const SampledSpectrum& rhs)
 {
     SampledSpectrum ret;

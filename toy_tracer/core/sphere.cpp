@@ -24,7 +24,7 @@ bool Sphere::Intercept(const Ray& r0, Interaction& i) const {
       i.pWorld = pHit;
       i.u = phi / 2 / Pi;
       i.v = theta / Pi;
-      i->n = obj2world(Normal3f(Vector3f(pHitLocal)));
+      i.n = obj2world(Normal3f(Normalize(Vector3f(pHitLocal))));
       i.wo = -r0.d;
       i.dpdu = obj2world(Vector3f(2 * Pi*pHitLocal.y, 2 * Pi*pHitLocal.x, 0));
       i.dpdv = obj2world(Vector3f(Pi*pHitLocal.z*std::cos(phi), Pi*pHitLocal.z*std::sin(phi), -Pi * radius*std::sin(theta)));
@@ -61,8 +61,8 @@ bool Sphere::ComputeDiff(const Ray& r0, Interaction* i) const {
       i->pWorld = pHit;
       i->u = phi / 2 / Pi;
       i->v = theta / Pi;
-      i->n = obj2world(Normal3f(Vector3f(pHitLocal)));
-      i->wo = -r0.d;
+      i->n = obj2world(Normal3f(Normalize(Vector3f(pHitLocal))));
+      i->wo = -r0.d; // assumed that d is normalized already
       i->dpdu = obj2world(Vector3f(2 * Pi*pHitLocal.y, 2 * Pi*pHitLocal.x, 0));
       i->dpdv = obj2world(Vector3f(Pi*pHitLocal.z*std::cos(phi), Pi*pHitLocal.z*std::sin(phi), -Pi * radius*std::sin(theta)));
       return true;
