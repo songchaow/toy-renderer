@@ -3,22 +3,22 @@
 bool Scene::Intercept(const Ray& r, Interaction& i) const {
       i.t = 0.f;
       Interaction tmp;
-      Primitive* min_p = nullptr;
-      for (auto& p : primitives) {
+      Shapeable* min_s = nullptr;
+      for (auto& p : shapes) {
             if (!p->InterceptP(r, &tmp))
                   continue;
-            if (!min_p) {
-                  min_p = p;
+            if (!min_s) {
+                  min_s = p;
                   i = tmp;
                   continue;
             }
             if (tmp.t > 0 && tmp.t < i.t) {
-                  min_p = p;
+                  min_s = p;
                   i = tmp;
             }
       }
-      if (!min_p) return false;
-      min_p->ComputeDiff(r, &i);
-      i.pTo = min_p;
+      if (!min_s) return false;
+      min_s->ComputeDiff(r, &i);
+      i.pTo = min_s;
       return true;
 }

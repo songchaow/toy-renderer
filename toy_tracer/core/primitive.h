@@ -3,16 +3,13 @@
 #include "core/material.h"
 #include "core/shape.h"
 
-class Primitive
+class Primitive : public Shapeable
 {
 private:
     // TODO: general material type should be replaced for SimpleMaterial later.
     //SimpleMaterial* m_material;
-      Shape* shape;
       SimpleMaterial* material;
 public:
-      bool Intercept(const Ray& r, Interaction& i) const { return shape->Intercept(r, i); }
-      bool InterceptP(const Ray& r, Interaction* i) const { return shape->InterceptP(r, i); }
-      bool ComputeDiff(const Ray& r, Interaction* i) const { return shape->ComputeDiff(r, i); }
-
+      Primitive(Shape* shape) :Shapeable(shape, ShapeID::Primitive) {}
+      const SimpleMaterial* getMaterial() const { return material; }
 };

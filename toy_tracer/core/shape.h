@@ -23,3 +23,21 @@ public:
       virtual bool InterceptP(const Ray& r, Interaction* i) const override;
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const override;
 };
+
+class Shapeable {
+public:
+      enum ShapeID {
+            Primitive,
+            Light
+      };
+private:
+      Shape* shape;
+      ShapeID s_id;
+public:
+      Shapeable(Shape* shape, ShapeID s_id) : shape(shape), s_id(s_id) {}
+      bool isPrimitive() const { return s_id == Primitive; }
+      bool isLight() const { return s_id == Light; }
+      bool Intercept(const Ray& r, Interaction& i) const { return shape->Intercept(r, i); }
+      bool InterceptP(const Ray& r, Interaction* i) const { return shape->InterceptP(r, i); }
+      bool ComputeDiff(const Ray& r, Interaction* i) const { return shape->ComputeDiff(r, i); }
+};

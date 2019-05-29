@@ -8,3 +8,5 @@ public:
       virtual Spectrum Li(Ray& r) const = 0;
       virtual Vector3f Sample_wi(Vector2f& sample, Interaction& i, Float* pdf) = 0;
 };
+
+// class AreaLight : public Light, Shapeable
