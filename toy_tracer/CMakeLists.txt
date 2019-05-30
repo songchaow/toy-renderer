@@ -42,7 +42,7 @@ target_link_libraries(toytracer tracer_lib)
 ENABLE_TESTING()
 
 file(GLOB TRACER_TEST
-    tests/*.cpp
+    tests/test_interaction_transform.cpp
 )
 
 add_executable(tracer_test ${TRACER_TEST} ${TRACER_LIB})

@@ -43,7 +43,8 @@ public:
     const ObjectMedium* medium;
     FlatMaterial(const ObjectMedium* medium, const Spectrum& R) :medium(medium), SimpleMaterial(SimpleMaterial::SurfaceType::Flat, R) {}
     // wo, wi, n should be normalized, but needn't to be in reflection coordinate
-    Spectrum delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f& n, SimpleMaterial* out_material, bool reflect) const;
+    Spectrum delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, SimpleMaterial* out_material, bool reflect) const;
+    Spectrum sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Vector3f n, Float* pdf) const;
     // only valid when out_material is glossy
     Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossMaterial* out_material) const;
 };

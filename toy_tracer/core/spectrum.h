@@ -77,7 +77,7 @@ public:
     void AddFromArray(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; }
     Float* GetAddr() {return c;}
     SampledSpectrum operator *(SampledSpectrum& s) const;
-    SampledSpectrum operator *=(SampledSpectrum& s);
+    SampledSpectrum& operator *=(SampledSpectrum& s);
     SampledSpectrum operator -(Float s) const;
     SampledSpectrum operator -() const;
     SampledSpectrum operator /(Float s) const;

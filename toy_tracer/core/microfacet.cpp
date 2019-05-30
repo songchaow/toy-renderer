@@ -43,7 +43,7 @@ Float BeckmannDistribution::Lambda(const Vector3f &w) const {
       return (1 - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
 }
 
-// wo and wi need to be normalized, but not necessary to be the correct frame
+// wo and wi need to be normalized, but not necessary to be in the correct frame
 // while wh is not required, if D(wh) is irrelevant with wh's length
 Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const {
     bool exit = SameOpposition(n, wi);

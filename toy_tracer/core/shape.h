@@ -3,6 +3,8 @@
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/interaction.h"
+
+struct Interaction;
 class Shape {
 protected:
       Transform world2obj, obj2world;

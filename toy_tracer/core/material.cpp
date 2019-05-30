@@ -32,14 +32,14 @@ Spectrum Dielectric::Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt
 
 
 
-Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f& n, SimpleMaterial* out_material, bool reflect) const
+Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, SimpleMaterial* out_material, bool reflect) const
 {
-    // wo should be in the same half sphere with n
+      bool revert = SameOpposition(Normal3f(n), wo) ^ reflect;
     if (out_material && out_material->m_surface == SimpleMaterial::Gloss) {
         LOG(WARNING) << "Transmissing from gloss material";
         return 0.f;
     }
-    Float cosWo = Dot(n, wo);
+    
     // Calculate medium, eta_in and eta_out
     const Dielectric* out_medium = nullptr;
       Float eta_in, eta_out;
@@ -54,9 +54,14 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f
             out_medium = dynamic_cast<const Dielectric*>(flat_out->medium);
             eta_out = out_medium->GetEta();
       }
-      else eta_out = 1.f;
+      else
+            eta_out = 1.f;
       const Dielectric* din = dynamic_cast<const Dielectric*>(medium);
-      Float eta_in = din->GetEta();
+      eta_in = din->GetEta();
+      if (revert) {
+            std::swap(eta_in, eta_out);
+            n = -n;
+      }
     if (reflect)
     {
         // wo known; wi=wo; calculate wt;
@@ -64,11 +69,13 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f
         Vector3f wt;
         Spectrum fr;
         Float cosThetaI = Dot(wi, n);
+        DLOG_IF(ERROR, cosThetaI < 0) << "cosThetaI < 0";
         if (!Refract(wi, n, eta_in / eta_out, wt))
               fr = 1.f;
         else {
               // wt is in the other half sphere, so revert the returned value
               Float cosThetaT = -Dot(wt, n);
+              DLOG_IF(ERROR, cosThetaT < 0) << "cosThetaT < 0";
               fr = medium->Fr(cosThetaI, out_medium, cosThetaT);
         }
         
@@ -79,10 +86,20 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, const Vector3f
         // wt known; wo=wt; calculate wi;
         if(!Refract(wo, n, eta_out / eta_in, wi))
               return 0;
-        Float cosThetaI = std::abs(Dot(wi, n));
+        Float cosThetaI = Dot(wi, n); // dot itself is positive
+        DLOG_IF(ERROR, cosThetaI < 0) << "cosThetaI < 0";
+        Float cosWo = -Dot(n, wo); // dot itself is negative
+        DLOG_IF(ERROR, cosWo < 0) << "cosWo < 0";
         auto fr = medium->Fr(cosThetaI, out_medium, cosWo);
         return (- fr + 1.f) / cosThetaI * eta_in*eta_in / eta_out / eta_out;
     }
+}
+
+Spectrum FlatMaterial::sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Vector3f n, Float* pdf) const {
+      // currently randomly choose from reflection and transmission
+      // TODO: sample according to r_mask and t_mask
+      if (pdf) *pdf = 0.5;
+      return delta_f(wo, wi, n, nullptr, sample);
 }
 
 Spectrum FlatMaterial::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossMaterial* out_material) const {
@@ -91,6 +108,6 @@ Spectrum FlatMaterial::f(const Vector3f& wo, const Vector3f& wi, const Vector3f&
             return 0;
       }
       // both reflection and transmission will be delegated to GlossMaterial::f
-      out_material->f(wo, wi, n, this);
+      out_material->f(wo, wi, Normal3f(n), this);
       
 }
