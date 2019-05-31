@@ -24,6 +24,7 @@ message(STATUS "Binary dir: " ${CMAKE_BINARY_DIR})
 file(GLOB TRACER_LIB 
 *.cpp *.h *.hpp
 core/*.cpp
+light/*.cpp
 utils/*.cpp
 )
 add_library(tracer_lib ${TRACER_LIB})
@@ -45,6 +46,7 @@ file(GLOB TRACER_TEST
     tests/test_interaction_transform.cpp
 )
 
-add_executable(tracer_test ${TRACER_TEST} ${TRACER_LIB})
+add_executable(tracer_test ${TRACER_TEST})
+target_link_libraries(tracer_test tracer_lib)
 
 add_test(tracer_unit_test tracer_test)

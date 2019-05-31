@@ -93,7 +93,7 @@ Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, 
       // sample wh
       Float p_wh;
       Point2f theta2phi = distribution->Sample_wh(random, &p_wh);
-      Vector3f wh = Sphere2Vector({ std::atan(theta2phi[0]),theta2phi[1] });
+      Vector3f wh = Sphere2Vector(Point2f(std::atan(theta2phi[0]),theta2phi[1]));
       wi = Reflect(wo, wh);
       *pdf = PdfFromWh2Wi(p_wh, wh, wo);
       // evaluate f given wh

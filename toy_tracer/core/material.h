@@ -41,7 +41,7 @@ class FlatMaterial : public SimpleMaterial
 {
 public:
     const ObjectMedium* medium;
-    FlatMaterial(const ObjectMedium* medium, const Spectrum& R) :medium(medium), SimpleMaterial(SimpleMaterial::SurfaceType::Flat, R) {}
+    FlatMaterial(const ObjectMedium* medium, const Spectrum& R=1.f) :medium(medium), SimpleMaterial(SimpleMaterial::SurfaceType::Flat, R) {}
     // wo, wi, n should be normalized, but needn't to be in reflection coordinate
     Spectrum delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, SimpleMaterial* out_material, bool reflect) const;
     Spectrum sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Vector3f n, Float* pdf) const;
@@ -64,7 +64,7 @@ public:
 class Dielectric : public ObjectMedium
 {
 public:
-    Dielectric(Float eta) : ObjectMedium(ObjectType::Dielectric), eta(eta) {}
+    Dielectric(Float eta = 1.5) : ObjectMedium(ObjectType::Dielectric), eta(eta) {}
     Float GetEta() const {return eta;}
     // `out` here just means the outter substance. Not means scatterring into
     // Re-calculate cosWt if the argument is 0
@@ -128,7 +128,7 @@ inline Float CosDPhi(const Vector3f &wa, const Vector3f &wb) {
 
 // coord: {theta, phi}
 // output: x, y, z = sintheta cosphi, sintheta sinphi, costheta
-Vector3f Sphere2Vector(const Point2f& coord) {
+inline Vector3f Sphere2Vector(const Point2f& coord) {
       return { std::sin(coord[0])*std::cos(coord[1]),std::sin(coord[0])*std::sin(coord[1]),std::cos(coord[0]) };
 }
 

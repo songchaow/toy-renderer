@@ -1,4 +1,5 @@
 #include "core/interaction.h"
+#include "core/material.h"
 #include <iostream>
 
 int main() {
@@ -8,6 +9,12 @@ int main() {
       i.wo = wo;
       i.n = n;
       Vector3f localWo = i.GetLocalWo();
+      // wo calculated by sample_f
+      Dielectric* d = new Dielectric();
+      FlatMaterial* flat_m = new FlatMaterial(d);
+      Vector3f localWi;
+      Spectrum reflect = flat_m->delta_f(localWo, localWi, Vector3f(0, 0, 1), nullptr, true);
       std::cout << "localWo:" << localWo.x << " " << localWo.y << " " << localWo.z << std::endl;
+      Vector3f wi = i.GlobalDirection(localWi);
       return 0;
 }

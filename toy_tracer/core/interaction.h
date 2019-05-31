@@ -1,7 +1,7 @@
 #pragma once
 #include "core/common.h"
 #include "core/geometry.h"
-#include "core/primitive.h"
+#include "core/shape.h"
 class Shapeable;
 struct Interaction {
       Point3f pWorld;

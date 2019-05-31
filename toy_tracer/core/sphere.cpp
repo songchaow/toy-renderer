@@ -1,6 +1,7 @@
 #include "core/common.h"
 #include "core/shape.h"
 #include "core/geometry.h"
+#include <algorithm>
 
 bool Sphere::Intercept(const Ray& r0, Interaction& i) const {
       Ray rt(world2obj(r0));
