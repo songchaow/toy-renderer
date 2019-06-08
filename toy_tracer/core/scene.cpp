@@ -2,9 +2,9 @@
 
 bool Scene::Intercept(const Ray& r, Interaction& i) const {
       i.t = 0.f;
-      Interaction tmp;
       Shapeable* min_s = nullptr;
       for (auto& p : shapes) {
+            Interaction tmp;
             if (!p->InterceptP(r, &tmp))
                   continue;
             if (!min_s) {

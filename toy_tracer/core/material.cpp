@@ -11,7 +11,7 @@ Spectrum Dielectric::Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt
       if (out_medium == nullptr)
             eta_i = 1.f;
       if (out_medium && out_medium->m_type == ObjectMedium::Dielectric)
-            eta_i = dynamic_cast<const Dielectric*>(out_medium)->eta;
+            eta_i = static_cast<const Dielectric*>(out_medium)->eta;
       // Light cannot transmit out of metal
       if (out_medium && out_medium->m_type == ObjectMedium::Metal) {
             LOG(WARNING) << "Light cannot transmit out of metal";
@@ -51,12 +51,12 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, Si
                   LOG(WARNING) << "Tranmissing from metal to electric.";
                   return 0.f;
             }
-            out_medium = dynamic_cast<const Dielectric*>(flat_out->medium);
+            out_medium = static_cast<const Dielectric*>(flat_out->medium);
             eta_out = out_medium->GetEta();
       }
       else
             eta_out = 1.f;
-      const Dielectric* din = dynamic_cast<const Dielectric*>(medium);
+      const Dielectric* din = static_cast<const Dielectric*>(medium);
       eta_in = din->GetEta();
       if (revert) {
             std::swap(eta_in, eta_out);

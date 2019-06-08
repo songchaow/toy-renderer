@@ -72,6 +72,10 @@ class Point3 {
         : x((T)p.x), y((T)p.y), z((T)p.z) {
         DCHECK(!HasNaNs());
     }
+    explicit Point3(const Vector3<U> &p)
+          : x((T)p.x), y((T)p.y), z((T)p.z) {
+          DCHECK(!HasNaNs());
+    }
     template <typename U>
     explicit operator Vector3<U>() const {
         return Vector3<U>(x, y, z);
@@ -402,6 +406,18 @@ class Normal3 {
         y = n.y;
         z = n.z;
     }
+    Normal3<T>(const Vector3<T> &n) {
+          DCHECK(!n.HasNaNs());
+          x = n.x;
+          y = n.y;
+          z = n.z;
+    }
+    Normal3<T>(const Point3<T> &n) {
+          DCHECK(!n.HasNaNs());
+          x = n.x;
+          y = n.y;
+          z = n.z;
+    }
 
     Normal3<T> &operator=(const Normal3<T> &n) {
         DCHECK(!n.HasNaNs());
@@ -676,7 +692,7 @@ inline std::ostream &operator<<(std::ostream &os, const Vector3<Float> &v) {
     return os;
 }
 
-typedef Vector2<Float> Vector2f;
+typedef Vector2<Float> Point2f;
 typedef Vector2<int> Vector2i;
 typedef Vector3<Float> Vector3f;
 typedef Vector3<int> Vector3i;

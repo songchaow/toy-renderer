@@ -55,7 +55,7 @@ class GlossMaterial : public SimpleMaterial
 public:
     GlossMaterial(const Spectrum& R) : SimpleMaterial(Gloss, R) {}
     virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const = 0;
-    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material, Float* pdf) const = 0;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const FlatMaterial* out_material, Float* pdf) const = 0;
 };
 
 /*  Dielectric

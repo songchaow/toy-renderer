@@ -68,3 +68,32 @@ bool Sphere::ComputeDiff(const Ray& r0, Interaction* i) const {
       i->dpdv = obj2world(Vector3f(Pi*pHitLocal.z*std::cos(phi), Pi*pHitLocal.z*std::sin(phi), -Pi * radius*std::sin(theta)));
       return true;
 }
+
+Point3f Sphere::PointfromUV(Float u, Float v, Normal3f * n) const
+{
+      Float theta = u * Pi, phi = v * Pi;
+      Point3f localP(radius*std::sin(theta)*std::cos(phi), radius*std::sin(theta)*std::sin(phi), radius*std::cos(theta));
+      Normal3f localN = Normal3f(Vector3f(localP / radius));
+      if (n)
+            *n = obj2world(localN);
+      return obj2world(localP);
+}
+
+
+
+Vector3f SampleUnitSphere(const Point2f& sample) {
+      Float z = 1 - 2 * sample[0];
+      Float r = 2 * std::sqrt(sample[0] * (1 - sample[0]));
+      Float x = r * std::cos(2 * Pi*sample[1]);
+      Float y = r * std::sin(2 * Pi*sample[1]);
+      return { x,y,z };
+}
+
+Point3f Sphere::SamplePoint(Point2f & random, Interaction & i, Normal3f & n, Float* pdf) const
+{
+      Point3f p_n(SampleUnitSphere(random));
+      n = obj2world(Normal3f(p_n));
+      if (pdf)
+            *pdf = 1.f / Area();
+      return obj2world(Point3f(p_n*radius));
+}

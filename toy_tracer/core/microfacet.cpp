@@ -70,8 +70,8 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal
             LOG(WARNING) << "Light transmitted into metal.";
             return 0;
         }
-        const Dielectric* out_dielectric = dynamic_cast<const Dielectric*>(out_material->medium);
-        const Dielectric* in_dielectric = dynamic_cast<const Dielectric*>(medium.get());
+        const Dielectric* out_dielectric = static_cast<const Dielectric*>(out_material->medium);
+        const Dielectric* in_dielectric = static_cast<const Dielectric*>(medium.get());
         if (exit) std::swap(out_dielectric, in_dielectric);
         Float eta_r = out_dielectric->GetEta() / in_dielectric->GetEta();
         const Vector3f wh = wo + wi* eta_r;
@@ -87,7 +87,7 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal
     ;
 }
 
-Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const Normal3f & n, const FlatMaterial * out_material, Float* pdf) const
+Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const FlatMaterial * out_material, Float* pdf) const
 {
       // wo and wi should be in the correct coordinate!
       // sample wh
@@ -95,7 +95,8 @@ Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, 
       Point2f theta2phi = distribution->Sample_wh(random, &p_wh);
       Vector3f wh = Sphere2Vector(Point2f(std::atan(theta2phi[0]),theta2phi[1]));
       wi = Reflect(wo, wh);
-      *pdf = PdfFromWh2Wi(p_wh, wh, wo);
+      if (pdf)
+            *pdf = PdfFromWh2Wi(p_wh, wh, wo);
       // evaluate f given wh
-      return f(wo, wi, n, out_material);
+      return f(wo, wi, Normal3f(0,0,1), out_material);
 }
