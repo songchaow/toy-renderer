@@ -22,3 +22,34 @@ bool Scene::Intercept(const Ray& r, Interaction& i) const {
       i.pTo = min_s;
       return true;
 }
+
+bool Scene::Visible(Interaction & i, const Vector3f& wi, Light* l) const
+{
+      Interaction newi;
+      Ray shadow_ray(i.pWorld, wi);
+      if (!Intercept(shadow_ray, newi))
+            // TODO: if point light, return true
+            return false;
+      return i.pTo == l;
+}
+
+Spectrum Scene::SampleDirectLight(Interaction & i) const
+{
+      for (auto& light : lights) {
+            Float pdf;
+            Vector3f wi;
+            if (light->Sample_wi(sample,i,wi,&pdf)) {
+                  if (Visible(i, wi, l)) {
+                        ;
+
+                  }
+            }
+            else
+                  // currently sample for the whole surface
+                  // TODO: change light::sample_wi to make the return always true
+                  return 0.f;
+            
+                  ;
+      }
+      return Spectrum();
+}

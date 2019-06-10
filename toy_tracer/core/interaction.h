@@ -6,7 +6,7 @@ class Shapeable;
 struct Interaction {
       Point3f pWorld;
       // Primitive* pFrom;
-      Shapeable* pTo;
+      Shapeable* pTo = nullptr;
       Float u;
       Float v;
       Normal3f n;

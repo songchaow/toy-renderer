@@ -5,6 +5,8 @@ class UniformAreaLight : public Light, public Shapeable {
       Spectrum emit;
 public:
       virtual Spectrum Li(Vector3f &w) const override;
-      virtual Vector3f Sample_wi(Point2f& sample, Interaction& i, Float* pArea) const override;
+      // fills i.wo
+      bool Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pwi) const override;
+      virtual bool isSingular() const override { return false; }
 };
 

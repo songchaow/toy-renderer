@@ -1027,3 +1027,6 @@ inline Float SphericalPhi(const Vector3f &v) {
     return (p < 0) ? (p + 2 * Pi) : p;
 }
 
+inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {
+      return Dot(n, wi) > 0;
+}

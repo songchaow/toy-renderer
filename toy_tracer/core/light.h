@@ -7,5 +7,6 @@ class Light {
 public:
       // assume there's no occlusion
       virtual Spectrum Li(Vector3f& w) const = 0;
-      virtual Vector3f Sample_wi(Point2f& sample, Interaction& i, Float* pdf) const = 0;
+      bool Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pwi) const = 0;
+      virtual bool isSingular() const = 0;
 };

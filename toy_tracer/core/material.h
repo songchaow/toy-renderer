@@ -154,7 +154,3 @@ inline bool Refract(const Vector3f &wi, const Vector3f &n, Float eta,
       wt = eta * -wi + (eta * cosThetaI - cosThetaT) * Vector3f(n);
       return true;
 }
-
-inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {
-      return Dot(n, wi) > 0;
-}
