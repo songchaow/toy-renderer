@@ -41,7 +41,7 @@ public:
             Primitive,
             Light
       };
-private:
+protected:
       Shape* shape;
       ShapeID s_id;
 public:

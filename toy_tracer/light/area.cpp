@@ -14,6 +14,6 @@ bool UniformAreaLight::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, 
       if (cosTheta > 0)
             return false;
       cosTheta = -cosTheta;
-      pwi = pwi * lenSquared / cosTheta;
+      *pwi = *pwi * lenSquared / cosTheta;
       return true;
 }

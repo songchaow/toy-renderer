@@ -31,6 +31,7 @@ public:
       enum SurfaceType {Flat, Gloss};
       SimpleMaterial(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type), R(R) {}
       bool isFlatSurface() const { return m_surface == Flat; }
+      bool isGlossSurface() const { return m_surface == Gloss; }
       const SurfaceType m_surface;
 private:
       const Spectrum R;

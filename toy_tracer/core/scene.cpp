@@ -1,4 +1,5 @@
 #include "core/scene.h"
+#include <cassert>
 
 bool Scene::Intercept(const Ray& r, Interaction& i) const {
       i.t = 0.f;
@@ -30,18 +31,24 @@ bool Scene::Visible(Interaction & i, const Vector3f& wi, Light* l) const
       if (!Intercept(shadow_ray, newi))
             // TODO: if point light, return true
             return false;
-      return i.pTo == l;
+      return static_cast<void*>(i.pTo) == static_cast<void*>(l);
 }
 
 Spectrum Scene::SampleDirectLight(Interaction & i) const
 {
+      // material must be gloss
+      assert(i.pTo->isPrimitive());
+      Primitive* p = static_cast<Primitive*>(i.pTo);
+      assert(p->getMaterial()->isGlossSurface());
+      const GlossMaterial* material = static_cast<const GlossMaterial*>(p->getMaterial());
       for (auto& light : lights) {
             Float pdf;
             Vector3f wi;
             if (light->Sample_wi(sample,i,wi,&pdf)) {
-                  if (Visible(i, wi, l)) {
-                        ;
-
+                  if (Visible(i, wi, light)) {
+                        Spectrum Li = light->Li(wi);
+                        Float cosWi = Dot(i.n, wi);
+                        
                   }
             }
             else
