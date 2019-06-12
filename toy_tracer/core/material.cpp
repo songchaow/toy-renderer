@@ -5,6 +5,8 @@
 #include <algorithm>
 #include "core/common.h"
 
+Dielectric vacuum(1.f);
+
 Spectrum Dielectric::Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt/* = 0*/) const
 {
       Float eta_i;

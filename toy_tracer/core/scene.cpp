@@ -39,24 +39,32 @@ Spectrum Scene::SampleDirectLight(Interaction & i) const
       // material must be gloss
       assert(i.pTo->isPrimitive());
       Primitive* p = static_cast<Primitive*>(i.pTo);
+      if (p->getMaterial()->isFlatSurface()) {
+            DLOG(WARNING) << "Call SampleDirectLight on a flat surface interaction.";
+            return 0;
+      }
       assert(p->getMaterial()->isGlossSurface());
       const GlossMaterial* material = static_cast<const GlossMaterial*>(p->getMaterial());
+      Spectrum Ld(0.f);
       for (auto& light : lights) {
             Float pdf;
             Vector3f wi;
-            if (light->Sample_wi(sample,i,wi,&pdf)) {
+            if (light->Sample_wi(sample, i, wi, &pdf)) {
                   if (Visible(i, wi, light)) {
                         Spectrum Li = light->Li(wi);
-                        Float cosWi = Dot(i.n, wi);
-                        
+                        Float cosWi = AbsDot(i.n, wi);
+                        Vector3f localWo = i.GetLocalWo();
+                        Vector3f localWi = i.LocalDirection(wi);
+                        Float fr = material->f(localWo, localWi, Normal3f(0.f, 0.f, 1.f), nullptr);
+                        Ld += fr * Li*cosWi / pdf;
                   }
+                  else
+                        continue;
             }
             else
                   // currently sample for the whole surface
                   // TODO: change light::sample_wi to make the return always true
-                  return 0.f;
-            
-                  ;
+                  continue;
       }
-      return Spectrum();
+      return Ld;
 }

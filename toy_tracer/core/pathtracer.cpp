@@ -51,10 +51,13 @@ Spectrum PathTracer::Li(Ray& ro) {
       }
       // At last, track to the light
       if (i.pTo->isLight()) {
-            ;
+            UniformAreaLight* el = static_cast<UniformAreaLight*>(i.pTo);
+            Li = prefix * el->Li(wo);
+      }
+      else {
+            Spectrum Ld = scene->SampleDirectLight(i);
+            Li = prefix * Ld;
       }
 
-
       return Li;
-
 }

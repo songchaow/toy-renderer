@@ -78,6 +78,8 @@ private:
 
 };
 
+extern Dielectric vacuum;
+
 /*  Metal
     with eta varying with lambda
  */

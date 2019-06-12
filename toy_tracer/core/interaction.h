@@ -18,6 +18,17 @@ struct Interaction {
             Float x = Cross(wo, n).Length();
             return { x, 0, height };
       }
+      Vector3f LocalDirection(Vector3f& globalWi) const {
+            Float height = Dot(globalWi, n);
+            // get globalWi - n
+            Vector3f& flatWi = globalWi - Vector3f(n) * height;
+            Float x = Dot(flatWi, wo);
+            Vector3f checky = Cross(flatWi, wo);
+            Float y = Cross(flatWi, wo).Length();
+            if (!SameOpposition(n, checky))
+                  y = -y;
+            return { x,y,height };
+      }
       Vector3f GlobalDirection(Vector3f& localWi) const {
             Vector3f globalXunit = Normalize(Cross(n, Cross(wo, n))); // TODO: make this an operation
             return Vector3f(localWi.z*n) + localWi.y*Normalize(Cross(wo, n)) + localWi.x*globalXunit;
