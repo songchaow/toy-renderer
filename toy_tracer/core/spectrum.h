@@ -104,7 +104,7 @@ SampledSpectrum operator+(const SampledSpectrum& lhs, const SampledSpectrum& rhs
 SampledSpectrum operator-(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
 SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
 
-typedef SampledSpectrum Spectrum;
+typedef RGBSpectrum Spectrum;
 
 struct RGBSpectrum {
       Float rgb[3];

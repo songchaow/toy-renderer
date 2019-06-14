@@ -12,4 +12,7 @@ public:
       Point2f Sample2D() {
             return { uniform_dist(raw_random),uniform_dist(raw_random) };
       }
+      Point2f SamplePixel(Float startx, Float starty) {
+            return { startx + uniform_dist(raw_random),starty + uniform_dist(raw_random) };
+      }
 };
