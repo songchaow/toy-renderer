@@ -4,7 +4,7 @@
 SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 cmake_minimum_required (VERSION 3.8)
 
-# 将源代码添加到此项目的可执行文件。
+# third-party dependencies
 # glog
 
 SET(WITH_GFLAGS OFF CACHE BOOL "Use gflags")
@@ -20,6 +20,11 @@ INCLUDE_DIRECTORIES (
 )
 message(STATUS "Binary dir: " ${CMAKE_BINARY_DIR})
 
+# image IO
+file(GLOB IMAGE_IO ext/std_image/include/*.h
+  ext/std_image/src/*.cpp
+)
+
 # toy tracer
 file(GLOB TRACER_LIB 
 *.cpp *.h *.hpp
@@ -27,7 +32,7 @@ core/*.cpp
 light/*.cpp
 utils/*.cpp
 )
-add_library(tracer_lib ${TRACER_LIB})
+add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO})
 target_link_libraries(tracer_lib glog)
 
 file(GLOB TRACER_EXE
