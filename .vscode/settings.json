@@ -24,5 +24,6 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp"
-    }
+    },
+    "editor.tabSize": 6
 }
