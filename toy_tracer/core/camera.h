@@ -15,6 +15,11 @@ class Camera {
 
       Float film_distance;
       Film film;
+      Float clip_near;
+      Float clip_far;
+      // gives a transform from world space to NDC
+      Transform Cam2NDC();
+
       Scene* s;
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);

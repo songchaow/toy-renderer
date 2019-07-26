@@ -11,7 +11,7 @@ struct Matrix4 {
       Matrix4(Float(*m)[4]) { memcpy(m_matrix, m, 4 * 4 * sizeof(Float)); }
       Float* operator[](const int n) { return m_matrix[n]; }
       const Float* operator[](const int n) const { return m_matrix[n]; }
-      Matrix4 operator*(const Matrix4& m);
+      Matrix4 operator*(const Matrix4& m) const;
 };
 
 extern Matrix4 Inverse(const Matrix4 &m);
@@ -28,6 +28,9 @@ struct Transform {
       Ray operator()(const Ray& r) const;
       Vector3f operator() (const Vector3f& o) const;
       Normal3f operator() (const Normal3f& o) const;
-
+      Transform operator*(const Transform& rhs) const;
 };
 
+Transform Translate(const Vector3f &delta);
+
+Transform Scale(Float x, Float y, Float z);

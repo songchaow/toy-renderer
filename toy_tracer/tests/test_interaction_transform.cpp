@@ -2,6 +2,10 @@
 #include "core/material.h"
 #include <iostream>
 
+int renderTest() {
+
+}
+
 int main() {
       Interaction i;
       Vector3f wo(0, 1, 0);

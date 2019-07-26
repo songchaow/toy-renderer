@@ -77,10 +77,8 @@ public:
     void AddFromArray(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; }
     Float* GetAddr() {return c;}
     SampledSpectrum operator *(SampledSpectrum& s) const;
-    SampledSpectrum& operator *=(SampledSpectrum& s);
-    SampledSpectrum operator -(Float s) const;
     SampledSpectrum operator -() const;
-    SampledSpectrum operator /(Float s) const;
+    SampledSpectrum& operator *=(SampledSpectrum& s);
     SampledSpectrum& operator *=(Float s) { for(int i=0;i<nSpectrralSamples;i++) c[i]*=s; return *this; }
     SampledSpectrum& operator +=(ArrayF<nSpectrralSamples> &ar) { for(int i=0;i<nSpectrralSamples;i++) c[i]+=ar[i]; return *this; }
     // ctors
@@ -106,6 +104,36 @@ SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs
 
 typedef RGBSpectrum Spectrum;
 
+struct R8G8B8;
+
 struct RGBSpectrum {
       Float rgb[3];
+      RGBSpectrum() = default;
+      RGBSpectrum(Float val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
+      RGBSpectrum(Float r, Float g, Float b) {rgb[0] = r; rgb[1] = g; rgb[2] = b;}
+      R8G8B8 toR8G8B8();
+      RGBSpectrum& operator/=(const RGBSpectrum& rhs) { for (int i = 0; i < 3; i++) rgb[i] /= rhs.rgb[i]; }
+      Float& operator[](int idx) { return rgb[idx]; }
+};
+
+RGBSpectrum operator+(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] + rhs.rgb[i]; }
+RGBSpectrum operator-(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] - rhs.rgb[i]; }
+RGBSpectrum operator*(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] * rhs.rgb[i]; }
+RGBSpectrum operator/(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] / rhs.rgb[i]; }
+
+static inline Float GammaTransform(Float stimus) {
+      if (stimus <= 0.0031308f) return 12.92f * stimus;
+      return 1.055f * std::pow(stimus, (Float)(1.f / 2.4f)) - 0.055f;
+}
+
+static Float GammaCorrection(Float stimus) {
+      return 256 * Clamp(GammaTransform(stimus), 0, 1);
+}
+
+struct R8G8B8 {
+    char rgb[3];
+    R8G8B8() = default;
+    R8G8B8(char val) { for(int i = 0; i < 3; i++) rgb[i] = val;}
+    R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b;}
+    RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0])/255,(Float)(rgb[1])/255,(Float)(rgb[2])/255); }
 };

@@ -28,7 +28,7 @@ Matrix4::Matrix4(Float t00, Float t01, Float t02, Float t03, Float t10,
       m_matrix[3][3] = t33;
 }
 
-Matrix4 Matrix4::operator*(const Matrix4& m) {
+Matrix4 Matrix4::operator*(const Matrix4& m) const {
       Matrix4 ret;
       for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++) {
@@ -128,4 +128,19 @@ Matrix4 Inverse(const Matrix4 &m) {
             }
       }
       return Matrix4(minv);
+}
+
+Transform Translate(const Vector3f &delta) {
+      Matrix4 m(1, 0, 0, delta.x, 0, 1, 0, delta.y, 0, 0, 1, delta.z, 0, 0, 0,
+            1);
+      return m;
+}
+
+Transform Scale(Float x, Float y, Float z) {
+      Matrix4 m(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
+      return m;
+}
+
+Transform Transform::operator*(const Transform& rhs) const {
+      return Transform(this->m*rhs.m);
 }

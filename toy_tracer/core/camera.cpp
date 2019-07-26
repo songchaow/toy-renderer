@@ -8,6 +8,18 @@ Ray Camera::GenerateRay(const Point2f& pFilm)
       return cam2world(localRay);
 }
 
+Transform Camera::Cam2NDC()
+{
+      Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
+            0, 0, 1, 0);
+      // Scale
+      Float height_original = film.getHeight() / film_distance;
+      Float width_original = film.getWidth() / film_distance;
+      Transform s = Scale(1 / width_original, 1 / height_original, 1);
+      Transform t = Translate(Vector3f(-width_original / 2, -height_original / 2, 0));
+      return s * t * Transform(persp);
+}
+
 void Camera::Render(RenderOption & options)
 {
       // TODO: initialize samplers here
@@ -22,4 +34,6 @@ void Camera::Render(RenderOption & options)
                   
             }
       }
+      // Normalize
+      film.Normalize();
 }

@@ -1130,24 +1130,10 @@ SampledSpectrum operator /(const SampledSpectrum& lhs, const SampledSpectrum& rh
 
 SampledSpectrum SampledSpectrum::operator-() const {
       SampledSpectrum ret;
-      for (int i = 0; i < nSpectrralSamples; i++)
+      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
             ret[i] = -(*this)[i];
       return ret;
 }
-
-SampledSpectrum SampledSpectrum::operator -(Float s) const {
-      SampledSpectrum ret;
-      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
-            ret[i] = c[i] - s;
-      return ret;
-}
-SampledSpectrum SampledSpectrum::operator /(Float s) const {
-      SampledSpectrum ret;
-      for (int i = 0; i < SampledSpectrum::nSpectrralSamples; i++)
-            ret[i] = c[i] / s;
-      return ret;
-}
-
 
 void SortSpectrumSamples(Float *lambda, Float *vals, int n)
 {
@@ -1268,4 +1254,9 @@ void SampledSpectrum::ToRGB(Float rgb[3]) const
       Float xyz[3];
       std::memcpy(xyz, rgb, sizeof(Float) * 3);
       XYZToRGB(xyz, rgb);
+}
+
+R8G8B8 RGBSpectrum::toR8G8B8() 
+{
+      return R8G8B8(rgb[0]*256, rgb[1]*256, rgb[2]*256);
 }
