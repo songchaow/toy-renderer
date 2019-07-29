@@ -4,6 +4,55 @@
 #include <cassert>
 #include <algorithm>
 #include "core/common.h"
+#include "core/sampler.h"
+
+Spectrum Material::sample_f(Interaction& i, Point2f sample, Float* pdf)
+{
+      int index = childSampler.sample(_sampler.Sample1D());
+      Material* chosen = children[index];
+      Spectrum ret = chosen->sample_f(i, sample, pdf);
+      *pdf *= probabilities[index];
+      return ret;
+}
+
+Spectrum SimpleMaterial::sample_f(Interaction& i, Point2f sample, Float* pdf)
+{
+      Spectrum throughput;
+      if(surface->isFlatSurface()) {
+            FlatSurface* flat = static_cast<FlatSurface*>(surface);
+            bool reflect = sample[0] > 0.5;
+            throughput = flat->sample_delta_f(reflect, i.wo, i.wi, i.n, pdf);
+      }
+      else {
+            GlossSurface* gloss = static_cast<GlossSurface*>(surface);
+            throughput = gloss->sample_f(sample, i.GetLocalWo(), i.wi, nullptr, pdf);
+      }
+      Spectrum color = texture->Evaluate(i.u, i.v).toRGBSpectrum();
+      return throughput * color;
+}
+
+void Material::AddSubMaterial(Material * m, Float scale)
+{
+      if (children.empty()) {
+            probabilities.push_back(1.f);
+            children.push_back(m);
+            return;
+      }
+      Float shrinkRatio = 1.f;
+      if (scale > 0.f)
+            shrinkRatio = 1 - scale;
+      else {
+            shrinkRatio = children.size() / (children.size() + 1);
+            scale = 1 / (children.size() + 1);
+      }
+      // shrink old children
+      for (auto& p : probabilities)
+            p *= shrinkRatio;
+      probabilities.push_back(scale);
+      children.push_back(m);
+      // update sampler
+      childSampler = StepSampler(probabilities);
+}
 
 Dielectric vacuum(1.f);
 
@@ -34,10 +83,10 @@ Spectrum Dielectric::Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt
 
 
 
-Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, SimpleMaterial* out_material, bool reflect) const
+Spectrum FlatSurface::delta_f(const Vector3f& wo, Vector3f & wi, Normal3f n, Surface* out_material, bool reflect) const
 {
       bool revert = SameOpposition(Normal3f(n), wo) ^ reflect;
-    if (out_material && out_material->m_surface == SimpleMaterial::Gloss) {
+    if (out_material && out_material->m_surface == Surface::Gloss) {
         LOG(WARNING) << "Transmissing from gloss material";
         return 0.f;
     }
@@ -47,7 +96,7 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, Si
       Float eta_in, eta_out;
       if (out_material) {
             // gloss material shouldn't be processed in this function
-            FlatMaterial* flat_out = static_cast<FlatMaterial*>(out_material);
+            FlatSurface* flat_out = static_cast<FlatSurface*>(out_material);
             // out_material can't be other materials
             if (flat_out->medium->m_type == ObjectMedium::Metal) {
                   LOG(WARNING) << "Tranmissing from metal to electric.";
@@ -97,19 +146,19 @@ Spectrum FlatMaterial::delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, Si
     }
 }
 
-Spectrum FlatMaterial::sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Vector3f n, Float* pdf) const {
+Spectrum FlatSurface::sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Normal3f n, Float* pdf) const {
       // currently randomly choose from reflection and transmission
       // TODO: sample according to r_mask and t_mask
       if (pdf) *pdf = 0.5;
       return delta_f(wo, wi, n, nullptr, sample);
 }
 
-Spectrum FlatMaterial::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossMaterial* out_material) const {
+Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossSurface* out_material) const {
       if (out_material == nullptr) {
             LOG(WARNING) << "Calling f while transmitting from flat material to vacuum";
             return 0;
       }
-      // both reflection and transmission will be delegated to GlossMaterial::f
+      // both reflection and transmission will be delegated to GlossSurface::f
       out_material->f(wo, wi, Normal3f(n), this);
       
 }

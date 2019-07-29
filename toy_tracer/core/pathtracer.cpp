@@ -23,7 +23,7 @@ Spectrum PathTracer::Li(Ray& ro) {
                   else {
                         Primitive* p = static_cast<Primitive*>(i.pTo);
                         if (p->getMaterial()->isFlatSurface()) {
-                              const FlatMaterial* flat_m = static_cast<const FlatMaterial*>(p->getMaterial());
+                              const FlatSurface* flat_m = static_cast<const FlatSurface*>(p->getMaterial());
                               Vector3f wi;
                               //fr = flat_m->delta_f(-ro.d, wi, (Vector3f)i.n, nullptr, true);
                               Float pdf;
@@ -32,8 +32,8 @@ Spectrum PathTracer::Li(Ray& ro) {
                               ro = Ray(i.pWorld, wi);
 
                         }
-                        else { // GlossMaterial
-                              const GlossMaterial* gloss_m = static_cast<const GlossMaterial*>(p->getMaterial());
+                        else { // GlossSurface
+                              const GlossSurface* gloss_m = static_cast<const GlossSurface*>(p->getMaterial());
                               Vector3f localWi;
                               Float pdf;
                               // wo and wi should be in the correct coordinate!

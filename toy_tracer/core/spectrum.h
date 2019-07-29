@@ -137,3 +137,11 @@ struct R8G8B8 {
     R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b;}
     RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0])/255,(Float)(rgb[1])/255,(Float)(rgb[2])/255); }
 };
+
+struct R8G8B8A8 {
+    char rgba[4];
+    R8G8B8A8() = default;
+    R8G8B8A8(char val) { for(int i = 0; i < 4; i++) rgba[i] = val;}
+    R8G8B8A8(char r, char g, char b, char a) { rgba[0] = r; rgba[1] = g; rgba[2] = b; rgba[3] = a;}
+    RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgba[0])/255,(Float)(rgba[1])/255,(Float)(rgba[2])/255); }
+};

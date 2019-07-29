@@ -15,7 +15,7 @@ int main() {
       Vector3f localWo = i.GetLocalWo();
       // wo calculated by sample_f
       Dielectric* d = new Dielectric();
-      FlatMaterial* flat_m = new FlatMaterial(d);
+      FlatSurface* flat_m = new FlatSurface(d);
       Vector3f localWi;
       Spectrum reflect = flat_m->delta_f(localWo, localWi, Vector3f(0, 0, 1), nullptr, true);
       std::cout << "localWo:" << localWo.x << " " << localWo.y << " " << localWo.z << std::endl;

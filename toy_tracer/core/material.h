@@ -4,7 +4,11 @@
 #include "core/geometry.h"
 #include <memory>
 #include <algorithm>
+#include <vector>
 #include "core/spectrum.h"
+#include "core/texture.h"
+#include "core/interaction.h"
+#include "core/sampler.h"
 
 /*  Medium
     defines how light changes its strength and orientation
@@ -21,42 +25,66 @@ public:
 
 class Material
 {
+      std::vector<Material*> children;
+      std::vector<Float> probabilities;
+      StepSampler childSampler;
+      Sampler _sampler;
+      void Normalize() {
+            Float sum = 0.f;
+            for (Float factor : probabilities)
+                  sum += factor;
+            for (Float& factor : probabilities)
+                  factor /= sum;
+      }
+      // default implementation: call sample_f on each child
+      virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf);
+public:
+      // default to use an averaged probability
+      void AddSubMaterial(Material* m, Float scale = 0.f);
 
 };
 
 class SimpleMaterial : public Material
 {
+      Surface* surface;
+      RGBTexture* texture;
+      // the unified interface
+      virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
+};
+
+class Surface
+{
     
 public:
       enum SurfaceType {Flat, Gloss};
-      SimpleMaterial(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type), R(R) {}
+      Surface(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type) {}
       bool isFlatSurface() const { return m_surface == Flat; }
       bool isGlossSurface() const { return m_surface == Gloss; }
       const SurfaceType m_surface;
 private:
-      const Spectrum R;
+      const Spectrum* scale;
 };
 
-class GlossMaterial;
-class FlatMaterial : public SimpleMaterial
+class GlossSurface;
+class FlatSurface : public Surface
 {
 public:
     const ObjectMedium* medium;
-    FlatMaterial(const ObjectMedium* medium, const Spectrum& R=1.f) :medium(medium), SimpleMaterial(SimpleMaterial::SurfaceType::Flat, R) {}
+    FlatSurface(const ObjectMedium* medium, const Spectrum& R=1.f) :medium(medium), Surface(Surface::SurfaceType::Flat, R) {}
     // wo, wi, n should be normalized, but needn't to be in reflection coordinate
-    Spectrum delta_f(const Vector3f& wo, Vector3f & wi, Vector3f n, SimpleMaterial* out_material, bool reflect) const;
-    Spectrum sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Vector3f n, Float* pdf) const;
+    Spectrum delta_f(const Vector3f& wo, Vector3f & wi, Normal3f n, Surface* out_material, bool reflect) const;
+    Spectrum sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Normal3f n, Float* pdf) const;
     // only valid when out_material is glossy
-    Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossMaterial* out_material) const;
+    Spectrum f(const Vector3f& wo, const Vector3f& wi, const Vector3f& n, const GlossSurface* out_material) const;
 };
 
-class GlossMaterial : public SimpleMaterial
+class GlossSurface : public Surface
 {
     
 public:
-    GlossMaterial(const Spectrum& R) : SimpleMaterial(Gloss, R) {}
-    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const = 0;
-    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const FlatMaterial* out_material, Float* pdf) const = 0;
+    GlossSurface(const Spectrum& R) : Surface(Gloss, R) {}
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatSurface* out_material) const = 0;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const FlatSurface* out_material, Float* pdf) const = 0;
 };
 
 /*  Dielectric
@@ -140,11 +168,11 @@ inline Float PdfFromWh2Wi(Float p_wh, const Vector3f& wh, const Vector3f& wo) {
       return p_wh / Dot(wh, wo) / 4;
 }
 
-inline Vector3f Reflect(const Vector3f &wo, const Vector3f &n) {
-      return -wo + 2 * Dot(wo, n) * n;
+inline Vector3f Reflect(const Vector3f &wo, const Normal3f &n) {
+      return -wo + 2 * Dot(wo, n) * Vector3f(n);
 }
 
-inline bool Refract(const Vector3f &wi, const Vector3f &n, Float eta,
+inline bool Refract(const Vector3f &wi, const Normal3f &n, Float eta,
       Vector3f &wt) {
       // Compute $\cos \theta_\roman{t}$ using Snell's law
       Float cosThetaI = Dot(n, wi);

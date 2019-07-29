@@ -44,7 +44,7 @@ Spectrum Scene::SampleDirectLight(Interaction & i) const
             return 0;
       }
       assert(p->getMaterial()->isGlossSurface());
-      const GlossMaterial* material = static_cast<const GlossMaterial*>(p->getMaterial());
+      const GlossSurface* material = static_cast<const GlossSurface*>(p->getMaterial());
       Spectrum Ld(0.f);
       for (auto& light : lights) {
             Float pdf;

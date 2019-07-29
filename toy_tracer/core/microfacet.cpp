@@ -45,7 +45,7 @@ Float BeckmannDistribution::Lambda(const Vector3f &w) const {
 
 // wo and wi need to be normalized, but not necessary to be in the correct frame
 // while wh is not required, if D(wh) is irrelevant with wh's length
-Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const {
+Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatSurface* out_material) const {
     bool exit = !SameOpposition(n, wi);
       // determine whether reflection or refraction happens.
     if (Dot(wo, n) * Dot(wi, n) > 0) { // reflection
@@ -91,7 +91,7 @@ Spectrum TorranceSparrow::f(const Vector3f& wo, const Vector3f& wi, const Normal
     ;
 }
 
-Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const FlatMaterial * out_material, Float* pdf) const
+Spectrum TorranceSparrow::sample_f(const Point2f & random, const Vector3f & wo, Vector3f & wi, const FlatSurface * out_material, Float* pdf) const
 {
       // wo and wi should be in the correct coordinate!
       // sample wh

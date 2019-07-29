@@ -12,6 +12,7 @@ struct Interaction {
       Normal3f n;
       Vector3f dpdu, dpdv;
       Vector3f wo;
+      Vector3f wi; // valid after sampling
       Float t;
       Vector3f GetLocalWo() const {
             Float height = Dot(wo, n);

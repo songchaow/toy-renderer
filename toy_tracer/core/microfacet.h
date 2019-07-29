@@ -47,12 +47,12 @@ private:
 
 
 
-class TorranceSparrow : public GlossMaterial
+class TorranceSparrow : public GlossSurface
 {
     const std::shared_ptr<const ObjectMedium> medium;
     const std::shared_ptr<const MicrofacetDistribution> distribution;
 public:
-    TorranceSparrow(const Spectrum& R, const ObjectMedium* medium,const MicrofacetDistribution* dist) :GlossMaterial(R),medium(medium),distribution(dist) {}
-    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatMaterial* out_material) const override;
-    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const FlatMaterial* out_material, Float *pdf) const override;
+    TorranceSparrow(const Spectrum& R, const ObjectMedium* medium,const MicrofacetDistribution* dist) :GlossSurface(R),medium(medium),distribution(dist) {}
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi, const Normal3f& n, const FlatSurface* out_material) const override;
+    virtual Spectrum sample_f(const Point2f& random, const Vector3f& wo, Vector3f& wi, const FlatSurface* out_material, Float *pdf) const override;
 };
