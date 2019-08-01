@@ -25,10 +25,48 @@ Spectrum SimpleMaterial::sample_f(Interaction& i, Point2f sample, Float* pdf)
       }
       else {
             GlossSurface* gloss = static_cast<GlossSurface*>(surface);
+            // wo must be transformed
             throughput = gloss->sample_f(sample, i.GetLocalWo(), i.wi, nullptr, pdf);
+            i.wi = i.GlobalDirection(i.wi);
       }
-      Spectrum color = texture->Evaluate(i.u, i.v).toRGBSpectrum();
+      Spectrum color = texture->Evaluate(i.u, i.v);
       return throughput * color;
+}
+
+Spectrum SimpleMaterial::f(const Interaction& i)
+{
+      if(surface->isFlatSurface())
+            return 0.f;
+      Spectrum color = texture->Evaluate(i.u, i.v);
+      GlossSurface* gloss = static_cast<GlossSurface*>(surface);
+      // needn't be in local space
+      Spectrum fr = gloss->f(i.wo, i.wi, i.n, nullptr);
+      return color * fr;
+}
+
+Spectrum Material::f(const Interaction& i)
+{
+      Spectrum sum;
+      for(auto m : children) {
+            if(m->isFlat())
+                  continue;
+            sum += m->f(i);
+      }
+
+}
+
+bool Material::isFlat()
+{
+      if(isflat_cache)
+            return *isflat_cache;
+      for(auto m : children) {
+            if(!m->isFlat()) {
+                  isflat_cache.reset(new bool(false));
+                  return false;
+            }
+      }
+      isflat_cache.reset(new bool(true));
+      return true;
 }
 
 void Material::AddSubMaterial(Material * m, Float scale)

@@ -116,26 +116,50 @@ struct RGBSpectrum {
       Float& operator[](int idx) { return rgb[idx]; }
 };
 
-RGBSpectrum operator+(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] + rhs.rgb[i]; }
-RGBSpectrum operator-(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] - rhs.rgb[i]; }
-RGBSpectrum operator*(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] * rhs.rgb[i]; }
-RGBSpectrum operator/(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] / rhs.rgb[i]; }
+RGBSpectrum operator+(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] + rhs.rgb[i]; return ret; }
+RGBSpectrum operator-(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] - rhs.rgb[i]; return ret; }
+RGBSpectrum operator*(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] * rhs.rgb[i]; return ret; }
+RGBSpectrum operator/(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] / rhs.rgb[i]; return ret; }
 
 static inline Float GammaTransform(Float stimus) {
       if (stimus <= 0.0031308f) return 12.92f * stimus;
       return 1.055f * std::pow(stimus, (Float)(1.f / 2.4f)) - 0.055f;
 }
 
+static inline Float GammaInvTransform(Float img_value) {
+      if (img_value <= 0.04045f) return img_value * 1.f / 12.92f;
+      return std::pow((img_value + 0.055f) * 1.f / 1.055f, (Float)2.4f);
+}
+
+// From Radiance 0-1 -> sRGB 0-256
 static Float GammaCorrection(Float stimus) {
       return 256 * Clamp(GammaTransform(stimus), 0, 1);
 }
+static R8G8B8 GammaCorrection(RGBSpectrum stimus) {
+      return R8G8B8(GammaCorrection(stimus[0]),
+                    GammaCorrection(stimus[1]),
+                    GammaCorrection(stimus[2]));
+}
+
+// sRGB 0-256 -> Radiance 0-1
+static Float InverseGammaCorrection(Float image_value) {
+      return GammaInvTransform(Clamp((Float)image_value/256, 0, 1));
+}
+static RGBSpectrum InverseGammaCorrection(R8G8B8 image_value) {
+      return RGBSpectrum(InverseGammaCorrection(image_value[0]),
+                         InverseGammaCorrection(image_value[1]),
+                         InverseGammaCorrection(image_value[2]));
+}
+
 
 struct R8G8B8 {
-    char rgb[3];
-    R8G8B8() = default;
-    R8G8B8(char val) { for(int i = 0; i < 3; i++) rgb[i] = val;}
-    R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b;}
-    RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0])/255,(Float)(rgb[1])/255,(Float)(rgb[2])/255); }
+      char rgb[3];
+      R8G8B8() = default;
+      explicit R8G8B8(char val) { for(int i = 0; i < 3; i++) rgb[i] = val;}
+      R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b;}
+      char& operator [](int idx) { return rgb[idx]; }
+      R8G8B8 operator/(Float div) { R8G8B8 ret(rgb[0]/div, rgb[1]/div, rgb[2]/div); return ret;}
+      RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0])/255,(Float)(rgb[1])/255,(Float)(rgb[2])/255); }
 };
 
 struct R8G8B8A8 {

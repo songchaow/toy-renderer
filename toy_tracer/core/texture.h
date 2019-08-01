@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <memory>
 
 #include "core/common.h"
 #include "core/geometry.h"
@@ -13,11 +14,20 @@ public:
       Element Evaluate(Point2f pos) {return Evaluate(pos.x, pos.y);};
 };
 
+template <typename Element>
+class ConstColorTexture : public Texture<Element> {
+      Element _color;
+public:
+      virtual Element Evaluate(Float u, Float v) { return _color; }
+      ConstColorTexture(Element color) : _color(color) {}
+};
+
 typedef Texture<Float> TextureF;
 typedef Texture<R8G8B8> RGBTexture;
+typedef Texture<RGBSpectrum> RGBSpectrumTexture;
 
-class ImageTexture : public RGBTexture {
-      Image* _image;
+class ImageTexture : public RGBSpectrumTexture {
+      std::shared_ptr<Image> _image;
 public:
       enum WrapMode {
             LOOP,
@@ -26,9 +36,9 @@ public:
 private:
       WrapMode _wrapMode;
 public:
-      ImageTexture(std::string img_path);
-      ImageTexture(Image* image);
+      ImageTexture(std::string img_path) : _image(std::make_shared<Image>(img_path)) {}
+      ImageTexture(Image* image) : _image(image) {}
 
 
-      R8G8B8 Evaluate(Float u, Float v) override;
+      RGBSpectrum Evaluate(Float u, Float v) override;
 };

@@ -9,10 +9,10 @@ bool UniformAreaLight::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, 
       Normal3f n;
       Point3f p = shape->SamplePoint(sample, i, n, pwi);
       wi = Normalize(p - i.pWorld);
-      Float lenSquared = (p - i.pWorld).LengthSquared();
       Float cosTheta = Dot(n, wi);
       if (cosTheta > 0)
             return false;
+      Float lenSquared = (p - i.pWorld).LengthSquared();
       cosTheta = -cosTheta;
       *pwi = *pwi * lenSquared / cosTheta;
       return true;

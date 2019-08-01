@@ -31,6 +31,7 @@ file(GLOB TRACER_LIB
 core/*.cpp
 light/*.cpp
 utils/*.cpp
+texture/*.cpp
 )
 add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO})
 target_link_libraries(tracer_lib glog)

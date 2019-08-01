@@ -22,27 +22,11 @@ Spectrum PathTracer::Li(Ray& ro) {
                   }
                   else {
                         Primitive* p = static_cast<Primitive*>(i.pTo);
-                        if (p->getMaterial()->isFlatSurface()) {
-                              const FlatSurface* flat_m = static_cast<const FlatSurface*>(p->getMaterial());
-                              Vector3f wi;
-                              //fr = flat_m->delta_f(-ro.d, wi, (Vector3f)i.n, nullptr, true);
-                              Float pdf;
-                              Spectrum fr = flat_m->sample_delta_f(sampler.SampleBool(), wo, wi, (Vector3f)i.n, &pdf);
-                              prefix *= (fr * AbsDot(wi, i.n) / pdf);
-                              ro = Ray(i.pWorld, wi);
-
-                        }
-                        else { // GlossSurface
-                              const GlossSurface* gloss_m = static_cast<const GlossSurface*>(p->getMaterial());
-                              Vector3f localWi;
-                              Float pdf;
-                              // wo and wi should be in the correct coordinate!
-                              Vector3f localWo = i.GetLocalWo();
-                              Spectrum fr = gloss_m->sample_f(sampler.Sample2D(), localWo, localWi, nullptr, &pdf);
-                              prefix *= (fr * CosTheta(localWi) / pdf);
-                              Vector3f wi = i.GlobalDirection(localWi);
-                              ro = Ray(i.pWorld, wi);
-                        }
+                        Material* material = p->getMaterial();
+                        Float pdf;
+                        Float fr = material->sample_f(i, sampler.Sample2D(), &pdf);
+                        prefix *= (fr * AbsDot(i.wi, i.n) / pdf);
+                        ro = Ray(i.pWorld, i.wi);
                   }
 
             }

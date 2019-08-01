@@ -36,20 +36,26 @@ class Material
             for (Float& factor : probabilities)
                   factor /= sum;
       }
+      // true if all children are flat surface
+      std::unique_ptr<bool> isflat_cache;
+public:
       // default implementation: call sample_f on each child
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf);
-public:
+      virtual Spectrum f(const Interaction& i);
       // default to use an averaged probability
       void AddSubMaterial(Material* m, Float scale = 0.f);
+      virtual bool isFlat();
 
 };
 
 class SimpleMaterial : public Material
 {
       Surface* surface;
-      RGBTexture* texture;
-      // the unified interface
+      RGBSpectrumTexture* texture;
+public:
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
+      virtual Spectrum f(const Interaction& i) override;
+      virtual bool isFlat() override { return surface->isFlatSurface(); }
 };
 
 class Surface

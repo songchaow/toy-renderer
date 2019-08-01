@@ -19,6 +19,8 @@ public:
       }
 };
 
+extern Sampler generalSampler;
+
 class StepSampler {
       std::vector<Float> prefix_sums;
 public:

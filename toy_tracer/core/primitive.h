@@ -7,11 +7,9 @@
 class Primitive : public Shapeable
 {
 private:
-      // TODO: general material type should be replaced for Surface later.
-      //Surface* m_material;
-      Surface* material;
-      RGBTexture* reflection;
+      Material* material;
+      RGBTexture* reflection; // currently not used
 public:
       Primitive(Shape* shape) :Shapeable(shape, ShapeID::Primitive) {}
-      const Surface* getMaterial() const { return material; }
+      Material* getMaterial() const { return material; }
 };
