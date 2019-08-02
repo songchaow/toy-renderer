@@ -16,7 +16,7 @@ class Film {
       Float& WeightSum(const Point2i& index) { assert(index.x < width && index.y < height); return weight_sum[index.y*width + index.x]; }
       RGBSpectrum& ContribSum(const Point2i& index) { assert(index.x < width && index.y < height); return matrix[index.y*width + index.x]; }
 public:
-      Film(Point2f& size) : width(size.x), height(size.y), matrix(new RGBSpectrum[width*height]()),
+      Film(Point2i& size) : width(size.x), height(size.y), matrix(new RGBSpectrum[width*height]()),
             weight_sum(new Float[width*height]()) {}
       const int getWidth() const { return width; }
       const int getHeight() const { return height; }

@@ -15,8 +15,8 @@ Transform Camera::Cam2NDC()
       // Scale
       Float height_original = film.getHeight() / film_distance;
       Float width_original = film.getWidth() / film_distance;
+      Transform t = Translate(Vector3f(width_original / 2, height_original / 2, 0));
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
-      Transform t = Translate(Vector3f(-width_original / 2, -height_original / 2, 0));
       return s * t * Transform(persp);
 }
 

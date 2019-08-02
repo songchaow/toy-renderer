@@ -10,6 +10,6 @@ private:
       Material* material;
       RGBTexture* reflection; // currently not used
 public:
-      Primitive(Shape* shape) :Shapeable(shape, ShapeID::Primitive) {}
+      Primitive(Shape* shape, Material* m) :Shapeable(shape, ShapeID::Primitive), material(m) {}
       Material* getMaterial() const { return material; }
 };

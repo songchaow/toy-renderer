@@ -30,8 +30,13 @@ Spectrum PathTracer::Li(Ray& ro) {
                   }
 
             }
-            scene->Intercept(ro, i);
+            if (!scene->Intercept(ro, i)) {
+                  Skybox* sky = scene->skybox();
+                  if (sky)
+                        Li = prefix * sky->Li(ro.d);
+            }
             wo = -ro.d;
+            currSegment++;
       }
       // At last, track to the light
       if (i.pTo->isLight()) {

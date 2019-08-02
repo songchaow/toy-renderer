@@ -1,6 +1,9 @@
 #include "core/texture.h"
 #include "core/image.h"
 
+ConstColorTexture<RGBSpectrum> blackConstantTexture = ConstColorTexture<RGBSpectrum>(RGBSpectrum(0.f, 0.f, 0.f));
+ConstColorTexture<RGBSpectrum> whiteConstantTexture = ConstColorTexture<RGBSpectrum>(RGBSpectrum(1.f, 1.f, 1.f));
+
 RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
 {
       if(_wrapMode==LOOP) {

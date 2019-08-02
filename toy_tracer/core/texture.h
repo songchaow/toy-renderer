@@ -26,6 +26,9 @@ typedef Texture<Float> TextureF;
 typedef Texture<R8G8B8> RGBTexture;
 typedef Texture<RGBSpectrum> RGBSpectrumTexture;
 
+extern ConstColorTexture<RGBSpectrum> blackConstantTexture;
+extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
+
 class ImageTexture : public RGBSpectrumTexture {
       std::shared_ptr<Image> _image;
 public:

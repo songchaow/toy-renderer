@@ -24,6 +24,7 @@ extern Sampler generalSampler;
 class StepSampler {
       std::vector<Float> prefix_sums;
 public:
+      StepSampler() = default;
       StepSampler(const std::vector<Float> &probabilities) {
             prefix_sums.push_back(0.f);
             Float sum = 0.f;

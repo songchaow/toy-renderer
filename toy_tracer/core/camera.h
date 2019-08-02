@@ -6,15 +6,15 @@
 #include "core/transform.h"
 #include "core/renderoption.h"
 #include "core/tracer.h"
+#include <cmath>
 
 class Camera {
-      Point3f view_point;
-      Vector3f d; // normalized
-      Transform cam2world; // initialized first
+      Transform cam2world;
       Transform world2cam;
-
-      Float film_distance;
+      Float film_distance = 1.f;
       Film film;
+      Float fov_Vertical;
+      // Following members are used in RTR
       Float clip_near;
       Float clip_far;
       // gives a transform from world space to NDC
@@ -23,7 +23,10 @@ class Camera {
       Scene* s;
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
-      void Render(RenderOption& options);
 public:
-      Camera(Scene* s, Transform cam2world, Point2f& film_size) :s(s),tracer(s), cam2world(cam2world), world2cam(cam2world.Inverse()), film(film_size) {}
+      Camera(Scene* s, Transform cam2world, Point2i& film_size, Float fov_Vertical = 60.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), cam2world(cam2world),
+            world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
+      void Render(RenderOption& options);
+      // Generate XMMATRIX using XMMatrixPerspectiveFovLH
+      // Generate OpenGL transform
 };

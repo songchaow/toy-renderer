@@ -39,6 +39,7 @@ class Material
       // true if all children are flat surface
       std::unique_ptr<bool> isflat_cache;
 public:
+      Material() = default;
       // default implementation: call sample_f on each child
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf);
       virtual Spectrum f(const Interaction& i);
@@ -53,6 +54,7 @@ class SimpleMaterial : public Material
       Surface* surface;
       RGBSpectrumTexture* texture;
 public:
+      SimpleMaterial(Surface* s, RGBSpectrumTexture* t = &whiteConstantTexture) : surface(s), texture(t) {}
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
       virtual Spectrum f(const Interaction& i) override;
       virtual bool isFlat() override { return surface->isFlatSurface(); }
@@ -104,7 +106,7 @@ public:
     // `out` here just means the outter substance. Not means scatterring into
     // Re-calculate cosWt if the argument is 0
     virtual Spectrum Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt=0) const;
-    Spectrum Fr_fromT(Float cosWo, Float cosWi, const ObjectMedium* out_medium) const;
+    //Spectrum Fr_fromT(Float cosWo, Float cosWi, const ObjectMedium* out_medium) const;
 private:
     Float eta;
     Spectrum r_mask = 1.f;

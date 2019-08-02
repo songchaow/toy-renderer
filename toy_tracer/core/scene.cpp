@@ -65,3 +65,9 @@ Spectrum Scene::SampleDirectLight(Interaction & i) const
       }
       return Ld;
 }
+
+void Scene::AddObj(Shapeable* obj) {
+      shapes.push_back(obj);
+      if (obj->isLight())
+            lights.push_back((Light*)(obj));
+}
