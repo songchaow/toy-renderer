@@ -4,6 +4,8 @@
 #include "core/transform.h"
 #include "core/interaction.h"
 
+constexpr Float MIN_DISTANCE = 0.01f;
+
 struct Interaction;
 class Shape {
 protected:

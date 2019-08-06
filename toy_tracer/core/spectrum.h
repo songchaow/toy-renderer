@@ -1,6 +1,7 @@
 #pragma once
 #include "core/common.h"
 #include "utils/array.h"
+#include "utils/utils.h"
 
 static const int nCIESamples = 471;
 extern const Float CIE_X[nCIESamples];
@@ -102,8 +103,6 @@ SampledSpectrum operator+(const SampledSpectrum& lhs, const SampledSpectrum& rhs
 SampledSpectrum operator-(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
 SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs);
 
-typedef RGBSpectrum Spectrum;
-
 struct R8G8B8;
 
 struct RGBSpectrum {
@@ -112,14 +111,20 @@ struct RGBSpectrum {
       RGBSpectrum(Float val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
       RGBSpectrum(Float r, Float g, Float b) {rgb[0] = r; rgb[1] = g; rgb[2] = b;}
       R8G8B8 toR8G8B8();
-      RGBSpectrum& operator/=(const RGBSpectrum& rhs) { for (int i = 0; i < 3; i++) rgb[i] /= rhs.rgb[i]; }
+      RGBSpectrum& operator/=(const RGBSpectrum& rhs) { for (int i = 0; i < 3; i++) rgb[i] /= rhs.rgb[i]; return *this; }
+      RGBSpectrum& operator+=(const RGBSpectrum& rhs) { for (int i = 0; i < 3; i++) rgb[i] += rhs.rgb[i]; return *this; }
+      RGBSpectrum& operator*=(const RGBSpectrum& rhs) { for (int i = 0; i < 3; i++) rgb[i] *= rhs.rgb[i]; return *this; }
+      RGBSpectrum operator-();
       Float& operator[](int idx) { return rgb[idx]; }
+      const Float& operator[](int idx) const { return rgb[idx]; }
 };
 
-RGBSpectrum operator+(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] + rhs.rgb[i]; return ret; }
-RGBSpectrum operator-(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] - rhs.rgb[i]; return ret; }
-RGBSpectrum operator*(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] * rhs.rgb[i]; return ret; }
-RGBSpectrum operator/(const SampledSpectrum& lhs, const RGBSpectrum& rhs) { RGBSpectrum ret; for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] / rhs.rgb[i]; return ret; }
+typedef RGBSpectrum Spectrum;
+
+RGBSpectrum operator+(const RGBSpectrum& lhs, const RGBSpectrum& rhs);
+RGBSpectrum operator-(const RGBSpectrum& lhs, const RGBSpectrum& rhs);
+RGBSpectrum operator*(const RGBSpectrum& lhs, const RGBSpectrum& rhs);
+RGBSpectrum operator/(const RGBSpectrum& lhs, const RGBSpectrum& rhs);
 
 static inline Float GammaTransform(Float stimus) {
       if (stimus <= 0.0031308f) return 12.92f * stimus;
@@ -130,6 +135,24 @@ static inline Float GammaInvTransform(Float img_value) {
       if (img_value <= 0.04045f) return img_value * 1.f / 12.92f;
       return std::pow((img_value + 0.055f) * 1.f / 1.055f, (Float)2.4f);
 }
+
+struct R8G8B8 {
+      unsigned char rgb[3];
+      R8G8B8() = default;
+      explicit R8G8B8(char val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
+      R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b; }
+      unsigned char& operator [](int idx) { return rgb[idx]; }
+      R8G8B8 operator/(Float div) { R8G8B8 ret(rgb[0] / div, rgb[1] / div, rgb[2] / div); return ret; }
+      RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0]) / 255, (Float)(rgb[1]) / 255, (Float)(rgb[2]) / 255); }
+};
+
+struct R8G8B8A8 {
+      char rgba[4];
+      R8G8B8A8() = default;
+      R8G8B8A8(char val) { for (int i = 0; i < 4; i++) rgba[i] = val; }
+      R8G8B8A8(char r, char g, char b, char a) { rgba[0] = r; rgba[1] = g; rgba[2] = b; rgba[3] = a; }
+      RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgba[0]) / 255, (Float)(rgba[1]) / 255, (Float)(rgba[2]) / 255); }
+};
 
 // From Radiance 0-1 -> sRGB 0-256
 static Float GammaCorrection(Float stimus) {
@@ -150,22 +173,3 @@ static RGBSpectrum InverseGammaCorrection(R8G8B8 image_value) {
                          InverseGammaCorrection(image_value[1]),
                          InverseGammaCorrection(image_value[2]));
 }
-
-
-struct R8G8B8 {
-      char rgb[3];
-      R8G8B8() = default;
-      explicit R8G8B8(char val) { for(int i = 0; i < 3; i++) rgb[i] = val;}
-      R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b;}
-      char& operator [](int idx) { return rgb[idx]; }
-      R8G8B8 operator/(Float div) { R8G8B8 ret(rgb[0]/div, rgb[1]/div, rgb[2]/div); return ret;}
-      RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0])/255,(Float)(rgb[1])/255,(Float)(rgb[2])/255); }
-};
-
-struct R8G8B8A8 {
-    char rgba[4];
-    R8G8B8A8() = default;
-    R8G8B8A8(char val) { for(int i = 0; i < 4; i++) rgba[i] = val;}
-    R8G8B8A8(char r, char g, char b, char a) { rgba[0] = r; rgba[1] = g; rgba[2] = b; rgba[3] = a;}
-    RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgba[0])/255,(Float)(rgba[1])/255,(Float)(rgba[2])/255); }
-};

@@ -43,6 +43,8 @@ bool Sphere::InterceptP(const Ray& r0, Interaction* i) const {
       if (t0*t1 <= 0) ti = std::max(t0, t1);
       else if (t0 > 0) ti = std::min(t0, t1);
       else return false; // both negative
+      if (ti <= MIN_DISTANCE) // avoid 
+            return false;
       if (i)
             i->t = ti;
       return true;

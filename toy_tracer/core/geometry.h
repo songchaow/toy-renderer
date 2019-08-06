@@ -72,6 +72,7 @@ class Point3 {
         : x((T)p.x), y((T)p.y), z((T)p.z) {
         DCHECK(!HasNaNs());
     }
+    template <typename U>
     explicit Point3(const Vector3<U> &p)
           : x((T)p.x), y((T)p.y), z((T)p.z) {
           DCHECK(!HasNaNs());
@@ -427,6 +428,8 @@ class Normal3 {
         return *this;
     }
 #endif  // !NDEBUG
+
+#ifdef NDEBUG
     explicit Normal3<T>(const Vector3<T> &v) : x(v.x), y(v.y), z(v.z) {
         DCHECK(!v.HasNaNs());
     }
@@ -436,6 +439,7 @@ class Normal3 {
     bool operator!=(const Normal3<T> &n) const {
         return x != n.x || y != n.y || z != n.z;
     }
+#endif
 
     T operator[](int i) const {
         DCHECK(i >= 0 && i <= 2);
@@ -692,7 +696,7 @@ inline std::ostream &operator<<(std::ostream &os, const Vector3<Float> &v) {
     return os;
 }
 
-typedef Vector2<Float> Point2f;
+typedef Vector2<Float> Vector2f;
 typedef Vector2<int> Vector2i;
 typedef Vector3<Float> Vector3f;
 typedef Vector3<int> Vector3i;

@@ -52,7 +52,7 @@ Spectrum Material::f(const Interaction& i)
                   continue;
             sum += m->f(i);
       }
-
+      return sum;
 }
 
 bool Material::isFlat()
@@ -173,7 +173,7 @@ Spectrum FlatSurface::delta_f(const Vector3f& wo, Vector3f & wi, Normal3f n, Sur
     else
     {
         // wt known; wo=wt; calculate wi;
-        if(!Refract(wo, n, eta_out / eta_in, wi))
+        if(!Refract(wo, -n, eta_out / eta_in, wi))
               return 0;
         Float cosThetaI = Dot(wi, n); // dot itself is positive
         DLOG_IF(ERROR, cosThetaI < 0) << "cosThetaI < 0";

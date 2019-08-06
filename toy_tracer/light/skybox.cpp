@@ -14,4 +14,5 @@ bool Skybox::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pdf
       // TODO: if only transmissive or reflective material is found,
       // only sample hemisphere. Then pdf needs to be changed to 1/2Pi
       wi = SampleUnitSphere(sample);
+      return true;
 }

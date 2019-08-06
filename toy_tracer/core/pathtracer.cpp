@@ -24,7 +24,7 @@ Spectrum PathTracer::Li(Ray& ro) {
                         Primitive* p = static_cast<Primitive*>(i.pTo);
                         Material* material = p->getMaterial();
                         Float pdf;
-                        Float fr = material->sample_f(i, sampler.Sample2D(), &pdf);
+                        Spectrum fr = material->sample_f(i, sampler.Sample2D(), &pdf);
                         prefix *= (fr * AbsDot(i.wi, i.n) / pdf);
                         ro = Ray(i.pWorld, i.wi);
                   }
@@ -34,6 +34,9 @@ Spectrum PathTracer::Li(Ray& ro) {
                   Skybox* sky = scene->skybox();
                   if (sky)
                         Li = prefix * sky->Li(ro.d);
+                  else
+                        Li = 0.f;
+                  return Li;
             }
             wo = -ro.d;
             currSegment++;

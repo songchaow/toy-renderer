@@ -1149,7 +1149,39 @@ void SortSpectrumSamples(Float *lambda, Float *vals, int n)
     }
 }
 
+RGBSpectrum RGBSpectrum::operator-() {
+      RGBSpectrum ret;
+      for (int i = 0; i < 3; i++)
+            ret[i] = -rgb[i];
+      return ret;
+}
 
+RGBSpectrum operator+(const RGBSpectrum& lhs, const RGBSpectrum& rhs) {
+      RGBSpectrum ret;
+      for (int i = 0; i < 3; i++) ret.rgb[i] = lhs[i] + rhs.rgb[i];
+      return ret;
+}
+
+RGBSpectrum operator-(const RGBSpectrum& lhs, const RGBSpectrum& rhs) {
+      RGBSpectrum ret;
+      for (int i = 0; i < 3; i++)
+            ret.rgb[i] = lhs[i] - rhs.rgb[i];
+      return ret;
+}
+
+RGBSpectrum operator*(const RGBSpectrum& lhs, const RGBSpectrum& rhs) {
+      RGBSpectrum ret;
+      for (int i = 0; i < 3; i++)
+            ret.rgb[i] = lhs[i] * rhs.rgb[i];
+      return ret;
+}
+
+RGBSpectrum operator/(const RGBSpectrum& lhs, const RGBSpectrum& rhs) {
+      RGBSpectrum ret;
+      for (int i = 0; i < 3; i++)
+            ret.rgb[i] = lhs[i] / rhs.rgb[i];
+      return ret; 
+}
 
 void SampledSpectrum::FromSampled(Float lambdas[], Float values[], int n, SampledSpectrum* s)
 {

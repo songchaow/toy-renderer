@@ -51,11 +51,6 @@ Image::~Image()
       }
 }
 
-Image::Image(std::string path, Format flags)
-{
-      loaded = LoadFromFile(path);
-}
-
 R8G8B8 Image::R8G8B8Pixel(int i, int j)
 {
       if(!data) return ::R8G8B8(0.f);

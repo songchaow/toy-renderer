@@ -7,15 +7,23 @@ class Sampler {
       std::random_device r;
       std::mt19937 raw_random;
       std::uniform_real_distribution<Float> uniform_dist;
+      std::uniform_real_distribution<Float> uniform_dist2;
 public:
       Sampler() : raw_random(r()), uniform_dist(0.0, 1.0) {}
       bool SampleBool(Float p_true = 0.5);
       Float Sample1D() { return uniform_dist(raw_random); }
       Point2f Sample2D() {
-            return { uniform_dist(raw_random),uniform_dist(raw_random) };
+            return Point2f(uniform_dist(raw_random), uniform_dist2(raw_random));
       }
       Point2f SamplePixel(Float startx, Float starty) {
             return { startx + uniform_dist(raw_random),starty + uniform_dist(raw_random) };
+      }
+      void SetUniformDist(Float xstart, Float xend, Float ystart, Float yend) { 
+            uniform_dist = std::uniform_real_distribution<Float>(xstart, xend);
+            uniform_dist2 = std::uniform_real_distribution<Float>(ystart, yend);
+      }
+      void ResetUniformDist() {
+            uniform_dist = uniform_dist2 = std::uniform_real_distribution<Float>();
       }
 };
 

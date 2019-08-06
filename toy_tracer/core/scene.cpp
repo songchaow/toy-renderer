@@ -52,7 +52,7 @@ Spectrum Scene::SampleDirectLight(Interaction & i) const
                         Spectrum Li = light->Li(wi);
                         Float cosWi = AbsDot(i.n, wi);
                         i.wi = wi;
-                        Float fr = material->f(i);
+                        Spectrum fr = material->f(i);
                         Ld += fr * Li*cosWi / pdf;
                   }
                   else

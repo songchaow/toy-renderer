@@ -14,6 +14,7 @@ public:
       // i.wo must be valid
       bool Visible(Interaction & i, const Vector3f& wi, Light* l) const;
       Spectrum SampleDirectLight(Interaction& i) const;
+      void setSkybox(Skybox* skybox) { _skybox = skybox; }
       Skybox* skybox() const { return _skybox; }
       void AddObj(Shapeable* obj);
 };

@@ -49,6 +49,19 @@ public:
 
 };
 
+class Surface
+{
+
+public:
+      enum SurfaceType { Flat, Gloss };
+      Surface(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type) {}
+      bool isFlatSurface() const { return m_surface == Flat; }
+      bool isGlossSurface() const { return m_surface == Gloss; }
+      const SurfaceType m_surface;
+private:
+      const Spectrum* scale;
+};
+
 class SimpleMaterial : public Material
 {
       Surface* surface;
@@ -58,19 +71,6 @@ public:
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
       virtual Spectrum f(const Interaction& i) override;
       virtual bool isFlat() override { return surface->isFlatSurface(); }
-};
-
-class Surface
-{
-    
-public:
-      enum SurfaceType {Flat, Gloss};
-      Surface(const SurfaceType m_type, const Spectrum& R) :m_surface(m_type) {}
-      bool isFlatSurface() const { return m_surface == Flat; }
-      bool isGlossSurface() const { return m_surface == Gloss; }
-      const SurfaceType m_surface;
-private:
-      const Spectrum* scale;
 };
 
 class GlossSurface;

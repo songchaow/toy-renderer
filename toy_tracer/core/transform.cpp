@@ -60,9 +60,9 @@ Normal3f Transform::operator() (const Normal3f& n) const {
       // TODO: cache mInv?
       Matrix4 mInv = ::Inverse(m);
       // use the transposed matrix
-      ret.x = mInv[0][1] * n[0] + mInv[1][1] * n[1] + mInv[2][1] * n[2];
-      ret.y = mInv[0][2] * n[0] + mInv[1][2] * n[1] + mInv[2][2] * n[2];
-      ret.z = mInv[0][3] * n[0] + mInv[1][3] * n[1] + mInv[2][3] * n[3];
+      ret.x = mInv[0][0] * n[0] + mInv[1][0] * n[1] + mInv[2][0] * n[2];
+      ret.y = mInv[0][1] * n[0] + mInv[1][1] * n[1] + mInv[2][1] * n[2];
+      ret.z = mInv[0][2] * n[0] + mInv[1][2] * n[1] + mInv[2][2] * n[2];
       return ret;
 }
 
