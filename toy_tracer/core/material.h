@@ -21,6 +21,7 @@ public:
     const ObjectType m_type;
     ObjectMedium(const ObjectType type) : m_type(type) {}
     virtual Spectrum Fr(Float cosWi, const ObjectMedium* out_medium, Float cosWt = 0) const = 0;
+    bool isDielectric() const { return m_type == Dielectric; }
 };
 
 class Material

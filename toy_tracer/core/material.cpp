@@ -173,8 +173,10 @@ Spectrum FlatSurface::delta_f(const Vector3f& wo, Vector3f & wi, Normal3f n, Sur
     else
     {
         // wt known; wo=wt; calculate wi;
-        if(!Refract(wo, -n, eta_out / eta_in, wi))
+        if (!Refract(wo, -n, eta_in / eta_out, wi)) {
+              DLOG(WARNING) << "Total Reflection when refracting";
               return 0;
+        }
         Float cosThetaI = Dot(wi, n); // dot itself is positive
         DLOG_IF(ERROR, cosThetaI < 0) << "cosThetaI < 0";
         Float cosWo = -Dot(n, wo); // dot itself is negative
@@ -187,6 +189,8 @@ Spectrum FlatSurface::delta_f(const Vector3f& wo, Vector3f & wi, Normal3f n, Sur
 Spectrum FlatSurface::sample_delta_f(bool sample, const Vector3f& wo, Vector3f & wi, Normal3f n, Float* pdf) const {
       // currently randomly choose from reflection and transmission
       // TODO: sample according to r_mask and t_mask
+      if (medium->isDielectric() && !Refract(wo, -n, 1.f / static_cast<const Dielectric*>(medium)->GetEta(), wi))
+            sample = true;
       if (pdf) *pdf = 0.5;
       return delta_f(wo, wi, n, nullptr, sample);
 }

@@ -156,7 +156,7 @@ struct R8G8B8A8 {
 
 // From Radiance 0-1 -> sRGB 0-256
 static Float GammaCorrection(Float stimus) {
-      return 256 * Clamp(GammaTransform(stimus), 0, 1);
+      return 255.99f * Clamp(GammaTransform(stimus), 0, 1);
 }
 static R8G8B8 GammaCorrection(RGBSpectrum stimus) {
       return R8G8B8(GammaCorrection(stimus[0]),

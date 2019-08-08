@@ -5,7 +5,7 @@
 #include <vector>
 class Sampler {
       std::random_device r;
-      std::mt19937 raw_random;
+      std::minstd_rand raw_random;
       std::uniform_real_distribution<Float> uniform_dist;
       std::uniform_real_distribution<Float> uniform_dist2;
 public:

@@ -33,6 +33,8 @@ void Film::writePNG(const std::string& path) const {
                   img[(i*width + j) * 3] = GammaCorrection(ContribSum({ i,j })[0]);
                   img[(i*width + j) * 3 + 1] = GammaCorrection(ContribSum({ i,j })[1]);
                   img[(i*width + j) * 3 + 2] = GammaCorrection(ContribSum({ i,j })[2]);
+                  /*if (img[(i*width + j) * 3] == 0)
+                        LOG(WARNING) << "R:" << img[(i*width + j) * 3] << " G:" << img[(i*width + j) * 3 + 1] << " B:" << img[(i*width + j) * 3 + 2];*/
             }
       }
       lodepng_encode24_file(path.c_str(), img.get(), width, height);

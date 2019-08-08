@@ -93,8 +93,8 @@ Vector3f SampleUnitSphere(const Point2f& sample) {
 
 Point3f Sphere::SamplePoint(Point2f & random, Interaction & i, Normal3f & n, Float* pdf) const
 {
-      Point3f p_n(SampleUnitSphere(random));
-      n = obj2world(Normal3f(p_n));
+      Vector3f p_n(SampleUnitSphere(random));
+      n = obj2world((Normal3f)(p_n));
       if (pdf)
             *pdf = 1.f / Area();
       return obj2world(Point3f(p_n*radius));
