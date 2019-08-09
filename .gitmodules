@@ -1,3 +1,0 @@
-[submodule "toy_tracer/ext/assimp"]
-	path = toy_tracer/ext/assimp
-	url = https://github.com/assimp/assimp
