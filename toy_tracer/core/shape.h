@@ -4,6 +4,8 @@
 #include "core/transform.h"
 #include "core/interaction.h"
 
+#include <vector>
+
 constexpr Float MIN_DISTANCE = 0.01f;
 
 struct Interaction;
@@ -11,7 +13,11 @@ class Shape {
 protected:
       Transform world2obj, obj2world;
 public:
-      Shape(Transform& obj2world) :obj2world(obj2world), world2obj(obj2world.Inverse()) {}
+      Shape(Transform& obj2world) :obj2world(obj2world) {
+            obj2world.Inverse(&world2obj);
+            obj2world.setInverse(&world2obj);
+            world2obj.setInverse(&obj2world);
+      }
       virtual Float Area() const = 0;
       virtual bool Intercept(const Ray& r, Interaction& i) const = 0;
       // only returns ray's t, and stores useful intermediate results in i

@@ -18,12 +18,17 @@ extern Matrix4 Inverse(const Matrix4 &m);
 
 struct Transform {
       Matrix4 m;
+      Transform* tInv = nullptr;
+      Transform() = default;
       Transform(Float m[4][4]) : m(m[0][0], m[0][1], m[0][2], m[0][3],
             m[1][0], m[1][1], m[1][2], m[1][3],
             m[2][0], m[2][1], m[2][2], m[2][3],
             m[3][0], m[3][1], m[3][2], m[3][3]) {}
       Transform(Matrix4& m) : m(m) {}
       Transform Inverse() { return Transform(::Inverse(m)); }
+      void Inverse(Transform* _tInv) { *_tInv = ::Inverse(m); }
+      void setInverse(Transform* _tInv) { tInv = _tInv; }
+      const Matrix4* getMatrix() const { return &m; }
       Point3f operator() (const Point3f& o) const;
       Ray operator()(const Ray& r) const;
       Vector3f operator() (const Vector3f& o) const;
