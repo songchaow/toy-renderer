@@ -42,6 +42,7 @@ Spectrum PathTracer::Li(Ray& ro) {
             currSegment++;
       }
       // At last, track to the light
+      LOG(INFO) << "Abort tracing";
       if (i.pTo->isLight()) {
             UniformAreaLight* el = static_cast<UniformAreaLight*>(i.pTo);
             Li = prefix * el->Li(i.wo);

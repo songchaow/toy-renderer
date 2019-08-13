@@ -25,6 +25,17 @@ file(GLOB IMAGE_IO ext/std_image/include/*.h
   ext/std_image/src/*.cpp
 )
 
+# assimp
+INCLUDE_DIRECTORIES (
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/include
+)
+
+# qt
+set(CMAKE_AUTOMOC ON)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+qt5_wrap_ui(ui_headers main/mainwindow.ui)
+
 # toy tracer
 file(GLOB TRACER_LIB 
 *.cpp *.h *.hpp
@@ -32,17 +43,23 @@ core/*.cpp
 light/*.cpp
 utils/*.cpp
 texture/*.cpp
+shape/*.cpp
 )
 add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO})
-target_link_libraries(tracer_lib glog)
+target_link_libraries(tracer_lib glog Qt5::Widgets)
+if (MSVC)
+  target_link_libraries(tracer_lib ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp.lib)
+endif (MSVC)
+# TODO: add link statements for Linux
 
 file(GLOB TRACER_EXE
     main/*.cpp
+    main/*.h
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable (toytracer ${TRACER_EXE})
+add_executable (toytracer ${TRACER_EXE} ${ui_headers})
 target_link_libraries(toytracer tracer_lib)
 
 # TODO: 如有需要，请添加测试并安装目标。

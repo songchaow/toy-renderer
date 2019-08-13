@@ -11,9 +11,10 @@
 
 int renderTest() {
       // Scene object initialization
-      ConstColorTexture<RGBSpectrum>* skycolor = new ConstColorTexture<RGBSpectrum>(RGBSpectrum(255));
-      RGBSpectrumTexture* cb = new CheckerBoard(R8G8B8(255, 255, 255), R8G8B8(255, 0, 0), 40);
-      Skybox* skybox = new Skybox(cb);
+      
+      RGBSpectrumTexture* board_texture = new CheckerBoard(R8G8B8(255, 255, 255), R8G8B8(255, 0, 0), 40);
+      ConstColorTexture<RGBSpectrum>* skycolor = new ConstColorTexture<RGBSpectrum>(RGBSpectrum(1.f, 1.f, 1.f));
+      Skybox* skybox = new Skybox(skycolor);
       auto transform = Translate(Vector3f(0, 0.f, 10.f));
       Sphere* sphere_shape = new Sphere(8.f, transform);
       Dielectric* d = new Dielectric();
@@ -28,7 +29,7 @@ int renderTest() {
       // Camera
       Camera cam(scene, Translate(Vector3f(0, 0, -10.f)), Point2i(500, 500));
       RenderOption options;
-      options.sample_per_pixel = 100;
+      options.sample_per_pixel = 1024;
       cam.Render(options);
       const Film& film = cam.getFilm();
       film.writePNG("hopefully.png");

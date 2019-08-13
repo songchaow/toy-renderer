@@ -17,8 +17,7 @@ class Camera {
       // Following members are used in RTR
       Float clip_near;
       Float clip_far;
-      // gives a transform from world space to NDC
-      Transform Cam2NDC();
+      
 
       Scene* s;
       PathTracer tracer;
@@ -29,5 +28,6 @@ public:
       void Render(RenderOption& options);
       const Film& getFilm() const { return film; }
       // Generate XMMATRIX using XMMatrixPerspectiveFovLH
-      // Generate OpenGL transform
+      // Generate OpenGL transform, row major order
+      Transform Cam2NDC();
 };
