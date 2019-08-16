@@ -1,7 +1,7 @@
 #include "light/area.h"
 
 Spectrum UniformAreaLight::Li(Vector3f &w) const {
-      return emit;
+      return Le;
 }
 
 bool UniformAreaLight::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pwi) const {

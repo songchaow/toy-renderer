@@ -3,10 +3,12 @@
 #include <QWindow>
 #include <QOpenGLExtraFunctions>
 
-class Canvas : public QWindow, public QOpenGLExtraFunctions {
+class Canvas : public QWindow, public QOpenGLFunctions {
       QOpenGLContext* m_context;
 public:
-      Canvas() {
+      Canvas() { setSurfaceType(QWindow::OpenGLSurface); }
+
+      void initialize() {
             m_context = new QOpenGLContext();
             m_context->setFormat(requestedFormat());
             m_context->create();
@@ -15,10 +17,12 @@ public:
       }
 
       void resize() {
-            glViewport(0, 0, size().width, size().height);
+            glViewport(0, 0, size().width(), size().height());
       }
 
       void render() {
+            GLenum a;
+            
             ;
       }
 

@@ -3,22 +3,25 @@
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/interaction.h"
+#include "main/scene_object.h"
 
 #include <vector>
+#include <string>
 
 constexpr Float MIN_DISTANCE = 0.01f;
 
 struct Interaction;
-class Shape {
+class Shape : public RendererObject {
 protected:
       Transform world2obj, obj2world;
 public:
-      Shape(Transform& obj2world) :obj2world(obj2world) {
+      Shape(Transform& obj2world) :obj2world(obj2world), RendererObject(TypeID::Shape, QString::fromStdString(shapeName())) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
             world2obj.setInverse(&obj2world);
       }
       virtual Float Area() const = 0;
+      virtual std::string shapeName() const = 0;
       virtual bool Intercept(const Ray& r, Interaction& i) const = 0;
       // only returns ray's t, and stores useful intermediate results in i
       virtual bool InterceptP(const Ray& r, Interaction* i) const = 0;
@@ -26,12 +29,14 @@ public:
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const = 0;
       virtual Point3f PointfromUV(Float u, Float v, Normal3f* n) const = 0;
       virtual Point3f SamplePoint(Point2f& random, Interaction& i, Normal3f& n, Float* pdf) const = 0;
+      virtual void addProperties(QWidget* parent);
 };
 
 class Sphere : public Shape {
       Float radius; // radius in object space
 public:
       Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
+      virtual std::string shapeName() const { return "Sphere"; }
       virtual Float Area() const override { return 4 * Pi*radius*radius; }
       virtual bool Intercept(const Ray& r, Interaction& i) const override;
       virtual bool InterceptP(const Ray& r, Interaction* i) const override;
@@ -43,6 +48,8 @@ public:
 
 Vector3f SampleUnitSphere(const Point2f& sample);
 
+class TriangleMesh;
+
 class Shapeable {
 public:
       enum ShapeID {
@@ -50,15 +57,18 @@ public:
             Light
       };
 protected:
-      Shape* shape;
+      Shape* shape; // nullptr means it's contructed directly by mesh
       ShapeID s_id;
+      TriangleMesh* _mesh;
 public:
       Shapeable(Shape* shape, ShapeID s_id) : shape(shape), s_id(s_id) {}
       Float Area() const { return shape->Area(); }
-
+      std::string getShapeName() const { return shape->shapeName(); }
       bool isPrimitive() const { return s_id == Primitive; }
       bool isLight() const { return s_id == Light; }
       bool Intercept(const Ray& r, Interaction& i) const { return shape->Intercept(r, i); }
       bool InterceptP(const Ray& r, Interaction* i) const { return shape->InterceptP(r, i); }
       bool ComputeDiff(const Ray& r, Interaction* i) const { return shape->ComputeDiff(r, i); }
+      TriangleMesh* getMesh() { return _mesh; }
+      void setMesh(TriangleMesh* m) { _mesh = m; }
 };

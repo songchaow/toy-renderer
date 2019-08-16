@@ -2,7 +2,7 @@
 #include "core/light.h"
 #include "core/shape.h"
 class UniformAreaLight : public Light, public Shapeable {
-      Spectrum emit;
+      Spectrum Le;
 public:
       virtual Spectrum Li(Vector3f &w) const override;
       // fills i.wo

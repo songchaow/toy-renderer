@@ -28,7 +28,7 @@ struct Transform {
       Transform Inverse() { return Transform(::Inverse(m)); }
       void Inverse(Transform* _tInv) { *_tInv = ::Inverse(m); }
       void setInverse(Transform* _tInv) { tInv = _tInv; }
-      const Matrix4* getRowMajorData() const { return &m[0][0]; }
+      const Matrix4* getRowMajorData() const { return &m; }
       Point3f operator() (const Point3f& o) const;
       Ray operator()(const Ray& r) const;
       Vector3f operator() (const Vector3f& o) const;

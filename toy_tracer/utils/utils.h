@@ -29,8 +29,10 @@ inline bool Quadratic(Float a, Float b, Float c, Float *t0, Float *t1) {
             q = -.5 * (b - rootDiscrim);
       else
             q = -.5 * (b + rootDiscrim);
-      *t0 = q / a;
-      *t1 = c / q;
+      *t0 = (Float)q / a;
+      *t1 = c / (Float)q;
       if (*t0 > *t1) std::swap(*t0, *t1);
       return true;
 }
+
+#define GEN_VERBOSE_STRING_MAP(str) {str, #str}
