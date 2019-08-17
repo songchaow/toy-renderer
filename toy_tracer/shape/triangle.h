@@ -8,8 +8,9 @@ class Triangle;
 class TriangleMesh {
       // for generated meshes, those transforms are copied from the Shape object.
       Transform world2obj, obj2world;
-      void* raw_data = nullptr;
-      std::vector<Triangle> face_indices;
+      void* vertex_data = nullptr;
+      void* index_data = nullptr;
+
 public:
       enum ArrayType {
             ARRAY_VERTEX = 0,
@@ -35,11 +36,13 @@ public:
       using Layout = std::vector<LayoutItem>;
 private:
       Layout layout;
+      GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* raw_data, Layout l) : raw_data(raw_data), layout(l) {}
-      ~TriangleMesh() { if (raw_data) delete[] (char*)raw_data; }
+      TriangleMesh(void* raw_data, Layout l, void* index_data, GLenum idxFormat)
+            : vertex_data(raw_data), layout(l), index_data(index_data), indexFormat(idxFormat) {}
+      ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
 };
 
 class Triangle : public Shape {

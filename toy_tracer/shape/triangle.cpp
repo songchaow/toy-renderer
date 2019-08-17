@@ -32,6 +32,7 @@ TriangleMesh* LoadTriangleMesh(const std::string& path) {
                   TriangleMesh::LayoutItem normLayout = {};
                   normLayout.type = TriangleMesh::ArrayType::ARRAY_NORMAL;
                   normLayout.e_count = 3;
+                  // ai_real(float) same size as GL_FLOAT?
                   normLayout.e_format = GL_FLOAT;
                   normLayout.e_size = sizeof(ai_real);
                   normLayout.offset = curr_strip;
@@ -63,7 +64,13 @@ TriangleMesh* LoadTriangleMesh(const std::string& path) {
                         p_char += item.strip;
                   }
             }
-            TriangleMesh* tri_mesh = new TriangleMesh(raw_data, layout);
+            // copy faces
+            uint32_t* idx_data = new uint32_t[3 * mesh->mNumFaces];
+            for (int i = 0; i < mesh->mNumFaces; i++) {
+                  for (int j = 0; j < 3; j++)
+                        idx_data[i * 3 + j] = mesh->mFaces[i].mIndices[j];
+            }
+            TriangleMesh* tri_mesh = new TriangleMesh(raw_data, layout, idx_data, GL_UNSIGNED_INT);
             return tri_mesh;
       }
 
