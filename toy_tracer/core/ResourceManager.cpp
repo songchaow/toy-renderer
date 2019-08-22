@@ -11,8 +11,7 @@ ResourceManager* ResourceManager::getInstance() {
 
 void ResourceManager::loadFile(QString path) {
       if (path.endsWith("obj", Qt::CaseInsensitive)) {
-            TriangleMesh* mesh = LoadTriangleMesh(path.toStdString());
-            Primitive* p = CreatePrimitiveFromMesh(mesh);
+            Primitive* p = CreatePrimitiveFromModelFile(path.toStdString());
             _loadList.push_back(p);
       }
 }

@@ -3,14 +3,20 @@
 #include <QOpenGLExtraFunctions>
 #include <string>
 #include <memory>
+#include <assimp/scene.h>           // Output data structure
 
 class Triangle;
 class TriangleMesh {
       // for generated meshes, those transforms are copied from the Shape object.
       Transform world2obj, obj2world;
+      uint16_t vertex_num = 0;
+      uint16_t vbuffer_size = 0;
       void* vertex_data = nullptr;
+      uint16_t index_num = 0;
       void* index_data = nullptr;
-
+      GLuint vao = 0; // vertex array object
+      GLuint vbo = 0; // vertex buffer object
+      GLuint ebo = 0; // element buffer object
 public:
       enum ArrayType {
             ARRAY_VERTEX = 0,
@@ -30,6 +36,7 @@ public:
             GLenum e_format;    // element type in one unit
             GLint e_size;     // element size(in byte)
             uint16_t e_count; // element count in one unit
+            bool normalized = false;
             GLint offset;     // offset in the strip
             void* data_ptr;
       };
@@ -40,8 +47,14 @@ private:
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* raw_data, Layout l, void* index_data, GLenum idxFormat)
-            : vertex_data(raw_data), layout(l), index_data(index_data), indexFormat(idxFormat) {}
+      TriangleMesh(void* raw_data, Layout l, uint16_t vb_size, uint16_t vertex_num, void* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
+            : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
+            index_data(index_data), index_num(index_num), indexFormat(idxFormat) {
+            obj2world.Inverse(&world2obj);
+            obj2world.setInverse(&world2obj);
+            world2obj.setInverse(&obj2world);
+      }
+      void load(QOpenGLExtraFunctions* f);
       ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
 };
 
@@ -59,3 +72,4 @@ public:
 };
 
 TriangleMesh* LoadTriangleMesh(const std::string& path);
+std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene);

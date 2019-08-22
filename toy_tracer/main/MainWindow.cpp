@@ -31,6 +31,7 @@ void MainWindow::refreshResource() {
       for (RendererObject* obj : rec_list) {
             auto* item_name = new QTableWidgetItem(obj->name());
             item_name->setData(Qt::UserRole, QVariant::fromValue((void*)obj));
+            item_name->setCheckState(Qt::Unchecked);
             auto* item_type = new QTableWidgetItem(obj->type_name());
             resourceWidget->setItem(idx, 0, item_name);
             resourceWidget->setItem(idx, 1, item_type);

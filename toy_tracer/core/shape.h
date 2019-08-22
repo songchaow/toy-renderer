@@ -59,7 +59,7 @@ public:
 protected:
       Shape* shape; // nullptr means it's contructed directly by mesh
       ShapeID s_id;
-      TriangleMesh* _mesh;
+      std::vector<TriangleMesh*> _meshes;
 public:
       Shapeable(Shape* shape, ShapeID s_id) : shape(shape), s_id(s_id) {}
       Float Area() const { return shape->Area(); }
@@ -69,6 +69,6 @@ public:
       bool Intercept(const Ray& r, Interaction& i) const { return shape->Intercept(r, i); }
       bool InterceptP(const Ray& r, Interaction* i) const { return shape->InterceptP(r, i); }
       bool ComputeDiff(const Ray& r, Interaction* i) const { return shape->ComputeDiff(r, i); }
-      TriangleMesh* getMesh() { return _mesh; }
-      void setMesh(TriangleMesh* m) { _mesh = m; }
+      std::vector<TriangleMesh*>& getMeshes() { return _meshes; }
+      void setMeshes(std::vector<TriangleMesh*> ms) { _meshes = ms; }
 };

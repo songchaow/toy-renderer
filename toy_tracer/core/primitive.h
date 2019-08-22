@@ -16,6 +16,8 @@ public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), RendererObject(TypeID::Primitive, "Primitive"), material(m) {}
       Material* getMaterial() const { return material; }
       virtual void addProperties(QWidget* parent) override;
+      void load(QOpenGLFunctions* f);
 };
 
-Primitive* CreatePrimitiveFromMesh(TriangleMesh* mesh);
+Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);
+Primitive* CreatePrimitiveFromModelFile(std::string path);
