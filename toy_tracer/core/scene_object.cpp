@@ -1,4 +1,4 @@
-#include "main/scene_object.h"
+#include "core/scene_object.h"
 #include "utils/utils.h"
 #include <QHBoxLayout>
 #include <QLabel>

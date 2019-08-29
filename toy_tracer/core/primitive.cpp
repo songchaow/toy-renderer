@@ -37,6 +37,8 @@ void Primitive::addProperties(QWidget * parent) {
       parent->layout()->addWidget(primitive_group);
 }
 
-void Primitive::load(QOpenGLFunctions* f) {
-
+void Primitive::load(QOpenGLExtraFunctions* f) {
+      for (auto* mesh : _meshes) {
+            mesh->load(f);
+      }
 }

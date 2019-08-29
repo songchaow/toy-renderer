@@ -14,9 +14,10 @@ int renderTest() {
       
       RGBSpectrumTexture* board_texture = new CheckerBoard(R8G8B8(255, 255, 255), R8G8B8(255, 0, 0), 40);
       ConstColorTexture<RGBSpectrum>* skycolor = new ConstColorTexture<RGBSpectrum>(RGBSpectrum(1.f, 1.f, 1.f));
-      Skybox* skybox = new Skybox(skycolor);
-      auto transform = Translate(Vector3f(0, 0.f, 10.f));
-      Sphere* sphere_shape = new Sphere(8.f, transform);
+      ImageTexture* sphereMap = new ImageTexture("sph2.jpg", ImageTexture::WrapMode::BLACK);
+      Skybox* skybox = new Skybox(sphereMap);
+      auto transform = Translate(Vector3f(0, 0.f, 900.f));
+      Sphere* sphere_shape = new Sphere(890.f, transform);
       Dielectric* d = new Dielectric();
       FlatSurface* glass_surface = new FlatSurface(d);
       SimpleMaterial* glass_material = new SimpleMaterial(glass_surface);
@@ -27,7 +28,7 @@ int renderTest() {
       PathTracer tracer(scene);
       scene->AddObj(sphere_primitive);
       // Camera
-      Camera cam(scene, Translate(Vector3f(0, 0, -10.f)), Point2i(500, 500));
+      Camera cam(scene, Translate(Vector3f(0, 0, -10.f)), Point2i(1500, 1500), 180.f * Pi / 180);
       RenderOption options;
       options.sample_per_pixel = 1024;
       cam.Render(options);

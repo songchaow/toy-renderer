@@ -7,7 +7,20 @@
       "inheritEnvironments": [
         "msvc_x64"
       ],
-      "buildRoot": "${workspaceRoot}\\build",
+      "buildRoot": "${workspaceRoot}\\build_debug",
+      "installRoot": "${workspaceRoot}\\install",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": ""
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Visual Studio 15 2017 Win64",
+      "configurationType": "Release",
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "buildRoot": "${workspaceRoot}\\build_release",
       "installRoot": "${workspaceRoot}\\install",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",

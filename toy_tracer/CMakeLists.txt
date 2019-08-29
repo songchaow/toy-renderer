@@ -45,6 +45,9 @@ utils/*.cpp
 texture/*.cpp
 shape/*.cpp
 )
+
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
+
 add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO})
 target_link_libraries(tracer_lib glog Qt5::Widgets)
 if (MSVC)

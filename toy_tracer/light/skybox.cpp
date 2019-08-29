@@ -3,7 +3,7 @@
 Spectrum Skybox::Li(Vector3f& w) const {
       // TODO: use an image map
       Float u = SphericalTheta(w) / Pi;
-      Float v = SphericalPhi(w) / 2 / Pi;
+      Float v = SphericalPhi(w) / Pi;
       return _texture->Evaluate(u, v);
 }
 

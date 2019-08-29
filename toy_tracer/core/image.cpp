@@ -23,11 +23,12 @@ bool Image::LoadFromFile(std::string path)
             else {
                   if(flags==RGBSpectrum) {
                         data = new ::RGBSpectrum[x*y];
+                        uint16_t sizeRGBSpectrum = sizeof(::RGBSpectrum);
                         // apply InverseGammaCorrection
-                        for(int i = 0; i < x*y ; i += element_size) {
-                                    static_cast<::RGBSpectrum*>(data)[i] = ::RGBSpectrum(InverseGammaCorrection(static_cast<char*>(tmp)[element_size * i + 0]),
-                                                                                       InverseGammaCorrection(static_cast<char*>(tmp)[element_size * i + 1]),
-                                                                                       InverseGammaCorrection(static_cast<char*>(tmp)[element_size * i + 2]));
+                        for(int i = 0; i < x*y ; i++) {
+                                    static_cast<::RGBSpectrum*>(data)[i] = ::RGBSpectrum(InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 0]),
+                                                                                       InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 1]),
+                                                                                       InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 2]));
                         }
                   }
                   delete tmp;
@@ -60,5 +61,5 @@ R8G8B8 Image::R8G8B8Pixel(int i, int j)
 RGBSpectrum Image::SpectrumPixel(int i, int j)
 {
       if(!data) return ::RGBSpectrum(0.f);
-      return static_cast<::RGBSpectrum*>(data)[i * _resolution.x + _resolution.y];
+      return static_cast<::RGBSpectrum*>(data)[j * _resolution.x + i];
 }

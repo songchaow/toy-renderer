@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
-
+#include <QOpenGLExtraFunctions>
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/spectrum.h"
@@ -31,16 +31,17 @@ extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 
 class ImageTexture : public RGBSpectrumTexture {
       std::shared_ptr<Image> _image;
+      GLuint tbo;
 public:
       enum WrapMode {
             LOOP,
             BLACK
       };
 private:
-      WrapMode _wrapMode;
+      WrapMode _wrapMode = LOOP;
 public:
-      ImageTexture(std::string img_path) : _image(std::make_shared<Image>(img_path)) {}
-      ImageTexture(Image* image) : _image(image) {}
+      ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(std::make_shared<Image>(img_path)) {}
+      ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {}
 
 
       RGBSpectrum Evaluate(Float u, Float v) override;

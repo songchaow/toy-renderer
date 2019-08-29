@@ -25,7 +25,7 @@ private:
 public:
       Image() = default;
 
-      Image(std::string path, Format flags = RGBSpectrum) : flags(flags) {};
+      Image(std::string path, Format flags = RGBSpectrum) : flags(flags) { LoadFromFile(path); };
       ::R8G8B8 R8G8B8Pixel(int i, int j);
       ::RGBSpectrum SpectrumPixel(int i, int j);
       bool LoadFromFile(std::string path);

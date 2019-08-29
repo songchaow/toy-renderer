@@ -165,8 +165,8 @@ static R8G8B8 GammaCorrection(RGBSpectrum stimus) {
 }
 
 // sRGB 0-256 -> Radiance 0-1
-static Float InverseGammaCorrection(Float image_value) {
-      return GammaInvTransform(Clamp((Float)image_value/256, 0, 1));
+static Float InverseGammaCorrection(unsigned char image_value) {
+      return GammaInvTransform(Clamp((Float)image_value/256, 0.f, 1.f));
 }
 static RGBSpectrum InverseGammaCorrection(R8G8B8 image_value) {
       return RGBSpectrum(InverseGammaCorrection(image_value[0]),

@@ -3,7 +3,7 @@
 #include "core/geometry.h"
 #include "core/transform.h"
 #include "core/interaction.h"
-#include "main/scene_object.h"
+#include "core/scene_object.h"
 
 #include <vector>
 #include <string>
@@ -15,7 +15,7 @@ class Shape : public RendererObject {
 protected:
       Transform world2obj, obj2world;
 public:
-      Shape(Transform& obj2world) :obj2world(obj2world), RendererObject(TypeID::Shape, QString::fromStdString(shapeName())) {
+      Shape(Transform& obj2world) :obj2world(obj2world), RendererObject(TypeID::Shape) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
             world2obj.setInverse(&obj2world);
@@ -35,7 +35,7 @@ public:
 class Sphere : public Shape {
       Float radius; // radius in object space
 public:
-      Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
+      Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) { rename(QString::fromStdString(shapeName())); }
       virtual std::string shapeName() const { return "Sphere"; }
       virtual Float Area() const override { return 4 * Pi*radius*radius; }
       virtual bool Intercept(const Ray& r, Interaction& i) const override;

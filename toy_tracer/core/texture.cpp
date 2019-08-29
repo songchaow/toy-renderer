@@ -10,8 +10,12 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
             u = u - static_cast<int>(u);
             v = v - static_cast<int>(v);
       }
-      Float coordX = u * _image->resolution().x;
-      Float coordY = v * _image->resolution().y;
+      else if (_wrapMode == BLACK) {
+            if (u<0.f || u>1.f || v<0.f || v>1.f)
+                  return 0;
+      }
+      unsigned int coordX = u * (_image->resolution().x - 0.001);
+      unsigned int coordY = v * (_image->resolution().y - 0.001);
       // use the box filter
       return _image->SpectrumPixel(coordX, coordY);
 }

@@ -71,5 +71,4 @@ public:
 
 };
 
-TriangleMesh* LoadTriangleMesh(const std::string& path);
 std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene);

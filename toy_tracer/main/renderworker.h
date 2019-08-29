@@ -5,7 +5,7 @@
 #include "core/primitive.h"
 #include "core/camera.h"
 #include "main/TwoThreadQueue.h"
-class RenderWorker : public QObject, QOpenGLFunctions {
+class RenderWorker : public QObject, QOpenGLExtraFunctions {
       Q_OBJECT
       QOpenGLContext* m_context;
       TwoThreadQueue<Primitive*> primitiveQueue;

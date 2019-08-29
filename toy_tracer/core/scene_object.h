@@ -37,4 +37,5 @@ public:
       const QString type_name() { return TypeIDMap.at(type_id); }
       void rename(QString newname) { id = newname; }
       RendererObject(TypeID type_id, QString name) : type_id(type_id), id(name) {}
+      RendererObject(TypeID type_id) : type_id(type_id) {}
 };

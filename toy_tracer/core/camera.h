@@ -23,7 +23,7 @@ class Camera {
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
 public:
-      Camera(Scene* s, Transform cam2world, Point2i& film_size, Float fov_Vertical = 60.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), cam2world(cam2world),
+      Camera(Scene* s, Transform cam2world, Point2i& film_size, Float fov_Vertical = 160.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), cam2world(cam2world),
             world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
       void Render(RenderOption& options);
       const Film& getFilm() const { return film; }

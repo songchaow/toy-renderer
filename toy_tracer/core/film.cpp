@@ -28,11 +28,13 @@ void Film::Normalize()
 void Film::writePNG(const std::string& path) const {
       // always set the alpha channel to 0
       std::unique_ptr<unsigned char[]> img(new unsigned char[height*width * 3]);
-      for (int i = 0; i < height; i++) {
+      // lodepng uses a pixel order where it goes in rows from top to bottom
+      for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-                  img[(i*width + j) * 3] = GammaCorrection(ContribSum({ i,j })[0]);
-                  img[(i*width + j) * 3 + 1] = GammaCorrection(ContribSum({ i,j })[1]);
-                  img[(i*width + j) * 3 + 2] = GammaCorrection(ContribSum({ i,j })[2]);
+                  int image_row = height - 1 - i;
+                  img[(image_row*width + j) * 3] = GammaCorrection(ContribSum({ i,j })[0]);
+                  img[(image_row*width + j) * 3 + 1] = GammaCorrection(ContribSum({ i,j })[1]);
+                  img[(image_row*width + j) * 3 + 2] = GammaCorrection(ContribSum({ i,j })[2]);
                   /*if (img[(i*width + j) * 3] == 0)
                         LOG(WARNING) << "R:" << img[(i*width + j) * 3] << " G:" << img[(i*width + j) * 3 + 1] << " B:" << img[(i*width + j) * 3 + 2];*/
             }

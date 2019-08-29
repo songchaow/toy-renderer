@@ -1022,13 +1022,22 @@ inline Vector3f SphericalDirection(Float sinTheta, Float cosTheta, Float phi,
            cosTheta * z;
 }
 
+inline Float CaconicalSphericalTheta(const Vector3f &v) {
+      return std::acos(Clamp(v.z, -1, 1));
+}
+
 inline Float SphericalTheta(const Vector3f &v) {
-    return std::acos(Clamp(v.z, -1, 1));
+    return std::acos(Clamp(v.y, -1, 1));
+}
+
+inline Float CaconicalSphericalPhi(const Vector3f &v) {
+    Float p = std::atan2(v.y, v.x);
+    return (p < 0) ? (p + 2 * Pi) : p;
 }
 
 inline Float SphericalPhi(const Vector3f &v) {
-    Float p = std::atan2(v.y, v.x);
-    return (p < 0) ? (p + 2 * Pi) : p;
+      Float p = std::atan2(v.z, v.x);
+      return (p < 0) ? (p + Pi) : p;
 }
 
 inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {
