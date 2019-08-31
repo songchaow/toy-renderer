@@ -41,5 +41,8 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       for (auto* mesh : _meshes) {
             mesh->load(f);
       }
-      // assume the material to be a simple material
+      // RTMaterial must be valid now
+      assert(rt_m!=nullptr);
+      rt_m->load(f);
+      shader = LoadShader();
 }

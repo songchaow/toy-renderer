@@ -204,3 +204,13 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
       out_material->f(wo, wi, Normal3f(n), this);
       
 }
+
+void RTMaterial::load(QOpenGLExtraFunctions* f) {
+      if(albedo_map)
+            albedo_map->load(f);
+      if (metallic_map)
+            metallic_map->load(f);
+      if (rough_map)
+            rough_map->load(f);
+
+}

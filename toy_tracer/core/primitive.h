@@ -5,12 +5,14 @@
 #include "core/texture.h"
 #include "core/scene_object.h"
 #include "shape/triangle.h"
+#include "shader/shader.h"
 
 class Primitive : public Shapeable, public RendererObject
 {
 private:
       Material* material = nullptr;
-      
+      RTMaterial* rt_m = nullptr;
+      Shader* shader = nullptr;
       RGBTexture* reflection; // currently not used
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), RendererObject(TypeID::Primitive, "Primitive"), material(m) {}

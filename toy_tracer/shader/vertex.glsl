@@ -10,7 +10,8 @@ uniform mat4 cam2ndc
 
 out vec3 ver_color; // deprecated
 out vec2 TexCoord;
-out vec3 posWorld
+out vec3 posWorld;
+out vec3 normalWorld;
 
 void main()
 {
@@ -18,4 +19,5 @@ void main()
       posWorld = vec3(obj2world * vec4(posLocal,1.0));
       TexCoord = texCoord;
       ver_color = pColor;
+      normalWorld = transpose(inverse(cam2ndc * world2cam * obj2world)) * vec4(normalLocal,0);
 }

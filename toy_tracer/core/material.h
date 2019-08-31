@@ -5,10 +5,12 @@
 #include <memory>
 #include <algorithm>
 #include <vector>
+#include <QOpenGLExtraFunctions>
 #include "core/spectrum.h"
 #include "core/texture.h"
 #include "core/interaction.h"
 #include "core/sampler.h"
+#include "core/ResourceManager.h"
 
 /*  Medium
     defines how light changes its strength and orientation
@@ -75,8 +77,12 @@ public:
 };
 
 class RTMaterial {
-      ImageTexture* albedo_map = nullptr; // diffuse color
-      ImageTexture* specular_map = nullptr;
+      ImageTexture* albedo_map = nullptr;
+      //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
+      //ImageTexture* specular_map = nullptr; // replaced by metallic
+      ImageTexture* metallic_map = nullptr;
+      ImageTexture* rough_map = nullptr;
+
 
 
 public:

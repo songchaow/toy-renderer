@@ -1,5 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include "shader.h"
 #include <fstream>
 #include <sstream>
@@ -23,6 +21,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
             std::cout << "Read shader files failed." << std::endl;
             return;
       }
+      path = vertex_path + fragment_path;
       // compile
       char infoLog[1024];
       const char* v_shader_str_ptr = vertex_shader_code.c_str();
@@ -60,6 +59,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       // delete shader objects
       glDeleteShader(vertex);
       glDeleteShader(fragment);
+      _loaded = true;
 }
 
 void Shader::use() const { glUseProgram(program_id); }
