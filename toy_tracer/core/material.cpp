@@ -29,7 +29,7 @@ Spectrum SimpleMaterial::sample_f(Interaction& i, Point2f sample, Float* pdf)
             throughput = gloss->sample_f(sample, i.GetLocalWo(), i.wi, nullptr, pdf);
             i.wi = i.GlobalDirection(i.wi);
       }
-      Spectrum color = texture->Evaluate(i.u, i.v);
+      Spectrum color = albedo_texture->Evaluate(i.u, i.v);
       return throughput * color;
 }
 
@@ -37,7 +37,7 @@ Spectrum SimpleMaterial::f(const Interaction& i)
 {
       if(surface->isFlatSurface())
             return 0.f;
-      Spectrum color = texture->Evaluate(i.u, i.v);
+      Spectrum color = albedo_texture->Evaluate(i.u, i.v);
       GlossSurface* gloss = static_cast<GlossSurface*>(surface);
       // needn't be in local space
       Spectrum fr = gloss->f(i.wo, i.wi, i.n, nullptr);

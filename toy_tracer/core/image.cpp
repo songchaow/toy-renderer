@@ -12,21 +12,22 @@ bool Image::LoadFromFile(std::string path)
             _resolution.x = x;
             _resolution.y = y;
             if(isCompatible(flags)) {
-                  data = tmp;
+                  _data = tmp;
                   // apply GammaInvTransform
                   for(int i = 0; i < x*y ; i++) {
                         for(int j = 0; j < element_size; j++) {
-                              static_cast<char*>(data)[element_size * i + j] = GammaInvTransform(static_cast<char*>(data)[element_size * i + j]);
+                              static_cast<char*>(_data)[element_size * i + j] = GammaInvTransform(static_cast<char*>(_data)[element_size * i + j]);
                         }
                   }
             }
             else {
+                  // we need to convert char to Float
                   if(flags==RGBSpectrum) {
-                        data = new ::RGBSpectrum[x*y];
+                        _data = new ::RGBSpectrum[x*y];
                         uint16_t sizeRGBSpectrum = sizeof(::RGBSpectrum);
                         // apply InverseGammaCorrection
                         for(int i = 0; i < x*y ; i++) {
-                                    static_cast<::RGBSpectrum*>(data)[i] = ::RGBSpectrum(InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 0]),
+                                    static_cast<::RGBSpectrum*>(_data)[i] = ::RGBSpectrum(InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 0]),
                                                                                        InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 1]),
                                                                                        InverseGammaCorrection(static_cast<unsigned char*>(tmp)[element_size * i + 2]));
                         }
@@ -47,19 +48,19 @@ bool Image::LoadFromFile(std::string path)
 
 Image::~Image()
 {
-      if(data) {
-            stbi_image_free(data);
+      if(_data) {
+            stbi_image_free(_data);
       }
 }
 
 R8G8B8 Image::R8G8B8Pixel(int i, int j)
 {
-      if(!data) return ::R8G8B8(0.f);
-      return static_cast<::R8G8B8*>(data)[i * _resolution.x + _resolution.y];
+      if(!_data) return ::R8G8B8(0.f);
+      return static_cast<::R8G8B8*>(_data)[i * _resolution.x + _resolution.y];
 }
 
 RGBSpectrum Image::SpectrumPixel(int i, int j)
 {
-      if(!data) return ::RGBSpectrum(0.f);
-      return static_cast<::RGBSpectrum*>(data)[j * _resolution.x + i];
+      if(!_data) return ::RGBSpectrum(0.f);
+      return static_cast<::RGBSpectrum*>(_data)[j * _resolution.x + i];
 }

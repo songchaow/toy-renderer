@@ -41,4 +41,5 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       for (auto* mesh : _meshes) {
             mesh->load(f);
       }
+      // assume the material to be a simple material
 }

@@ -19,7 +19,7 @@ public:
 private:
       bool loaded = false;
       Format flags = UNSPECIFIED;
-      void* data = nullptr;
+      void* _data = nullptr;
       size_t element_size;
 
 public:
@@ -30,6 +30,8 @@ public:
       ::RGBSpectrum SpectrumPixel(int i, int j);
       bool LoadFromFile(std::string path);
       void setFormat(Format f) { flags = f; }
+      Format format() const { return flags; }
       const Point2i resolution() const {return _resolution;}
+      const void* data() const { return _data; }
       ~Image();
 };

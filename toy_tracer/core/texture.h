@@ -10,6 +10,7 @@
 template <typename Element>
 class Texture {
 public:
+      virtual bool loadable() { return false; }
       virtual Element Evaluate(Float u, Float v) = 0;
       Element Evaluate(Point2f pos) {return Evaluate(pos.x, pos.y);};
 };
@@ -31,7 +32,7 @@ extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 
 class ImageTexture : public RGBSpectrumTexture {
       std::shared_ptr<Image> _image;
-      GLuint tbo;
+      GLuint tbo = 0;
 public:
       enum WrapMode {
             LOOP,
@@ -42,7 +43,7 @@ private:
 public:
       ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(std::make_shared<Image>(img_path)) {}
       ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {}
-
-
+      bool loadable() override { return true; }
+      void load(QOpenGLExtraFunctions* f);
       RGBSpectrum Evaluate(Float u, Float v) override;
 };

@@ -19,3 +19,21 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
       // use the box filter
       return _image->SpectrumPixel(coordX, coordY);
 }
+
+void ImageTexture::load(QOpenGLExtraFunctions* f) {
+      f->glGenTextures(1, &tbo);
+      f->glBindTexture(GL_TEXTURE_2D, tbo);
+      // default tex params
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // level: 0
+      GLuint image_format;
+      if (_image->format() == Image::Format::R8G8B8)
+            image_format = GL_RGB;
+      else if (_image->format() == Image::Format::R8G8B8A8)
+            image_format = GL_RGBA;
+      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+
+}

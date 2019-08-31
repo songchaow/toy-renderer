@@ -66,12 +66,21 @@ private:
 class SimpleMaterial : public Material
 {
       Surface* surface;
-      RGBSpectrumTexture* texture;
+      RGBSpectrumTexture* albedo_texture;
 public:
-      SimpleMaterial(Surface* s, RGBSpectrumTexture* t = &whiteConstantTexture) : surface(s), texture(t) {}
+      SimpleMaterial(Surface* s, RGBSpectrumTexture* t = &whiteConstantTexture) : surface(s), albedo_texture(t) {}
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
       virtual Spectrum f(const Interaction& i) override;
       virtual bool isFlat() override { return surface->isFlatSurface(); }
+};
+
+class RTMaterial {
+      ImageTexture* albedo_map = nullptr; // diffuse color
+      ImageTexture* specular_map = nullptr;
+
+
+public:
+      void load(QOpenGLExtraFunctions* f);
 };
 
 class GlossSurface;
