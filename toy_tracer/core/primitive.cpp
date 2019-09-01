@@ -44,5 +44,30 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       // RTMaterial must be valid now
       assert(rt_m!=nullptr);
       rt_m->load(f);
-      shader = LoadShader();
+      shader = LoadShader("shader/vertex.glsl", "pbr_pixel.glsl", f);
+}
+
+void Primitive::draw(QOpenGLExtraFunctions* f) {
+      // draw all meshes
+      // TODO: maybe different meshes' materials/textures are different.
+      if (rt_m->albedo_map) {
+            f->glActiveTexture(GL_TEXTURE0);
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map->tbo());
+      }
+      if (rt_m->metallic_map) {
+            f->glActiveTexture(GL_TEXTURE1);
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->metallic_map->tbo());
+      }
+      if (rt_m->rough_map) {
+            f->glActiveTexture(GL_TEXTURE2);
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->rough_map->tbo());
+      }
+
+      
+      for (auto& m : _meshes) {
+            f->glBindVertexArray(m->vao());
+            // no need to bind the ebo again
+            
+
+      }
 }

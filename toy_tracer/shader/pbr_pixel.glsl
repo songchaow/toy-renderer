@@ -5,9 +5,9 @@ in vec3 posWorld;
 in vec3 normalWorld;
 
 // material parameters
-uniform vec3 albedo;
-uniform float metallic;
-uniform float roughness;
+uniform sampler2D albedoSampler; // vec3
+uniform sampler2D metallicSampler; // float
+uniform sampler2D roughnessSampler; // float
 // uniform float ao;
 
 // lights
@@ -66,8 +66,10 @@ void main()
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = vec3(0.04); 
+    float albedo = texture(albedoSampler, TexCoords).r;
+    float metallic = texture(metallicSampler, TexCoords).r;
+    float roughness = texture(roughnessSampler, TexCoords).r;
     F0 = mix(F0, albedo, metallic);
-
     // reflectance equation
     vec3 Lo = vec3(0.0);
     for(int i = 0; i < 4; ++i) 

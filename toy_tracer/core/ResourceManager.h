@@ -1,6 +1,6 @@
 #pragma once
 #include "core/scene.h"
-#include "shader/shader.h"
+#include "core/shader.h"
 #include <vector>
 
 class ResourceManager {
@@ -13,4 +13,4 @@ public:
       void loadFile(QString path);
 };
 
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path);
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f);

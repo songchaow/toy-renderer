@@ -14,9 +14,9 @@ class TriangleMesh {
       void* vertex_data = nullptr;
       uint16_t index_num = 0;
       void* index_data = nullptr;
-      GLuint vao = 0; // vertex array object
-      GLuint vbo = 0; // vertex buffer object
-      GLuint ebo = 0; // element buffer object
+      GLuint _vao = 0; // vertex array object
+      GLuint _vbo = 0; // vertex buffer object
+      GLuint _ebo = 0; // element buffer object
 public:
       enum ArrayType {
             ARRAY_VERTEX = 0,
@@ -55,6 +55,9 @@ public:
             world2obj.setInverse(&obj2world);
       }
       void load(QOpenGLExtraFunctions* f);
+      GLuint vao() const { return _vao; }
+      GLuint vbo() const { return _vbo; }
+      GLuint ebo() const { return _ebo; }
       ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
 };
 

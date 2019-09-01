@@ -94,15 +94,15 @@ static std::map<TriangleMesh::ArrayType, uint16_t> ShaderLocMap = {
 };
 
 void TriangleMesh::load(QOpenGLExtraFunctions* f) {
-      f->glGenVertexArrays(1, &vao);
-      f->glBindVertexArray(vao);
+      f->glGenVertexArrays(1, &_vao);
+      f->glBindVertexArray(_vao);
       // vbo
-      f->glGenBuffers(1, &vbo);
-      f->glBindBuffer(GL_ARRAY_BUFFER, vbo);
+      f->glGenBuffers(1, &_vbo);
+      f->glBindBuffer(GL_ARRAY_BUFFER, _vbo);
       f->glBufferData(GL_ARRAY_BUFFER, vbuffer_size, vertex_data, GL_STATIC_DRAW);
       // ebo
-      f->glGenBuffers(1, &ebo);
-      f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+      f->glGenBuffers(1, &_ebo);
+      f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
       f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*index_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (auto& l : layout) {

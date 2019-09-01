@@ -1,4 +1,4 @@
-﻿# CMakeList.txt: toy_tracer 的 CMake 项目，在此处包括源代码并定义
+# CMakeList.txt: toy_tracer 的 CMake 项目，在此处包括源代码并定义
 # 项目特定的逻辑。
 #
 SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
@@ -68,7 +68,7 @@ target_link_libraries(toytracer tracer_lib)
 # copy shader files to the binary directory
 add_custom_command(TARGET toytracer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_CURRENT_SOURCE_DIR}/shader $<TARGET_FILE_DIR:toytracer>)
+                       ${CMAKE_CURRENT_SOURCE_DIR}/shader $<TARGET_FILE_DIR:toytracer>/shader)
 
 # TODO: 如有需要，请添加测试并安装目标。
 ENABLE_TESTING()

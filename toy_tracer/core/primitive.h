@@ -5,7 +5,7 @@
 #include "core/texture.h"
 #include "core/scene_object.h"
 #include "shape/triangle.h"
-#include "shader/shader.h"
+#include "core/shader.h"
 
 class Primitive : public Shapeable, public RendererObject
 {
@@ -19,6 +19,7 @@ public:
       Material* getMaterial() const { return material; }
       virtual void addProperties(QWidget* parent) override;
       void load(QOpenGLExtraFunctions* f);
+      void inline draw(QOpenGLExtraFunctions* f);
 };
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);

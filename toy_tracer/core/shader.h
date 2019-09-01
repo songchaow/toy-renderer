@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <QOpenGLExtraFunctions>
 
 class Shader {
       std::string path;
@@ -7,9 +8,11 @@ class Shader {
       std::string fragment_shader_code;
       bool _loaded = false;
       unsigned int program_id;
+      QOpenGLExtraFunctions* f = nullptr;
 public:
-      Shader(const std::string& vertex_path, const std::string& fragment_path);
+      Shader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f = nullptr);
       bool loaded() const { return _loaded; }
+      void compile(QOpenGLExtraFunctions* f);
       void use() const;
       void setUniformF(const std::string& name, const float val);
       void setUniformF(const std::string& name, const float val, const float val2);

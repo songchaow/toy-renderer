@@ -77,6 +77,7 @@ public:
 };
 
 class RTMaterial {
+public:
       ImageTexture* albedo_map = nullptr;
       //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
       //ImageTexture* specular_map = nullptr; // replaced by metallic

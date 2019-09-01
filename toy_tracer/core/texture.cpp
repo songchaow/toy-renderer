@@ -21,8 +21,8 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
 }
 
 void ImageTexture::load(QOpenGLExtraFunctions* f) {
-      f->glGenTextures(1, &tbo);
-      f->glBindTexture(GL_TEXTURE_2D, tbo);
+      f->glGenTextures(1, &_tbo);
+      f->glBindTexture(GL_TEXTURE_2D, _tbo);
       // default tex params
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
