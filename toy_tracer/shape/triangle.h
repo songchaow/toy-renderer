@@ -58,6 +58,7 @@ public:
       GLuint vao() const { return _vao; }
       GLuint vbo() const { return _vbo; }
       GLuint ebo() const { return _ebo; }
+      GLuint face_count() const { return index_num; }
       ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
 };
 

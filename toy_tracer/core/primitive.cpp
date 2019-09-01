@@ -50,23 +50,30 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
 void Primitive::draw(QOpenGLExtraFunctions* f) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
+      shader->use();
       if (rt_m->albedo_map) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map->tbo());
+            shader->setUniformI("albedoSampler", 0);
       }
       if (rt_m->metallic_map) {
             f->glActiveTexture(GL_TEXTURE1);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->metallic_map->tbo());
+            shader->setUniformI("metallicSampler", 1);
       }
       if (rt_m->rough_map) {
             f->glActiveTexture(GL_TEXTURE2);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->rough_map->tbo());
+            shader->setUniformI("roughnessSampler", 2);
       }
-
       
       for (auto& m : _meshes) {
             f->glBindVertexArray(m->vao());
             // no need to bind the ebo again
+            // eg: 2 faces => 6 element count
+            f->glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
+            
+            
             
 
       }

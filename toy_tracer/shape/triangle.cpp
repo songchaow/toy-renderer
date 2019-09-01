@@ -103,7 +103,8 @@ void TriangleMesh::load(QOpenGLExtraFunctions* f) {
       // ebo
       f->glGenBuffers(1, &_ebo);
       f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4*index_num, index_data, GL_STATIC_DRAW);
+      // each int32_t contains 4 bytes
+      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * 3 * index_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (auto& l : layout) {
             if (ShaderLocMap.find(l.type) == ShaderLocMap.end())
