@@ -5,13 +5,14 @@ Everyone learning CG seems to have his/her own ray-tracer. So this one is mine.
 
 - [x] Design and implement `Spectrum` and other color-related interfaces.
 
-- [ ] Add basic math utilities.
+- [x] Add basic math utilities.
 
-  - [ ] Transformation, matrix.
+  - [x] Transformation, matrix.
 
-- [ ] Design and implement scattering-related interfaces.
+- [x] Design and implement scattering-related interfaces.
   - Reflection and transmission of dielectrics.
   - 
 
-- [ ] Prepare test framework.
+- [x] Prepare test framework.
 
+- ...
