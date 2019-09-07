@@ -9,8 +9,8 @@
 #include <cmath>
 
 class Camera {
-      Transform cam2world;
-      Transform world2cam;
+      Transform _cam2world;
+      Transform _world2cam;
       Float film_distance = 1.f;
       Film film;
       Float fov_Vertical;
@@ -23,11 +23,13 @@ class Camera {
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
 public:
-      Camera(Scene* s, Transform cam2world, Point2i& film_size, Float fov_Vertical = 160.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), cam2world(cam2world),
-            world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
+      Camera(Scene* s, Transform cam2world, Point2i& film_size, Float fov_Vertical = 160.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), _cam2world(cam2world),
+            _world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
       void Render(RenderOption& options);
       const Film& getFilm() const { return film; }
       // Generate XMMATRIX using XMMatrixPerspectiveFovLH
       // Generate OpenGL transform, row major order
-      Transform Cam2NDC();
+      Transform Cam2NDC() const;
+      const Transform& world2cam() const { return _world2cam; }
+      const Transform& cam2world() const { return _cam2world; }
 };

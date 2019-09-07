@@ -8,7 +8,7 @@
 class Triangle;
 class TriangleMesh {
       // for generated meshes, those transforms are copied from the Shape object.
-      Transform world2obj, obj2world;
+      Transform _world2obj, _obj2world;
       uint16_t vertex_num = 0;
       uint16_t vbuffer_size = 0;
       void* vertex_data = nullptr;
@@ -50,15 +50,17 @@ public:
       TriangleMesh(void* raw_data, Layout l, uint16_t vb_size, uint16_t vertex_num, void* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
             : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
             index_data(index_data), index_num(index_num), indexFormat(idxFormat) {
-            obj2world.Inverse(&world2obj);
-            obj2world.setInverse(&world2obj);
-            world2obj.setInverse(&obj2world);
+            obj2world.Inverse(&_world2obj);
+            obj2world.setInverse(&_world2obj);
+            _world2obj.setInverse(&obj2world);
       }
       void load(QOpenGLExtraFunctions* f);
       GLuint vao() const { return _vao; }
       GLuint vbo() const { return _vbo; }
       GLuint ebo() const { return _ebo; }
       GLuint face_count() const { return index_num; }
+      const Transform& obj2world() const { return _obj2world; }
+      const Transform& world2obj() const { return _world2obj; }
       ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
 };
 

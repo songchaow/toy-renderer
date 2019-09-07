@@ -11,15 +11,15 @@ class Primitive : public Shapeable, public RendererObject
 {
 private:
       Material* material = nullptr;
-      RTMaterial* rt_m = nullptr;
-      Shader* shader = nullptr;
+      PBRMaterial* rt_m = nullptr;
+      Shader* shader = nullptr; // acquired from material
       RGBTexture* reflection; // currently not used
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), RendererObject(TypeID::Primitive, "Primitive"), material(m) {}
       Material* getMaterial() const { return material; }
       virtual void addProperties(QWidget* parent) override;
       void load(QOpenGLExtraFunctions* f);
-      void inline draw(QOpenGLExtraFunctions* f);
+      void draw(QOpenGLExtraFunctions* f);
 };
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);

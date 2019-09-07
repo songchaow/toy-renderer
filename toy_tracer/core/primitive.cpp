@@ -5,6 +5,8 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
+#include "core/ResourceManager.h"
+#include "main/renderworker.h"
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
       Primitive* p = new Primitive(nullptr, nullptr);
@@ -44,13 +46,14 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       // RTMaterial must be valid now
       assert(rt_m!=nullptr);
       rt_m->load(f);
-      shader = LoadShader("shader/vertex.glsl", "pbr_pixel.glsl", f);
+      shader = rt_m->shader();
 }
 
 void Primitive::draw(QOpenGLExtraFunctions* f) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
       shader->use();
+
       if (rt_m->albedo_map) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map->tbo());
@@ -69,12 +72,14 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
       
       for (auto& m : _meshes) {
             f->glBindVertexArray(m->vao());
+            // set MVP
+            // TODO: obj2world could be stored for each mesh's shader program
+            shader->setUniformF("obj2world", m->obj2world().getRowMajorData());
+            shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
+            shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             f->glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
-            
-            
-            
 
       }
 }

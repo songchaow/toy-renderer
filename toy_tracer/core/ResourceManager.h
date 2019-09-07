@@ -12,5 +12,3 @@ public:
       std::vector<RendererObject*>& getResourceList() { return _loadList; }
       void loadFile(QString path);
 };
-
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f);

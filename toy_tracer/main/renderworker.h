@@ -11,7 +11,7 @@ class RenderWorker : public QObject, QOpenGLExtraFunctions {
       TwoThreadQueue<Primitive*> primitiveQueue;
       std::vector<Primitive*> primitives;
       // TODO: define an update info structure
-      Camera* cam;
+      static Camera* cam;
 
 public slots:
       void initialize(QWindow* s);
@@ -19,4 +19,5 @@ public slots:
 public:
       // thread-safe using mutex
       void addPrimitive(Primitive* p);
+      static const Camera* getCamera() { return cam; }
 };

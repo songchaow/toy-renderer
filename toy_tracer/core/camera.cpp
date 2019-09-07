@@ -5,10 +5,10 @@ Ray Camera::GenerateRay(const Point2f& pFilm)
 {
       Vector3f d(pFilm.x - film.getWidth() / 2, pFilm.y - film.getHeight() / 2, film_distance);
       Ray localRay({ 0.f,0.f,0.f }, Normalize(d));
-      return cam2world(localRay);
+      return _cam2world(localRay);
 }
 
-Transform Camera::Cam2NDC()
+Transform Camera::Cam2NDC() const
 {
       Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
             0, 0, 1, 0);

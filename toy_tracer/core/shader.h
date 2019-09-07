@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <QOpenGLExtraFunctions>
+#include <core/transform.h>
 
 class Shader {
       std::string path;
@@ -11,6 +12,7 @@ class Shader {
       QOpenGLExtraFunctions* f = nullptr;
 public:
       Shader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f = nullptr);
+      Shader() = default;
       bool loaded() const { return _loaded; }
       void compile(QOpenGLExtraFunctions* f);
       void use() const;
@@ -18,6 +20,7 @@ public:
       void setUniformF(const std::string& name, const float val, const float val2);
       void setUniformF(const std::string& name, const float val, const float val2, const float val3);
       void setUniformF(const std::string& name, const float val, const float val2, const float val3, const float val4);
+      void setUniformF(const std::string& name, const Matrix4* data);
       void setUniformF(unsigned int loc, const float val);
       void setUniformF(unsigned int loc, const float val, const float val2);
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3);
@@ -27,3 +30,5 @@ public:
       unsigned int getUniformLocation(const std::string& name);
 
 };
+
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f);

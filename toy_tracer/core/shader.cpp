@@ -96,6 +96,11 @@ void Shader::setUniformF(const std::string & name, const float val, const float 
       f->glUniform4f(loc, val, val2, val3, val4);
 }
 
+void Shader::setUniformF(const std::string& name, const Matrix4* data) {
+      int loc = f->glGetUniformLocation(program_id, name.c_str());
+      f->glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)data);
+}
+
 void Shader::setUniformF(unsigned int loc, const float val)
 {
 }
@@ -105,4 +110,20 @@ void Shader::setUniformI(const std::string& name, const int val)
       const char* test = name.c_str();
       int loc = f->glGetUniformLocation(program_id, name.c_str());
       f->glUniform1i(loc, val);
+}
+
+static std::map<std::string, Shader> shaderStore;
+
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f) {
+      std::string id = vertex_path + fragment_path;
+      if (shaderStore.find(id) != shaderStore.end())
+            return &shaderStore[id];
+      else {
+            Shader s(vertex_path, fragment_path);
+            if (s.loaded()) {
+                  shaderStore[id] = s;
+                  return &shaderStore[id];
+            }
+            else return nullptr;
+      }
 }

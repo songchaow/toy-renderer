@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QGroupBox>
 #include <QDoubleSpinBox>
+#include <QPushButton>
 
 const std::map<RendererObject::TypeID, QString> RendererObject::TypeIDMap = {
       GEN_VERBOSE_STRING_MAP(TypeID::Camera),
@@ -69,6 +70,16 @@ void RendererObject::addNumberf(QString desc, Float* value_ptr, QWidget* target)
       lineLayout->addWidget(numEdit);
       target->setLayout(lineLayout);
       // TODO: signal: QDoubleSpinBox::valueChanged() -> updateValue()
+}
+
+void RendererObject::addFileDialog(QString desc, QString button_text, QWidget* target) {
+      QHBoxLayout* lineLayout = new QHBoxLayout;
+      lineLayout->addWidget(new QLabel(desc));
+      QLineEdit* filePath = new QLineEdit();
+      lineLayout->addWidget(filePath);
+      QPushButton* open = new QPushButton(tr("Open"));
+      lineLayout->addWidget(open);
+      QObject::connect(open, SIGNAL(clicked()),)
 }
 
 void RendererObject::addNumberi(QString desc, int* value_ptr, QWidget* target) {

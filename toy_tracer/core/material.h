@@ -10,7 +10,8 @@
 #include "core/texture.h"
 #include "core/interaction.h"
 #include "core/sampler.h"
-#include "core/ResourceManager.h"
+#include "core/shader.h"
+
 
 /*  Medium
     defines how light changes its strength and orientation
@@ -76,7 +77,7 @@ public:
       virtual bool isFlat() override { return surface->isFlatSurface(); }
 };
 
-class RTMaterial {
+class PBRMaterial : public RendererObject {
 public:
       ImageTexture* albedo_map = nullptr;
       //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
@@ -84,11 +85,16 @@ public:
       ImageTexture* metallic_map = nullptr;
       ImageTexture* rough_map = nullptr;
 
-
+private:
+      Shader* _shader;
 
 public:
       void load(QOpenGLExtraFunctions* f);
+      Shader* shader() const { return _shader; }
+      virtual void addProperties(QWidget* parent) override;
 };
+
+PBRMaterial* CreatePBRMaterial(QString albedo, QString metallic, QString rough);
 
 class GlossSurface;
 class FlatSurface : public Surface

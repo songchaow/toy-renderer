@@ -1,6 +1,8 @@
 #include "main/renderworker.h"
 #include <QWindow>
 
+Camera* RenderWorker::cam;
+
 void RenderWorker::initialize(QWindow* s) {
       m_context = new QOpenGLContext();
       m_context->setFormat(s->requestedFormat());
@@ -18,7 +20,12 @@ void RenderWorker::renderLoop() {
                   primitives.push_back(p);
             }
       }
-
+      // rendering
+      glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT);
+      for (auto &p : primitives) {
+            p->draw(this);
+      }
 }
 
 void RenderWorker::addPrimitive(Primitive* p)

@@ -16,18 +16,3 @@ void ResourceManager::loadFile(QString path) {
       }
 }
 
-static std::map<std::string, Shader> shaderStore;
-
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f) {
-      std::string id = vertex_path + fragment_path;
-      if (shaderStore.find(id) != shaderStore.end())
-            return &shaderStore[id];
-      else {
-            Shader s(vertex_path, fragment_path);
-            if (s.loaded()) {
-                  shaderStore[id] = s;
-                  return &shaderStore[id];
-            }
-            else return nullptr;
-      }
-}

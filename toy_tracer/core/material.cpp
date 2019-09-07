@@ -205,12 +205,18 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
       
 }
 
-void RTMaterial::load(QOpenGLExtraFunctions* f) {
+void PBRMaterial::load(QOpenGLExtraFunctions* f) {
+      // TODO: use a const texture as the fallback if there're null pointers
       if(albedo_map)
             albedo_map->load(f);
       if (metallic_map)
             metallic_map->load(f);
       if (rough_map)
             rough_map->load(f);
+      _shader = LoadShader("shader/vertex.glsl", "pbr_pixel.glsl", f);
+}
+
+void PBRMaterial::addProperties(QWidget* parent) {
+      RendererObject::addProperties(parent);
 
 }

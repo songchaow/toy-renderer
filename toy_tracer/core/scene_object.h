@@ -17,6 +17,7 @@ protected:
       void addText(QString desc, QString* value_ptr, QWidget* target);
       void addNumberf(QString desc, Float* value_ptr, QWidget* target);
       void addNumberi(QString desc, int* value_ptr, QWidget* target);
+      void addFileDialog(QString desc, QString button_text, QWidget* target);
 private slots:
       void updateValue();
 public:
