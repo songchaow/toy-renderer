@@ -8,7 +8,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindow
       Q_OBJECT
 private slots:
       void importObj();
-      void objLoadToggled(QTreeWidgetItem* i);
+      void objLoadToggled(QTableWidgetItem* i);
       void refreshResource();
       void showProperties(QTableWidgetItem* obj);
 public:

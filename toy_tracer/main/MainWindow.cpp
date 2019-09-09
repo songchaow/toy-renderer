@@ -33,8 +33,17 @@ void MainWindow::importObj() {
       refreshResource();
 }
 
-void MainWindow::objLoadToggled(QTreeWidgetItem* i)
+void MainWindow::objLoadToggled(QTableWidgetItem* i)
 {
+      QVariant obj = i->data(Qt::UserRole);
+      if(!obj.isNull()) {
+            RendererObject* o = static_cast<RendererObject*>(obj.value<void*>());
+            bool toggled = i->checkState() == Qt::Checked;
+            if(toggled) {
+                  
+            }
+      }
+      bool toggled;
 
 }
 

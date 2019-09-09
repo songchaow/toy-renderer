@@ -20,4 +20,5 @@ public:
       // thread-safe using mutex
       void addPrimitive(Primitive* p);
       static const Camera* getCamera() { return cam; }
+      static inline RendererWorker* Instance();
 };
