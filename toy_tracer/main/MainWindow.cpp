@@ -2,25 +2,40 @@
 #include "core/ResourceManager.h"
 #include <QFileDialog>
 
+MainWindow* _mainWindow;
+
 MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
+      _mainWindow = this;
       setupUi(this);
       resourceWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-      QObject::connect(loadResButton, SIGNAL(clicked()), this, SLOT(loadObj()));
+      QObject::connect(loadResButton, SIGNAL(clicked()), this, SLOT(importObj()));
       QObject::connect(resourceWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem *)));
 }
 
 void MainWindow::showProperties(QTableWidgetItem* obj) {
       RendererObject* robj = static_cast<RendererObject*>(obj->data(Qt::UserRole).value<void*>());
-      if (robj)
+      if (robj) {
             robj->addProperties(properties);
+            if (robj->typeID() == RendererObject::TypeID::Primitive) {
+                  PBRMaterial* m = static_cast<Primitive*>(robj)->getPBRMaterial();
+                  if (m)
+                        m->addProperties(materialWidget);
+
+            }
+      }
 }
 
-void MainWindow::loadObj() {
+void MainWindow::importObj() {
       QFileDialog dialog(this, "Load Resource...", QString(), ResourceManager::getInstance()->filters.join(';'));
       dialog.exec();
       resourcePath->setText(dialog.selectedFiles()[0]);
       ResourceManager::getInstance()->loadFile(dialog.selectedFiles()[0]);
       refreshResource();
+}
+
+void MainWindow::objLoadToggled(QTreeWidgetItem* i)
+{
+
 }
 
 void MainWindow::refreshResource() {
@@ -37,4 +52,8 @@ void MainWindow::refreshResource() {
             resourceWidget->setItem(idx, 1, item_type);
             idx++;
       }
+}
+
+MainWindow* MainWindow::getInstance() {
+      return _mainWindow;
 }

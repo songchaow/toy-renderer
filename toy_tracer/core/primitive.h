@@ -17,6 +17,7 @@ private:
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), RendererObject(TypeID::Primitive, "Primitive"), material(m) {}
       Material* getMaterial() const { return material; }
+      PBRMaterial* getPBRMaterial() const { return rt_m; }
       virtual void addProperties(QWidget* parent) override;
       void load(QOpenGLExtraFunctions* f);
       void draw(QOpenGLExtraFunctions* f);

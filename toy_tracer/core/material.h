@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <QOpenGLExtraFunctions>
+#include <QLineEdit>
 #include "core/spectrum.h"
 #include "core/texture.h"
 #include "core/interaction.h"
@@ -77,24 +78,31 @@ public:
       virtual bool isFlat() override { return surface->isFlatSurface(); }
 };
 
-class PBRMaterial : public RendererObject {
+class PBRMaterial : public QObject {
+      Q_OBJECT
+      QLineEdit* albedo_text;
+      QLineEdit* metallic_text;
+      QLineEdit* rough_text;
 public:
-      ImageTexture* albedo_map = nullptr;
+      ImageTexture albedo_map;
       //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
       //ImageTexture* specular_map = nullptr; // replaced by metallic
-      ImageTexture* metallic_map = nullptr;
-      ImageTexture* rough_map = nullptr;
+      ImageTexture metallic_map;
+      ImageTexture rough_map;
 
 private:
-      Shader* _shader;
+      Shader* _shader = nullptr;
+      bool _dirty; // need to update some of those `tbo`s.
+private slots:
+      void updateProperties();
 
 public:
       void load(QOpenGLExtraFunctions* f);
       Shader* shader() const { return _shader; }
-      virtual void addProperties(QWidget* parent) override;
+      void addProperties(QWidget* parent);
+      void update(QOpenGLExtraFunctions* f);
+      bool dirty() const { return _dirty; }
 };
-
-PBRMaterial* CreatePBRMaterial(QString albedo, QString metallic, QString rough);
 
 class GlossSurface;
 class FlatSurface : public Surface

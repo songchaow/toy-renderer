@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "core/common.h"
 #include "core/sampler.h"
+#include <QPushButton>
 
 Spectrum Material::sample_f(Interaction& i, Point2f sample, Float* pdf)
 {
@@ -207,16 +208,41 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
 
 void PBRMaterial::load(QOpenGLExtraFunctions* f) {
       // TODO: use a const texture as the fallback if there're null pointers
-      if(albedo_map)
-            albedo_map->load(f);
-      if (metallic_map)
-            metallic_map->load(f);
-      if (rough_map)
-            rough_map->load(f);
+      if(!albedo_map.isValid())
+            albedo_map.load(f);
+      if (!metallic_map.isValid())
+            metallic_map.load(f);
+      if (!rough_map.isValid())
+            rough_map.load(f);
       _shader = LoadShader("shader/vertex.glsl", "pbr_pixel.glsl", f);
 }
 
-void PBRMaterial::addProperties(QWidget* parent) {
-      RendererObject::addProperties(parent);
+void PBRMaterial::update(QOpenGLExtraFunctions* f) {
+      if (!albedo_map.isValid())
+            albedo_map.update(f);
+      if (!metallic_map.isValid())
+            metallic_map.update(f);
+      if (!rough_map.isValid())
+            rough_map.update(f);
+      _dirty = false;
+}
 
+// called when adding images to texture, or the texures change
+void PBRMaterial::updateProperties() {
+      albedo_map.resetImage(Image::CreateImageFromFile(albedo_text->text().toStdString()));
+      metallic_map.resetImage(Image::CreateImageFromFile(metallic_text->text().toStdString()));
+      rough_map.resetImage(Image::CreateImageFromFile(rough_text->text().toStdString()));
+      _dirty = true;
+}
+
+void PBRMaterial::addProperties(QWidget* parent) {
+      //RendererObject::addProperties(parent);
+      // TODO: add existing values
+      albedo_text = RendererObject::addFileDialog("Albedo Map:", "Open", parent);
+      metallic_text = RendererObject::addFileDialog("Metallic Map:", "Open:", parent);
+      rough_text = RendererObject::addFileDialog("Rough Map:", "Open:", parent);
+      // add create menu
+      auto* parentLayout = parent->layout();
+      QPushButton* update = new QPushButton();
+      QObject::connect(update, SIGNAL(clicked()), this, SLOT(updateProperties()));
 }

@@ -43,8 +43,9 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       for (auto* mesh : _meshes) {
             mesh->load(f);
       }
-      // RTMaterial must be valid now
-      assert(rt_m!=nullptr);
+      // TODO: consider other types of RTMaterial
+      if (rt_m == nullptr)
+            rt_m = new PBRMaterial();
       rt_m->load(f);
       shader = rt_m->shader();
 }
@@ -54,19 +55,19 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
       // TODO: maybe different meshes' materials/textures are different.
       shader->use();
 
-      if (rt_m->albedo_map) {
+      if (rt_m->albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map->tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map.tbo());
             shader->setUniformI("albedoSampler", 0);
       }
-      if (rt_m->metallic_map) {
+      if (rt_m->metallic_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE1);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->metallic_map->tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->metallic_map.tbo());
             shader->setUniformI("metallicSampler", 1);
       }
-      if (rt_m->rough_map) {
+      if (rt_m->rough_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE2);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->rough_map->tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->rough_map.tbo());
             shader->setUniformI("roughnessSampler", 2);
       }
       

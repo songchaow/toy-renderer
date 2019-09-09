@@ -1,5 +1,15 @@
 #include "core/image.h"
 #include "ext/std_image/include/stb_image.h"
+#include <map>
+
+static std::map<std::string, Image> _imageStore;
+
+Image* Image::CreateImageFromFile(std::string path) {
+      if (_imageStore.find(path) != _imageStore.end())
+            return &_imageStore[path];
+      _imageStore[path] = Image(path);
+      return &_imageStore[path];
+}
 
 bool Image::LoadFromFile(std::string path)
 {

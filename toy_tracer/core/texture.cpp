@@ -35,5 +35,22 @@ void ImageTexture::load(QOpenGLExtraFunctions* f) {
       else if (_image->format() == Image::Format::R8G8B8A8)
             image_format = GL_RGBA;
       f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      f->glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void ImageTexture::update(QOpenGLExtraFunctions* f) {
+      // if unloaded
+      if (_tbo == 0) {
+            load(f);
+            return;
+      }
+      f->glBindTexture(GL_TEXTURE_2D, _tbo);
+      GLuint image_format;
+      if (_image->format() == Image::Format::R8G8B8)
+            image_format = GL_RGB;
+      else if (_image->format() == Image::Format::R8G8B8A8)
+            image_format = GL_RGBA;
+      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      f->glBindTexture(GL_TEXTURE_2D, 0);
 
 }

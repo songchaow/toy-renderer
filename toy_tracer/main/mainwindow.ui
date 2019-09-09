@@ -21,6 +21,32 @@
     </sizepolicy>
    </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="3" column="0">
+     <widget class="QPushButton" name="loadResButton">
+      <property name="text">
+       <string>Load</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QFrame" name="materialWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLineEdit" name="resourcePath"/>
+    </item>
     <item row="0" column="0">
      <widget class="QLabel" name="scene_label">
       <property name="text">
@@ -33,42 +59,6 @@
       <property name="text">
        <string>Material</string>
       </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLineEdit" name="resourcePath"/>
-    </item>
-    <item row="1" column="1">
-     <widget class="QTreeWidget" name="materialWidget">
-      <column>
-       <property name="text">
-        <string notr="true">1</string>
-       </property>
-      </column>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QPushButton" name="loadResButton">
-      <property name="text">
-       <string>Load</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QFrame" name="properties">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Panel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2"/>
      </widget>
     </item>
     <item row="1" column="0">
@@ -91,7 +81,30 @@
       </column>
      </widget>
     </item>
+    <item row="1" column="2">
+     <widget class="QFrame" name="properties">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Panel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
    </layout>
+   <zorder>materialWidget</zorder>
+   <zorder>scene_label</zorder>
+   <zorder>material_label</zorder>
+   <zorder>resourcePath</zorder>
+   <zorder>loadResButton</zorder>
+   <zorder>resourceWidget</zorder>
+   <zorder>properties</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>

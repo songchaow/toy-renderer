@@ -11,4 +11,5 @@ public:
       static ResourceManager* getInstance();
       std::vector<RendererObject*>& getResourceList() { return _loadList; }
       void loadFile(QString path);
+      
 };

@@ -24,7 +24,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       path = vertex_path + fragment_path;
       // compile
       if (f) {
-            
+            compile(f);
       }
       this->f = f;
 }

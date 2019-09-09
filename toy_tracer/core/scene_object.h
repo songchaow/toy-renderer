@@ -2,6 +2,7 @@
 #include <QString>
 #include <QWidget>
 #include <QToolBox>
+#include <QLineEdit>
 #include <map>
 #include "core/common.h"
 
@@ -10,14 +11,14 @@ struct Transform;
 
 class RendererObject : public QObject {
       QString id;
-protected:
-      void addProperty(const RGBSpectrum* s, QWidget* parent, QString desc = "");
-      void addProperty(const Transform* t, QWidget* parent, QString desc = "");
-      void addConstText(QString desc, QString value, QWidget* parent);
-      void addText(QString desc, QString* value_ptr, QWidget* target);
-      void addNumberf(QString desc, Float* value_ptr, QWidget* target);
-      void addNumberi(QString desc, int* value_ptr, QWidget* target);
-      void addFileDialog(QString desc, QString button_text, QWidget* target);
+public:
+      static void addProperty(const RGBSpectrum* s, QWidget* parent, QString desc = "");
+      static void addProperty(const Transform* t, QWidget* parent, QString desc = "");
+      static void addConstText(QString desc, QString value, QWidget* parent);
+      static void addText(QString desc, QString* value_ptr, QWidget* target);
+      static void addNumberf(QString desc, Float* value_ptr, QWidget* target);
+      static void addNumberi(QString desc, int* value_ptr, QWidget* target);
+      static QLineEdit* addFileDialog(QString desc, QString button_text, QWidget* target, QString path = QString(), QStringList filters = QStringList());
 private slots:
       void updateValue();
 public:
@@ -26,17 +27,19 @@ public:
             Primitive,
             Light, // and other lights
             Shape,
+            Image,
       };
       static const std::map<TypeID, QString> TypeIDMap;
 private:
-      TypeID type_id;
+      TypeID _typeID;
 protected:
       QString& nameRef() { return id; }
 public:
       virtual void addProperties(QWidget* parent);
       const QString name() { return id; }
-      const QString type_name() { return TypeIDMap.at(type_id); }
+      const TypeID typeID() const { return _typeID; }
+      const QString type_name() { return TypeIDMap.at(_typeID); }
       void rename(QString newname) { id = newname; }
-      RendererObject(TypeID type_id, QString name) : type_id(type_id), id(name) {}
-      RendererObject(TypeID type_id) : type_id(type_id) {}
+      RendererObject(TypeID type_id, QString name) : _typeID(type_id), id(name) {}
+      RendererObject(TypeID type_id) : _typeID(type_id) {}
 };
