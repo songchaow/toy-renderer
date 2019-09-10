@@ -1,5 +1,6 @@
 #include "main/MainWindow.h"
 #include "core/ResourceManager.h"
+#include "main/renderworker.h"
 #include <QFileDialog>
 
 MainWindow* _mainWindow;
@@ -9,10 +10,11 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       setupUi(this);
       resourceWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
       QObject::connect(loadResButton, SIGNAL(clicked()), this, SLOT(importObj()));
-      QObject::connect(resourceWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem *)));
+      QObject::connect(resourceWidget, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem* ,QTableWidgetItem *)));
+      QObject::connect(resourceWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(objLoadToggled(QTableWidgetItem *)));
 }
 
-void MainWindow::showProperties(QTableWidgetItem* obj) {
+void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
       RendererObject* robj = static_cast<RendererObject*>(obj->data(Qt::UserRole).value<void*>());
       if (robj) {
             robj->addProperties(properties);
@@ -40,7 +42,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
             RendererObject* o = static_cast<RendererObject*>(obj.value<void*>());
             bool toggled = i->checkState() == Qt::Checked;
             if(toggled) {
-                  
+                  RenderWorker::Instance()->addObject(o);
             }
       }
       bool toggled;

@@ -2,6 +2,7 @@
 //
 
 #include <QtWidgets/QApplication>
+#include <QThread>
 #include "main/MainWindow.h"
 #include "main/canvas.h"
 #include "main/renderworker.h"
@@ -21,6 +22,7 @@ int main(int argc, char *argv[])
       QThread workerThread;
       worker->moveToThread(&workerThread);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
+      workerThread.start();
       a.exec();
 	return 0;
 }

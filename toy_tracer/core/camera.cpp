@@ -20,6 +20,12 @@ Transform Camera::Cam2NDC() const
       return s * t * Transform(persp);
 }
 
+void Camera::applyRotation() {
+      _rotationXTrigger = false;
+      _rotationYTrigger = false;
+      _world2cam = _rotationX * _rotationY * _world2cam;
+}
+
 void Camera::Render(RenderOption & options)
 {
       // TODO: initialize samplers here

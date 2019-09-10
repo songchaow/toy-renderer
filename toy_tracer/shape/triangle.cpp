@@ -9,7 +9,7 @@
 void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, std::vector<TriangleMesh*>& meshes) {
       aiMatrix4x4 o2w = local2world * node->mTransformation;
       for (int idx = 0; idx < node->mNumMeshes; idx++) {
-            aiMesh* mesh = scene->mMeshes[scene->mRootNode->mMeshes[idx]];
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[idx]];
             unsigned int vertex_count = mesh->mNumVertices;
             TriangleMesh::Layout layout;
             uint16_t curr_strip = 0;
@@ -80,7 +80,7 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
 }
 
 std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene) {
-      if (scene->mRootNode->mNumMeshes == 0)
+      if (scene->mNumMeshes == 0)
             return {};
       std::vector<TriangleMesh*> meshes;
       addMesh(scene->mRootNode, scene, aiMatrix4x4(), meshes);
@@ -104,7 +104,7 @@ void TriangleMesh::load(QOpenGLExtraFunctions* f) {
       f->glGenBuffers(1, &_ebo);
       f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
       // each int32_t contains 4 bytes
-      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * 3 * index_num, index_data, GL_STATIC_DRAW);
+      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (auto& l : layout) {
             if (ShaderLocMap.find(l.type) == ShaderLocMap.end())

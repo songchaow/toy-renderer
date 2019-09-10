@@ -12,7 +12,7 @@ class TriangleMesh {
       uint16_t vertex_num = 0;
       uint16_t vbuffer_size = 0;
       void* vertex_data = nullptr;
-      uint16_t index_num = 0;
+      uint16_t face_num = 0;
       void* index_data = nullptr;
       GLuint _vao = 0; // vertex array object
       GLuint _vbo = 0; // vertex buffer object
@@ -49,7 +49,7 @@ public:
       TriangleMesh() = default;
       TriangleMesh(void* raw_data, Layout l, uint16_t vb_size, uint16_t vertex_num, void* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
             : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
-            index_data(index_data), index_num(index_num), indexFormat(idxFormat) {
+            index_data(index_data), face_num(index_num), indexFormat(idxFormat) {
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);
@@ -58,7 +58,7 @@ public:
       GLuint vao() const { return _vao; }
       GLuint vbo() const { return _vbo; }
       GLuint ebo() const { return _ebo; }
-      GLuint face_count() const { return index_num; }
+      GLuint face_count() const { return face_num; }
       const Transform& obj2world() const { return _obj2world; }
       const Transform& world2obj() const { return _world2obj; }
       ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }

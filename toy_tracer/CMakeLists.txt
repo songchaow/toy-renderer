@@ -68,7 +68,7 @@ target_link_libraries(toytracer tracer_lib)
 # copy shader files to the binary directory
 add_custom_command(TARGET toytracer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_CURRENT_SOURCE_DIR}/shader $<TARGET_FILE_DIR:toytracer>/shader)
+                       ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
 
 # TODO: 如有需要，请添加测试并安装目标。
 ENABLE_TESTING()

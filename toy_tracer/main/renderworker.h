@@ -5,10 +5,14 @@
 #include "core/primitive.h"
 #include "core/camera.h"
 #include "main/TwoThreadQueue.h"
+
+class RenderWorker;
+extern RenderWorker _worker;
+
 class RenderWorker : public QObject, QOpenGLExtraFunctions {
       Q_OBJECT
       QOpenGLContext* m_context;
-      TwoThreadQueue<Primitive*> primitiveQueue;
+      TwoThreadQueue<RendererObject*> primitiveQueue;
       std::vector<Primitive*> primitives;
       // TODO: define an update info structure
       static Camera* cam;
@@ -18,7 +22,7 @@ public slots:
       void renderLoop();
 public:
       // thread-safe using mutex
-      void addPrimitive(Primitive* p);
+      void addObject(RendererObject* p);
       static const Camera* getCamera() { return cam; }
-      static inline RendererWorker* Instance();
+      static inline RenderWorker* Instance() { return &_worker; }
 };

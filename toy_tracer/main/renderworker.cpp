@@ -1,13 +1,13 @@
 #include "main/renderworker.h"
 #include <QWindow>
 
-static RendererWorker _worker;
-
-RendererWorker* RendererWorker::Instance() {
-      return &_worker;
-}
+RenderWorker _worker;
 
 Camera* RenderWorker::cam;
+
+Camera* CreateRTCamera() {
+
+}
 
 void RenderWorker::initialize(QWindow* s) {
       m_context = new QOpenGLContext();
@@ -19,14 +19,26 @@ void RenderWorker::initialize(QWindow* s) {
 
 void RenderWorker::renderLoop() {
       for(;;) {
-            std::vector<Primitive*> pendingAddPrimitives;
+            // resize the camera if needed
+
+            // update the camera's orientation
+            if (RenderWorker::cam->rotationTrigger()) {
+                  cam->applyRotation();
+            }
+            // add pending primitives
+            std::vector<RendererObject*> pendingAddPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives)) {
                   // loading
-                  for (auto* p : pendingAddPrimitives) {
-                        p->load(this);
-                        // TODO: maybe check duplicate in the future
-                        // time-consuming, but only happens when loading
-                        primitives.push_back(p);
+                  for (auto* o : pendingAddPrimitives) {
+                        if (o->typeID() == RendererObject::TypeID::Primitive) {
+                              Primitive* p = static_cast<Primitive*>(o);
+                              p->load(this);
+                              // TODO: maybe check duplicate in the future
+                              // time-consuming, but only happens when loading
+                              primitives.push_back(p);
+                        }
+                        else if (o->typeID() == RendererObject::TypeID::Light)
+                              ;
                   }
             }
             // rendering
@@ -40,7 +52,7 @@ void RenderWorker::renderLoop() {
       }
 }
 
-void RenderWorker::addPrimitive(Primitive* p)
+void RenderWorker::addObject(RendererObject* p)
 {
       while (!primitiveQueue.addElement(p));
 }

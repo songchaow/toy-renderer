@@ -9,8 +9,12 @@
 #include <cmath>
 
 class Camera {
-      Transform _cam2world;
+      Transform _cam2world; // not used in RTR
       Transform _world2cam;
+      volatile bool _rotationXTrigger = false;
+      volatile bool _rotationYTrigger = false;
+      Transform _rotationX;
+      Transform _rotationY;
       Float film_distance = 1.f;
       Film film;
       Float fov_Vertical;
@@ -32,4 +36,12 @@ public:
       Transform Cam2NDC() const;
       const Transform& world2cam() const { return _world2cam; }
       const Transform& cam2world() const { return _cam2world; }
+      bool rotationXTrigger() const { return _rotationXTrigger; }
+      bool rotationYTrigger() const { return _rotationYTrigger; }
+      bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
+
+      void applyRotation();
+      
 };
+
+Camera* CreateRTCamera();
