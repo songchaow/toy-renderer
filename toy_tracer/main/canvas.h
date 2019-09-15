@@ -5,9 +5,12 @@
 
 class Canvas : public QWindow, public QOpenGLFunctions {
       QOpenGLContext* m_context;
+      volatile bool _drag = false;
+      volatile bool _resized = false;
 public:
-      Canvas() { setSurfaceType(QWindow::OpenGLSurface); }
+      Canvas() { setSurfaceType(QWindow::OpenGLSurface); create(); }
 
+      // deprecated
       void initialize() {
             m_context = new QOpenGLContext();
             m_context->setFormat(requestedFormat());
@@ -15,15 +18,17 @@ public:
             m_context->makeCurrent(this);
             initializeOpenGLFunctions();
       }
-
+      // deprecated
       void resize() {
             glViewport(0, 0, size().width(), size().height());
       }
-
-      void render() {
-            GLenum a;
-            
-            ;
-      }
+      bool resized() const { return _resized; }
+      void clearResized() { _resized = false; }
+      bool drag() const { return _drag; }
+      void clearDrag() { _drag = false; }
+protected:
+      void mousePressEvent(QMouseEvent *ev) override;
+      void mouseReleaseEvent(QMouseEvent *ev) override;
+      void mouseMoveEvent(QMouseEvent *ev) override;
 
 };

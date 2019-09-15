@@ -16,6 +16,12 @@ struct Matrix4 {
 
 extern Matrix4 Inverse(const Matrix4 &m);
 
+struct Transform;
+
+Transform Translate(const Vector3f &delta);
+
+Transform Scale(Float x, Float y, Float z);
+
 struct Transform {
       Matrix4 m;
       Matrix4 mInv;
@@ -33,7 +39,8 @@ struct Transform {
             Float d1, Float d2, Float d3, Float d4) :m(a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4) {
             mInv = ::Inverse(m);
       }
-      Transform(Matrix4& m) : m(m) { mInv = ::Inverse(m); }
+      Transform(const Matrix4& m) : m(m) { mInv = ::Inverse(m); }
+      Transform(const Matrix4& m, const Matrix4& mInv) :m(m), mInv(mInv) {}
       Transform Inverse() { return Transform(::Inverse(m)); }
       void Inverse(Transform* _tInv) { *_tInv = ::Inverse(m); }
       void setInverse(Transform* _tInv) { tInv = _tInv; }
@@ -43,8 +50,6 @@ struct Transform {
       Vector3f operator() (const Vector3f& o) const;
       Normal3f operator() (const Normal3f& o) const;
       Transform operator*(const Transform& rhs) const;
+
+      static Transform Identity() { return Scale(1.f, 1.f, 1.f); }
 };
-
-Transform Translate(const Vector3f &delta);
-
-Transform Scale(Float x, Float y, Float z);

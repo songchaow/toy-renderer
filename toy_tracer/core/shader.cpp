@@ -34,22 +34,28 @@ void Shader::compile(QOpenGLExtraFunctions* f) {
       char infoLog[1024];
       const char* v_shader_str_ptr = vertex_shader_code.c_str();
       const char* f_shader_str_ptr = fragment_shader_code.c_str();
+      GLenum err;
+      err = f->glGetError();
       unsigned int vertex = f->glCreateShader(GL_VERTEX_SHADER);
+      err = f->glGetError();
       unsigned int fragment = f->glCreateShader(GL_FRAGMENT_SHADER);
       f->glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
       f->glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
 
       f->glCompileShader(vertex);
       int success = 0;
+      int len = 0;
       f->glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
       if (!success) {
-            f->glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+            f->glGetShaderInfoLog(vertex, 512, &len, infoLog);
+            infoLog[len] = 0;
             std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
       }
       f->glCompileShader(fragment);
       f->glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
       if (!success) {
-            f->glGetShaderInfoLog(vertex, 1024, NULL, infoLog);
+            f->glGetShaderInfoLog(fragment, 1024, &len, infoLog);
+            infoLog[len] = 0;
             std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
       }
 

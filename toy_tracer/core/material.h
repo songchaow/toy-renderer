@@ -93,7 +93,7 @@ public:
 private:
       Shader* _shader = nullptr;
       volatile bool _dirty; // need to update some of those `tbo`s.
-private slots:
+public slots:
       void updateProperties();
 
 public:

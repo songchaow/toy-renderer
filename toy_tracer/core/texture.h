@@ -32,6 +32,7 @@ extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 
 class ImageTexture : public RGBSpectrumTexture {
       std::shared_ptr<Image> _image;
+      std::string _path;
       GLuint _tbo = 0;
 public:
       enum WrapMode {
@@ -54,4 +55,5 @@ public:
       void update(QOpenGLExtraFunctions* f);
       RGBSpectrum Evaluate(Float u, Float v) override;
       GLuint tbo() const { return _tbo; }
+      const std::string& path() const { return _path; }
 };

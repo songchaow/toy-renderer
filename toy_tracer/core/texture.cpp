@@ -30,11 +30,12 @@ void ImageTexture::load(QOpenGLExtraFunctions* f) {
       f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // level: 0
       GLuint image_format;
-      if (_image->format() == Image::Format::R8G8B8)
+      if (_image->format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
             image_format = GL_RGB;
       else if (_image->format() == Image::Format::R8G8B8A8)
             image_format = GL_RGBA;
       f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       f->glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -46,11 +47,11 @@ void ImageTexture::update(QOpenGLExtraFunctions* f) {
       }
       f->glBindTexture(GL_TEXTURE_2D, _tbo);
       GLuint image_format;
-      if (_image->format() == Image::Format::R8G8B8)
+      if (_image->format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
             image_format = GL_RGB;
       else if (_image->format() == Image::Format::R8G8B8A8)
             image_format = GL_RGBA;
-      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       f->glBindTexture(GL_TEXTURE_2D, 0);
 
 }

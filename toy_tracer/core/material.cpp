@@ -6,7 +6,9 @@
 #include "core/common.h"
 #include "core/sampler.h"
 #include <QPushButton>
+
 #include <QLayout>
+#include <QDebug>
 
 Spectrum Material::sample_f(Interaction& i, Point2f sample, Float* pdf)
 {
@@ -219,26 +221,31 @@ void PBRMaterial::load(QOpenGLExtraFunctions* f) {
 }
 
 void PBRMaterial::update(QOpenGLExtraFunctions* f) {
-      if (!albedo_map.isValid())
+      if (albedo_map.isValid())
             albedo_map.update(f);
-      if (!metallic_map.isValid())
+      if (metallic_map.isValid())
             metallic_map.update(f);
-      if (!rough_map.isValid())
+      if (rough_map.isValid())
             rough_map.update(f);
       _dirty = false;
 }
 
 // called when adding images to texture, or the texures change
 void PBRMaterial::updateProperties() {
-      albedo_map.resetImage(Image::CreateImageFromFile(albedo_text->text().toStdString()));
-      metallic_map.resetImage(Image::CreateImageFromFile(metallic_text->text().toStdString()));
-      rough_map.resetImage(Image::CreateImageFromFile(rough_text->text().toStdString()));
+      if(!albedo_text->text().isEmpty())
+            albedo_map.resetImage(Image::CreateImageFromFile(albedo_text->text().toStdString()));
+      if(!metallic_text->text().isEmpty())
+            metallic_map.resetImage(Image::CreateImageFromFile(metallic_text->text().toStdString()));
+      if(!rough_text->text().isEmpty())
+            rough_map.resetImage(Image::CreateImageFromFile(rough_text->text().toStdString()));
       _dirty = true;
 }
 
 void PBRMaterial::addProperties(QWidget* parent) {
       //RendererObject::addProperties(parent);
       // TODO: add existing values
+      qDebug() << "PBRMaterial thread affinity:" << thread();
+      QVBoxLayout* globalLayout = new QVBoxLayout;
       if (parent->layout()) {
             // Delete all existing widgets, if any.
             if (parent->layout() != NULL)
@@ -252,11 +259,13 @@ void PBRMaterial::addProperties(QWidget* parent) {
                   delete parent->layout();
             }
       }
-      albedo_text = RendererObject::addFileDialog("Albedo Map:", "Open", parent);
-      metallic_text = RendererObject::addFileDialog("Metallic Map:", "Open:", parent);
-      rough_text = RendererObject::addFileDialog("Rough Map:", "Open:", parent);
+      parent->setLayout(globalLayout);
+      albedo_text = RendererObject::addFileDialog("Albedo Map:", "Open", parent, QString::fromStdString(albedo_map.path()));
+      metallic_text = RendererObject::addFileDialog("Metallic Map:", "Open:", parent, QString::fromStdString(metallic_map.path()));
+      rough_text = RendererObject::addFileDialog("Rough Map:", "Open:", parent, QString::fromStdString(rough_map.path()));
       // add create menu
       auto* parentLayout = parent->layout();
-      QPushButton* update = new QPushButton();
-      QObject::connect(update, SIGNAL(clicked()), this, SLOT(updateProperties()));
+      QPushButton* update = new QPushButton("Update Material");
+      parentLayout->addWidget(update);
+      QObject::connect(update, &QPushButton::clicked, this, &PBRMaterial::updateProperties);
 }

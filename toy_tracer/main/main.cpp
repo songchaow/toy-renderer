@@ -18,9 +18,10 @@ int main(int argc, char *argv[])
       canvas->show();
       //canvas->initialize(); // use RenderWorker's
       RenderWorker* worker = RenderWorker::Instance();
-      worker->initialize(canvas);
+      worker->setCanvas(canvas);
       QThread workerThread;
       worker->moveToThread(&workerThread);
+      QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
       workerThread.start();
       a.exec();

@@ -44,8 +44,10 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
             mesh->load(f);
       }
       // TODO: consider other types of RTMaterial
-      if (rt_m == nullptr)
+      if (rt_m == nullptr) {
             rt_m = new PBRMaterial();
+            rt_m->moveToThread(thread());
+      }
       rt_m->load(f);
       shader = rt_m->shader();
 }
