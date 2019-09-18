@@ -1,7 +1,7 @@
 # CMakeList.txt: toy_tracer 的 CMake 项目，在此处包括源代码并定义
 # 项目特定的逻辑。
 #
-SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+# SET(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 cmake_minimum_required (VERSION 3.8)
 
 # third-party dependencies
@@ -60,7 +60,9 @@ file(GLOB TRACER_EXE
     main/*.h
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+
+message(STATUS "CMAKE CURRENT BINARY DIR: " ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable (toytracer ${TRACER_EXE} ${ui_headers})
 target_link_libraries(toytracer tracer_lib)
@@ -69,6 +71,11 @@ target_link_libraries(toytracer tracer_lib)
 add_custom_command(TARGET toytracer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
+if(MSVC)
+  add_custom_command(TARGET toytracer POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+      ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
+endif (MSVC)
 
 # TODO: 如有需要，请添加测试并安装目标。
 ENABLE_TESTING()
