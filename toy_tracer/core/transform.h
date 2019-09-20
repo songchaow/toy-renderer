@@ -23,6 +23,8 @@ Transform Translate(const Float x, const Float y, const Float z);
 
 Transform Scale(Float x, Float y, Float z);
 
+Transform Rotate(Float dTheta, Float dPhi);
+
 struct Transform {
       Matrix4 m;
       Matrix4 mInv;

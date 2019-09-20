@@ -14,8 +14,7 @@ class Camera {
       // Contrl
       volatile bool _rotationXTrigger = false;
       volatile bool _rotationYTrigger = false;
-      Transform _rotationX;
-      Transform _rotationY;
+      Transform _rotation;
       // Config
       Float film_distance = 1.f;
       Film film;
@@ -41,7 +40,7 @@ public:
       bool rotationXTrigger() const { return _rotationXTrigger; }
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
-
+      void setTransform(Float offsetX, Float offsetY);
       void applyRotation();
       
 };

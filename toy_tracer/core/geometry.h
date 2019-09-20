@@ -35,7 +35,8 @@
 #pragma once
 #endif
 
-// core/geometry.h*
+#include <QPoint>
+
 #include "core/common.h"
 #include "utils/utils.h"
 #include <iterator>
@@ -285,6 +286,11 @@ class Point2 {
         x *= f;
         y *= f;
         return *this;
+    }
+    Point2<T>& operator=(const QPoint& qp) {
+          x = qp.x();
+          y = qp.y();
+          return *this;
     }
     template <typename U>
     Point2<T> operator/(U f) const {

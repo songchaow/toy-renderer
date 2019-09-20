@@ -82,7 +82,8 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
             shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
+            GLenum err = f->glGetError();
             f->glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
-
+            err = f->glGetError();
       }
 }

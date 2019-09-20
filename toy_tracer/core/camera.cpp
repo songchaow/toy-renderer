@@ -20,10 +20,15 @@ Transform Camera::Cam2NDC() const
       return s * t * Transform(persp);
 }
 
+void Camera::setTransform(Float offsetX, Float offsetY) {
+      _rotation = Rotate(offsetY/50.f, offsetX/50.f);
+      _rotationXTrigger = true;
+}
+
 void Camera::applyRotation() {
       _rotationXTrigger = false;
       _rotationYTrigger = false;
-      _world2cam = _rotationX * _rotationY * _world2cam;
+      _world2cam = _rotation * _world2cam;
 }
 
 void Camera::Render(RenderOption & options)

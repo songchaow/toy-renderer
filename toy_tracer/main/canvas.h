@@ -1,14 +1,18 @@
 #pragma once
+#include "core/geometry.h"
+
 #include <QtWidgets/qwidget.h>
 #include <QWindow>
 #include <QOpenGLExtraFunctions>
+#include <QMouseEvent>
 
 class Canvas : public QWindow, public QOpenGLFunctions {
       QOpenGLContext* m_context;
       volatile bool _drag = false;
       volatile bool _resized = false;
+      Point2f _pos0;
 public:
-      Canvas() { setSurfaceType(QWindow::OpenGLSurface); create(); }
+      Canvas();
 
       // deprecated
       void initialize() {

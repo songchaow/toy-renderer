@@ -27,7 +27,7 @@ public slots:
 public:
       // thread-safe using mutex
       void addObject(RendererObject* p);
-      static const Camera* getCamera() { return cam; }
+      static Camera* getCamera() { return cam; }
       void setCanvas(Canvas* c) { _canvas = c; }
       static inline RenderWorker* Instance() { return &_worker; }
 };
