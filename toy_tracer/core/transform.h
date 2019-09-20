@@ -19,6 +19,7 @@ extern Matrix4 Inverse(const Matrix4 &m);
 struct Transform;
 
 Transform Translate(const Vector3f &delta);
+Transform Translate(const Float x, const Float y, const Float z);
 
 Transform Scale(Float x, Float y, Float z);
 

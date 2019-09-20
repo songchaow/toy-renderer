@@ -57,9 +57,11 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             for (auto& item : layout) {
                   item.strip = curr_strip;
                   char* p_char = (char*)raw_data + item.offset;
+                  char* p_src = (char*)item.data_ptr;
                   for (int i = 0; i < vertex_count; i++) {
-                        std::memcpy(p_char, item.data_ptr, item.e_size*item.e_count);
+                        std::memcpy(p_char, p_src, item.e_size*item.e_count);
                         p_char += item.strip;
+                        p_src += item.e_size*item.e_count;
                   }
             }
             // copy faces

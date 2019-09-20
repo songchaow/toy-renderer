@@ -8,7 +8,7 @@ RenderWorker _worker;
 Camera* RenderWorker::cam;
 
 Camera* CreateRTCamera(const Point2i& screen_size) {
-      return new Camera(nullptr, Scale(0.f, 0.f, -10.f), screen_size);
+      return new Camera(nullptr, Translate(0.f, 0.f, -4.f), screen_size);
 }
 
 void RenderWorker::initialize() {

@@ -136,6 +136,12 @@ Transform Translate(const Vector3f &delta) {
       return m;
 }
 
+Transform Translate(const Float x, const Float y, const Float z) {
+      Matrix4 m(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0,
+            1);
+      return m;
+}
+
 Transform Scale(Float x, Float y, Float z) {
       Matrix4 m(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
       Matrix4 mInv(1.f / x, 0, 0, 0, 0, 1.f / y, 0, 0, 0, 0, 1.f / z, 0, 0, 0, 0, 1);
