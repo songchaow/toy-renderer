@@ -148,7 +148,7 @@ Transform Scale(Float x, Float y, Float z) {
       return m;
 }
 
-// dTheta:  rotation around the x axis.
+// dTheta:  rotation around the x axis. Actually theta
 // dPhi:    rotation around the y axis.
 Transform Rotate(Float dTheta, Float dPhi) {
       Matrix4 m(std::cos(dPhi), std::sin(dPhi)*std::sin(dTheta), std::cos(dTheta)*std::sin(dPhi), 0,

@@ -40,6 +40,8 @@ void RenderWorker::renderLoop() {
             if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
             }
+            if (_canvas->keyPressed())
+                  cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
             // add pending primitives
             std::vector<RendererObject*> pendingAddPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives)) {

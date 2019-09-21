@@ -9,12 +9,18 @@
 #include <cmath>
 
 class Camera {
+      // Orientation
       Transform _cam2world; // not used in RTR
       Transform _world2cam;
+      Vector3f _viewDir = { 0.f,0.f,1.f };
+      Point3f _pos = { 0.f, 0.f, -10.f };
       // Contrl
       volatile bool _rotationXTrigger = false;
       volatile bool _rotationYTrigger = false;
+      Vector3f newX;
+      Vector3f newY;
       Transform _rotation;
+      Float _speed = 2.f;
       // Config
       Float film_distance = 1.f;
       Film film;
@@ -27,6 +33,10 @@ class Camera {
       Scene* s;
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
+
+protected:
+      void LookAt();
+
 public:
       Camera(Scene* s, Transform cam2world, const Point2i& film_size, Float fov_Vertical = 160.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), _cam2world(cam2world),
             _world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
@@ -42,6 +52,7 @@ public:
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
       void setTransform(Float offsetX, Float offsetY);
       void applyRotation();
+      void applyTranslation(volatile bool* statuses, Float deltaT);
       
 };
 
