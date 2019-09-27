@@ -1,3 +1,4 @@
+// TODO: move to main
 #pragma once
 #include <QString>
 #include <QWidget>

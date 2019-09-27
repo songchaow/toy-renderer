@@ -5,7 +5,6 @@
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
-#include "core/ResourceManager.h"
 #include "main/renderworker.h"
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
@@ -23,6 +22,7 @@ Primitive* CreatePrimitiveFromModelFile(std::string path) {
       return p;
 }
 
+// TODO: move to main
 void Primitive::addProperties(QWidget * parent) {
       RendererObject::addProperties(parent);
       QGroupBox* primitive_group = new QGroupBox("Primitive");

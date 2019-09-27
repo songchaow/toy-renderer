@@ -29,9 +29,12 @@ file(GLOB IMAGE_IO ext/std_image/include/*.h
 INCLUDE_DIRECTORIES (
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/include
 )
-
+# Don't process generated source files with AUTOMOC
+if(POLICY CMP0071)
+      cmake_policy(SET CMP0071 OLD)
+endif(POLICY CMP0071)
 # qt
-set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOMOC TRUE)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
 qt5_wrap_ui(ui_headers main/mainwindow.ui)

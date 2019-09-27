@@ -241,6 +241,7 @@ void PBRMaterial::updateProperties() {
       _dirty = true;
 }
 
+// TODO: move to main
 void PBRMaterial::addProperties(QWidget* parent) {
       //RendererObject::addProperties(parent);
       // TODO: add existing values

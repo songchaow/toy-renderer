@@ -1,4 +1,4 @@
-#include "core/ResourceManager.h"
+#include "main/ResourceManager.h"
 #include "shape/triangle.h"
 
 static ResourceManager _resourceManager;

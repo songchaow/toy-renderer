@@ -1,5 +1,5 @@
 #include "main/MainWindow.h"
-#include "core/ResourceManager.h"
+#include "main/ResourceManager.h"
 #include "main/renderworker.h"
 #include <QFileDialog>
 
