@@ -78,30 +78,27 @@ public:
       virtual bool isFlat() override { return surface->isFlatSurface(); }
 };
 
-class PBRMaterial : public QObject {
-      Q_OBJECT
-      QLineEdit* albedo_text;
-      QLineEdit* metallic_text;
-      QLineEdit* rough_text;
+class PBRMaterial {
 public:
-      ImageTexture albedo_map;
+      ImageTexture _albedo_map;
       //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
       //ImageTexture* specular_map = nullptr; // replaced by metallic
-      ImageTexture metallic_map;
-      ImageTexture rough_map;
+      ImageTexture _metallic_map;
+      ImageTexture _rough_map;
 
-private:
+protected:
       Shader* _shader = nullptr;
       volatile bool _dirty; // need to update some of those `tbo`s.
-public slots:
-      void updateProperties();
 
 public:
       void load(QOpenGLExtraFunctions* f);
       Shader* shader() const { return _shader; }
-      void addProperties(QWidget* parent);
       void update(QOpenGLExtraFunctions* f);
       bool dirty() const { return _dirty; }
+      void setDirty() { _dirty = true; }
+      ImageTexture& albedo_map() { return _albedo_map; }
+      ImageTexture& metallic_map() { return _metallic_map; }
+      ImageTexture& rough_map() {return _rough_map; }
 };
 
 class GlossSurface;

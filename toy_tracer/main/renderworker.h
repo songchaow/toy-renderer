@@ -15,7 +15,7 @@ Camera* CreateRTCamera(const Point2i& screen_size);
 class RenderWorker : public QObject, QOpenGLExtraFunctions {
       Q_OBJECT
       QOpenGLContext* m_context;
-      TwoThreadQueue<RendererObject*> primitiveQueue;
+      TwoThreadQueue<Primitive*> primitiveQueue;
       std::vector<Primitive*> primitives;
       // TODO: define an update info structure
       static Camera* cam;
@@ -26,7 +26,7 @@ public slots:
       void renderLoop();
 public:
       // thread-safe using mutex
-      void addObject(RendererObject* p);
+      void addObject(Primitive* p);
       static Camera* getCamera() { return cam; }
       void setCanvas(Canvas* c) { _canvas = c; }
       static inline RenderWorker* Instance() { return &_worker; }

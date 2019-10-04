@@ -1,4 +1,5 @@
 #include "main/renderworker.h"
+#include "main/uiwrapper.h"
 #include <QWindow>
 #include <QThread>
 #include <QDebug>
@@ -43,20 +44,23 @@ void RenderWorker::renderLoop() {
             if (_canvas->keyPressed())
                   cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
             // add pending primitives
-            std::vector<RendererObject*> pendingAddPrimitives;
+            std::vector<Primitive*> pendingAddPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives)) {
                   // loading
                   for (auto* o : pendingAddPrimitives) {
-                        if (o->typeID() == RendererObject::TypeID::Primitive) {
-                              Primitive* p = static_cast<Primitive*>(o);
-                              p->load(this);
-                              qDebug() << "Primitive " << p << " thread:" << p->thread();
-                              // TODO: maybe check duplicate in the future
-                              // time-consuming, but only happens when loading
-                              primitives.push_back(p);
-                        }
-                        else if (o->typeID() == RendererObject::TypeID::Light)
-                              ;
+                        // o is primitive now
+                        o->load(this);
+                        primitives.push_back(o);
+                        // if (o->typeID() == RendererObject::TypeID::Primitive) {
+                        //       Primitive_Ui* p = static_cast<Primitive_Ui*>(o);
+                        //       p->m()->load(this);
+                        //       qDebug() << "Primitive " << p << " thread:" << p->thread();
+                        //       // TODO: maybe check duplicate in the future
+                        //       // time-consuming, but only happens when loading
+                        //       primitives.push_back(p->m());
+                        // }
+                        // else if (o->typeID() == RendererObject::TypeID::Light)
+                        //       ;
                   }
             }
             // rendering
@@ -76,7 +80,7 @@ void RenderWorker::renderLoop() {
       }
 }
 
-void RenderWorker::addObject(RendererObject* p)
+void RenderWorker::addObject(Primitive* p)
 {
       while (!primitiveQueue.addElement(p));
 }

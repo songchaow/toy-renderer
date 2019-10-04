@@ -1,6 +1,7 @@
 #include "main/MainWindow.h"
 #include "main/ResourceManager.h"
 #include "main/renderworker.h"
+#include "main/uiwrapper.h"
 #include <QFileDialog>
 
 MainWindow* _mainWindow;
@@ -19,10 +20,12 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
       if (robj) {
             robj->addProperties(properties);
             if (robj->typeID() == RendererObject::TypeID::Primitive) {
-                  PBRMaterial* m = static_cast<Primitive*>(robj)->getPBRMaterial();
-                  if (m)
-                        m->addProperties(materialWidget);
-
+                  //PBRMaterial_Ui new_Ui = PBRMaterial_Ui(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
+                  Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
+                  pUi->setMaterialUi(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
+                  if (pUi->isValid()) {
+                        pUi->addProperties(materialWidget);
+                  }
             }
       }
 }
@@ -41,8 +44,11 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
       if(!obj.isNull()) {
             RendererObject* o = static_cast<RendererObject*>(obj.value<void*>());
             bool toggled = i->checkState() == Qt::Checked;
+            // o must be a Primitive_Ui
+            // TODO: consider lights and other types
+            Primitive_Ui* pUi = static_cast<Primitive_Ui*>(o);
             if(toggled) {
-                  RenderWorker::Instance()->addObject(o);
+                  RenderWorker::Instance()->addObject(pUi->m());
             }
       }
       bool toggled;
@@ -51,10 +57,10 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
 
 void MainWindow::refreshResource() {
       //resourceWidget->clear();
-      const auto& rec_list = ResourceManager::getInstance()->getResourceList();
+      std::vector<RendererObject*> rec_list = ResourceManager::getInstance()->getResourceList();
       resourceWidget->setRowCount(rec_list.size());
       int idx = 0;
-      for (RendererObject* obj : rec_list) {
+      for (const RendererObject* obj : rec_list) {
             auto* item_name = new QTableWidgetItem(obj->name());
             item_name->setData(Qt::UserRole, QVariant::fromValue((void*)obj));
             item_name->setCheckState(Qt::Unchecked);

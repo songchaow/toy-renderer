@@ -1,4 +1,4 @@
-#include "core/scene_object.h"
+#include "main/scene_object.h"
 #include "utils/utils.h"
 #include "main/MainWindow.h"
 #include <QHBoxLayout>
@@ -15,7 +15,8 @@ const std::map<RendererObject::TypeID, QString> RendererObject::TypeIDMap = {
       GEN_VERBOSE_STRING_MAP(TypeID::Light),
       GEN_VERBOSE_STRING_MAP(TypeID::Camera),
       GEN_VERBOSE_STRING_MAP(TypeID::Shape),
-      GEN_VERBOSE_STRING_MAP(TypeID::Image)
+      GEN_VERBOSE_STRING_MAP(TypeID::Image),
+      GEN_VERBOSE_STRING_MAP(TypeID::Material)
 };
 
 void RendererObject::updateValue() {
@@ -52,16 +53,16 @@ void RendererObject::addConstText(QString desc, QString value, QWidget* target) 
       parentLayout->addWidget(lineWidget);
 }
 
-void RendererObject::addText(QString desc, QString* value_ptr, QWidget* target) {
+void RendererObject::addText(QString desc, const QString value_ptr, QWidget* target) {
       QWidget* lineWidget = new QWidget;
       QHBoxLayout* lineLayout = new QHBoxLayout;
       lineLayout->addWidget(new QLabel(desc));
-      auto* edit = new QLineEdit(*value_ptr);
+      auto* edit = new QLineEdit(value_ptr);
       lineLayout->addWidget(edit);
       lineWidget->setLayout(lineLayout);
       QLayout* parentLayout = target->layout();
       parentLayout->addWidget(lineWidget);
-      edit->setProperty("string_ptr", QVariant::fromValue((void*)value_ptr));
+      edit->setProperty("string_ptr", QVariant::fromValue(value_ptr));
       // TODO: instead of the following, store the UI element in a UI wrapper.
       //connect(edit, &QLineEdit::returnPressed, this, &RendererObject::updateValue);
 }
@@ -107,7 +108,7 @@ void RendererObject::addNumberi(QString desc, int* value_ptr, QWidget* target) {
       // TODO: signal: QSpinBox::valueChanged() -> updateValue()
 }
 
-void RendererObject::addProperties(QWidget* parent) {
+void RendererObject::addProperties(QWidget* parent) const {
       // set global layout
       QVBoxLayout* globalLayout = new QVBoxLayout;
       if (parent->layout()) {
@@ -133,7 +134,7 @@ void RendererObject::addProperties(QWidget* parent) {
       roGroup->setLayout(currentLayout);
       // Add items to current widget
       addConstText("Object type:", TypeIDMap.at(_typeID), roGroup);
-      addText("Name:", &nameRef(), roGroup);
+      addText("Name:", id, roGroup);
       parent->layout()->addWidget(roGroup);
       
 }

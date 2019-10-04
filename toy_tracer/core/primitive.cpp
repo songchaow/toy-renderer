@@ -22,23 +22,6 @@ Primitive* CreatePrimitiveFromModelFile(std::string path) {
       return p;
 }
 
-// TODO: move to main
-void Primitive::addProperties(QWidget * parent) {
-      RendererObject::addProperties(parent);
-      QGroupBox* primitive_group = new QGroupBox("Primitive");
-      // set current widget's layout
-      QVBoxLayout* currentLayout = new QVBoxLayout;
-      primitive_group->setLayout(currentLayout);
-      // add toolbars for current item
-      addConstText("another p:", "this value", primitive_group);
-      // add sub toolbars for child items
-      QGroupBox* shapeToolBox = new QGroupBox("Shape");
-      if(shape)
-            shape->addProperties(shapeToolBox);
-      currentLayout->addWidget(shapeToolBox);
-      parent->layout()->addWidget(primitive_group);
-}
-
 void Primitive::load(QOpenGLExtraFunctions* f) {
       for (auto* mesh : _meshes) {
             mesh->load(f);
@@ -46,7 +29,8 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       // TODO: consider other types of RTMaterial
       if (rt_m == nullptr) {
             rt_m = new PBRMaterial();
-            rt_m->moveToThread(thread());
+            // // move from the render thrad to the UI thread
+            // rt_m->moveToThread(thread());
       }
       rt_m->load(f);
       shader = rt_m->shader();
@@ -57,19 +41,19 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
       // TODO: maybe different meshes' materials/textures are different.
       shader->use();
 
-      if (rt_m->albedo_map.isLoad()) {
+      if (rt_m->_albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->albedo_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->_albedo_map.tbo());
             shader->setUniformI("albedoSampler", 0);
       }
-      if (rt_m->metallic_map.isLoad()) {
+      if (rt_m->_metallic_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE1);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->metallic_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->_metallic_map.tbo());
             shader->setUniformI("metallicSampler", 1);
       }
-      if (rt_m->rough_map.isLoad()) {
+      if (rt_m->_rough_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE2);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->rough_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m->_rough_map.tbo());
             shader->setUniformI("roughnessSampler", 2);
       }
       

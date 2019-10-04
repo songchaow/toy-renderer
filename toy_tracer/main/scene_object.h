@@ -11,12 +11,13 @@ struct RGBSpectrum;
 struct Transform;
 
 class RendererObject : public QObject {
+      Q_OBJECT
       QString id;
 public:
       static void addProperty(const RGBSpectrum* s, QWidget* parent, QString desc = "");
       static void addProperty(const Transform* t, QWidget* parent, QString desc = "");
       static void addConstText(QString desc, QString value, QWidget* parent);
-      static void addText(QString desc, QString* value_ptr, QWidget* target);
+      static void addText(QString desc, const QString value_ptr, QWidget* target);
       static void addNumberf(QString desc, Float* value_ptr, QWidget* target);
       static void addNumberi(QString desc, int* value_ptr, QWidget* target);
       static QLineEdit* addFileDialog(QString desc, QString button_text, QWidget* target, QString path = QString(), QStringList filters = QStringList());
@@ -29,6 +30,7 @@ public:
             Light, // and other lights
             Shape,
             Image,
+            Material,
       };
       static const std::map<TypeID, QString> TypeIDMap;
 private:
@@ -36,10 +38,10 @@ private:
 protected:
       QString& nameRef() { return id; }
 public:
-      virtual void addProperties(QWidget* parent);
-      const QString name() { return id; }
+      virtual void addProperties(QWidget* parent) const;
+      const QString name() const { return id; }
       const TypeID typeID() const { return _typeID; }
-      const QString type_name() { return TypeIDMap.at(_typeID); }
+      const QString type_name() const { return TypeIDMap.at(_typeID); }
       void rename(QString newname) { id = newname; }
       RendererObject(TypeID type_id, QString name) : _typeID(type_id), id(name) {}
       RendererObject(TypeID type_id) : _typeID(type_id) {}
