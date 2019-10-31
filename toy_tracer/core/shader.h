@@ -13,6 +13,7 @@ class Shader {
 public:
       Shader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f = nullptr);
       Shader() = default;
+      static const size_t maxPointLightNum = 4;
       bool loaded() const { return _loaded; }
       void compile(QOpenGLExtraFunctions* f);
       void use() const;
@@ -27,7 +28,7 @@ public:
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4);
       void setUniformI(const std::string& name, const int val);
       void setUniformI(unsigned int loc, const int val);
-      unsigned int getUniformLocation(const std::string& name);
+      unsigned int getUniformLocation(const std::string& name) { return f->glGetUniformLocation(program_id, name.c_str()); }
 
 };
 

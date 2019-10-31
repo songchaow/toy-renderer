@@ -3,6 +3,7 @@
 #include "main/renderworker.h"
 #include "main/uiwrapper.h"
 #include <QFileDialog>
+#include <QMenu>
 
 MainWindow* _mainWindow;
 
@@ -10,7 +11,15 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       _mainWindow = this;
       setupUi(this);
       resourceWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-      QObject::connect(loadResButton, SIGNAL(clicked()), this, SLOT(importObj()));
+      // add menu for the Add button
+      QMenu *menu = new QMenu(this);
+      QAction* primitiveAdd = menu->addAction("Primitive...");
+      QAction* pointLightAdd = menu->addAction("Point Light");
+      loadResButton->setMenu(menu);
+
+      QObject::connect(primitiveAdd, SIGNAL(triggered()), this, SLOT(importObj()));
+      // TODO: make sure the slot is called directly. Change addPointLight
+      QObject::connect(pointLightAdd, SIGNAL(triggered()), this, SLOT(addPointLight()), Qt::DirectConnection);
       QObject::connect(resourceWidget, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem* ,QTableWidgetItem *)));
       QObject::connect(resourceWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(objLoadToggled(QTableWidgetItem *)));
 }
@@ -23,9 +32,14 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
                   //PBRMaterial_Ui new_Ui = PBRMaterial_Ui(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
                   Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
                   pUi->setMaterialUi(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
-                  if (pUi->isValid()) {
-                        pUi->addProperties(materialWidget);
+                  if (pUi->isValid() && pUi->materialUi().isValid()) {
+                        pUi->materialUi().addProperties(materialWidget);
                   }
+            }
+            else if (robj->typeID() == RendererObject::TypeID::Light) {
+                  PointLight_Ui* lUi = static_cast<PointLight_Ui*>(robj);
+                  
+
             }
       }
 }
@@ -38,17 +52,41 @@ void MainWindow::importObj() {
       refreshResource();
 }
 
+void MainWindow::addPointLight() {
+      PointLight* pl = new PointLight();
+      PointLight_Ui* pl_ui = new PointLight_Ui(pl);
+      ResourceManager::getInstance()->getResourceList().push_back(pl_ui);
+      refreshResource();
+      // TODO: Consider directly load the light
+
+}
+
 void MainWindow::objLoadToggled(QTableWidgetItem* i)
 {
       QVariant obj = i->data(Qt::UserRole);
       if(!obj.isNull()) {
             RendererObject* o = static_cast<RendererObject*>(obj.value<void*>());
             bool toggled = i->checkState() == Qt::Checked;
-            // o must be a Primitive_Ui
-            // TODO: consider lights and other types
-            Primitive_Ui* pUi = static_cast<Primitive_Ui*>(o);
-            if(toggled) {
-                  RenderWorker::Instance()->addObject(pUi->m());
+            switch (o->typeID())
+            {
+            case RendererObject::TypeID::Primitive:
+            {
+                  Primitive_Ui * pUi = static_cast<Primitive_Ui*>(o);
+                  if (toggled) {
+                        RenderWorker::Instance()->loadObject(pUi->m());
+                  }
+                  break;
+            }
+                  
+            case RendererObject::TypeID::Light:
+            {
+                  PointLight_Ui* lUi = static_cast<PointLight_Ui*>(o);
+                  if (toggled) {
+                        RenderWorker::Instance()->loadPointLight(lUi->m());
+                  }
+                  break;
+            }
+                  
             }
       }
       bool toggled;

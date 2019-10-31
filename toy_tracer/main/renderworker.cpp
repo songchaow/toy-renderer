@@ -22,6 +22,7 @@ void RenderWorker::initialize() {
       initializeOpenGLFunctions();
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
+      glEnable(GL_DEPTH_TEST);
       err = glGetError();
       err = glGetError();
 }
@@ -63,14 +64,20 @@ void RenderWorker::renderLoop() {
                         //       ;
                   }
             }
+            // add pending lights
+            std::vector<PointLight*> pendingLights;
+            if (lightQueue.readAll(pendingLights)) {
+                  for (auto* l : pendingLights) {
+                        _pointLights.push_back(l);
+                  }
+            }
             // rendering
             loopN++;
             GLenum err = glGetError();
             glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
             err = glGetError();
             //glViewport(0, 0, _canvas->width(), _canvas->height());
-            glClear(GL_COLOR_BUFFER_BIT);
-            
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             for (auto &p : primitives) {
                  if (p->getPBRMaterial()->dirty())
                        p->getPBRMaterial()->update(this);
@@ -80,7 +87,12 @@ void RenderWorker::renderLoop() {
       }
 }
 
-void RenderWorker::addObject(Primitive* p)
+void RenderWorker::loadObject(Primitive* p)
 {
       while (!primitiveQueue.addElement(p));
+}
+
+void RenderWorker::loadPointLight(PointLight * l)
+{
+      while (!lightQueue.addElement(l));
 }

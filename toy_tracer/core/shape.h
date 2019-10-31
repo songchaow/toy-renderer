@@ -70,5 +70,6 @@ public:
       bool ComputeDiff(const Ray& r, Interaction* i) const { return _shape->ComputeDiff(r, i); }
       std::vector<TriangleMesh*>& getMeshes() { return _meshes; }
       void setMeshes(std::vector<TriangleMesh*> ms) { _meshes = ms; }
+      const std::vector<TriangleMesh*>& meshes() { return _meshes; }
       const Shape* shape() const { return _shape; }
 };

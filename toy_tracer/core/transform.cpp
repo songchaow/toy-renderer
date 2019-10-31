@@ -1,5 +1,25 @@
 #include "core/transform.h"
 
+Matrix3::Matrix3() {
+      m_matrix[0][0] = m_matrix[1][1] = m_matrix[2][2] = 1.f;
+      m_matrix[0][1] = m_matrix[0][2] = m_matrix[1][0] = m_matrix[1][2]
+            = m_matrix[2][0] = m_matrix[2][1] = 0.f;
+}
+
+Matrix3::Matrix3(Float t00, Float t01, Float t02,
+      Float t10, Float t11, Float t12,
+      Float t20, Float t21, Float t22) {
+      m_matrix[0][0] = t00; m_matrix[0][1] = t01; m_matrix[0][2] = t02;
+      m_matrix[1][0] = t10; m_matrix[1][1] = t11; m_matrix[1][2] = t22;
+      m_matrix[2][0] = t20; m_matrix[2][1] = t21; m_matrix[2][2] = t22;
+}
+
+Matrix3::Matrix3(const Matrix4& m4) {
+      m_matrix[0][0] = m4[0][0]; m_matrix[0][1] = m4[0][1]; m_matrix[0][2] = m4[0][2];
+      m_matrix[1][0] = m4[1][0]; m_matrix[1][1] = m4[1][1]; m_matrix[1][2] = m4[1][2];
+      m_matrix[2][0] = m4[2][0]; m_matrix[2][1] = m4[2][1]; m_matrix[2][2] = m4[2][2];
+}
+
 Matrix4::Matrix4() {
       m_matrix[0][0] = m_matrix[1][1] = m_matrix[2][2] = m_matrix[3][3] = 1.f;
       m_matrix[0][1] = m_matrix[0][2] = m_matrix[0][3] = m_matrix[1][0] = m_matrix[1][2] = m_matrix[1][3] = m_matrix[2][0] =
@@ -28,6 +48,21 @@ Matrix4::Matrix4(Float t00, Float t01, Float t02, Float t03, Float t10,
       m_matrix[3][3] = t33;
 }
 
+Matrix4::Matrix4(const Matrix3& m3) {
+      m_matrix[0][0] = m3[0][0]; m_matrix[0][1] = m3[0][1]; m_matrix[0][2] = m3[0][2]; m_matrix[0][3] = 0.f;
+      m_matrix[1][0] = m3[1][0]; m_matrix[1][1] = m3[1][1]; m_matrix[1][2] = m3[1][2]; m_matrix[1][3] = 0.f;
+      m_matrix[2][0] = m3[2][0]; m_matrix[2][1] = m3[2][1]; m_matrix[2][2] = m3[2][2]; m_matrix[2][3] = 0.f;
+      m_matrix[3][0] = 0.f; m_matrix[3][1] = 0.f; m_matrix[3][2] = 0.f; m_matrix[3][3] = 1.f;
+}
+
+Matrix4 SRT::toMatrix4() {
+      Matrix4 translate = TranslateM(translationX, translationY, translationZ);
+      // order: T.S.(rz.ry.rx).M
+      Matrix4 rotate = RotateM(rotationX, rotationY, rotationZ);
+      Matrix4 scale = ScaleM(scaleX, scaleY, scaleZ);
+      return translate * scale * rotate;
+}
+
 Matrix4 Matrix4::operator*(const Matrix4& m) const {
       Matrix4 ret;
       for (int i = 0; i < 4; i++)
@@ -36,6 +71,27 @@ Matrix4 Matrix4::operator*(const Matrix4& m) const {
                   for (int t = 0; t < 4; t++)
                         ret[i][j] += m_matrix[i][t] * m[t][j];
             }
+      return ret;
+}
+
+SRT Matrix4::toSRT() const {
+      SRT ret;
+      // Translate
+      ret.translationX = m_matrix[0][3]; ret.translationY = m_matrix[1][3]; ret.translationZ = m_matrix[2][3];
+      ///start[0] = Matrix3(Translate(m_matrix[0][3], m_matrix[1][3], m_matrix[2][3]).m);
+      // The order of scale and rotate doesn't matter
+      // Scale
+      ret.scaleX = Vector3f(m_matrix[0][0], m_matrix[1][0], m_matrix[2][0]).Length();
+      ret.scaleY = Vector3f(m_matrix[0][1], m_matrix[1][1], m_matrix[2][1]).Length();
+      ret.scaleZ = Vector3f(m_matrix[0][2], m_matrix[1][2], m_matrix[2][2]).Length();
+      // Rotate TODO: check again!
+      Matrix3 rotate = Matrix3(m_matrix[0][0] / ret.scaleX, m_matrix[0][1] / ret.scaleY, m_matrix[0][2] / ret.scaleZ,
+            m_matrix[1][0] / ret.scaleX, m_matrix[1][1] / ret.scaleY, m_matrix[1][2] / ret.scaleZ,
+            m_matrix[2][0] / ret.scaleX, m_matrix[2][1] / ret.scaleY, m_matrix[2][2] / ret.scaleZ);
+      ret.rotationX = std::atan2(rotate[2][1], rotate[2][2]);
+      ret.rotationY = std::atan2(-rotate[2][0], std::sqrt(rotate[2][1] * rotate[2][1] + rotate[2][2] * rotate[2][2]));
+      ret.rotationZ = std::atan2(rotate[1][0], rotate[0][0]);
+      
       return ret;
 }
 
@@ -133,18 +189,33 @@ Matrix4 Inverse(const Matrix4 &m) {
 Transform Translate(const Vector3f &delta) {
       Matrix4 m(1, 0, 0, delta.x, 0, 1, 0, delta.y, 0, 0, 1, delta.z, 0, 0, 0,
             1);
+      Matrix4 mInv(1, 0, 0, -delta.x, 0, 1, 0, -delta.y, 0, 0, 1, -delta.z, 0, 0, 0, 1);
+      return Transform(m, mInv);
+}
+
+Matrix4 TranslateM(const Vector3f &delta) {
+      Matrix4 m(1, 0, 0, delta.x, 0, 1, 0, delta.y, 0, 0, 1, delta.z, 0, 0, 0,
+            1);
       return m;
 }
 
 Transform Translate(const Float x, const Float y, const Float z) {
-      Matrix4 m(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0,
-            1);
+      Matrix4 m(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
+      Matrix4 mInv(1, 0, 0, -x, 0, 1, 0, -y, 0, 0, 1, -z, 0, 0, 0, 1);
+      return Transform(m, mInv);
+}
+Matrix4 TranslateM(const Float x, const Float y, const Float z) {
+      Matrix4 m(1, 0, 0, x, 0, 1, 0, y, 0, 0, 1, z, 0, 0, 0, 1);
       return m;
 }
 
 Transform Scale(Float x, Float y, Float z) {
       Matrix4 m(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
       Matrix4 mInv(1.f / x, 0, 0, 0, 0, 1.f / y, 0, 0, 0, 0, 1.f / z, 0, 0, 0, 0, 1);
+      return m;
+}
+Matrix4 ScaleM(Float x, Float y, Float z) {
+      Matrix4 m(x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1);
       return m;
 }
 
@@ -159,6 +230,28 @@ Transform Rotate(Float dTheta, Float dPhi) {
       return Transform(m, m);
 }
 
+// Rotation order: rz.ry.rx.M
+Matrix4 RotateM(Float rx, Float ry, Float rz) {
+      Matrix4 m;
+      m[0][0] = std::cos(ry)*std::cos(rz);
+      m[0][1] = std::cos(rz)*std::sin(rx)*std::sin(ry) - std::cos(rx)*std::sin(rz);
+      m[0][2] = std::cos(rx)*std::cos(rz)*std::sin(ry) + std::sin(rx)*std::sin(rz);
+      m[0][3] = 0.f;
+      m[1][0] = std::cos(ry)*std::sin(rz);
+      m[1][1] = std::cos(rx)*std::cos(rz) + std::sin(rx)*std::sin(ry)*std::sin(rz);
+      m[1][2] = -std::cos(rz)* std::sin(rx) + std::cos(rx) * std::sin(ry) * std::sin(rz);
+      m[1][3] = 0.f;
+      m[2][0] = -std::sin(ry);
+      m[2][1] = std::cos(ry)* std::sin(rx);
+      m[2][2] = std::cos(rx)* std::cos(ry);
+      m[2][3] = 0.f;
+      m[3][0] = m[3][1] = m[3][2] = 0.f;
+      m[3][3] = 1.f;
+      return m;
+}
+
 Transform Transform::operator*(const Transform& rhs) const {
+      // TODO: optimize
       return Transform(this->m*rhs.m);
 }
+

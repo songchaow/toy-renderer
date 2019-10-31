@@ -31,7 +31,7 @@ extern ConstColorTexture<RGBSpectrum> blackConstantTexture;
 extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 
 class ImageTexture : public RGBSpectrumTexture {
-      std::shared_ptr<Image> _image;
+      Image* _image;
       std::string _path;
       GLuint _tbo = 0;
 public:
@@ -42,10 +42,10 @@ public:
 private:
       WrapMode _wrapMode = LOOP;
 public:
-      ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(std::make_shared<Image>(img_path)) {}
+      ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(new Image(img_path)) {}
       ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {}
       ImageTexture() = default;
-      void resetImage(Image* i) { _image.reset(i); }
+      void resetImage(Image* i) { _image = i; }
       bool loadable() override { return true; }
       bool isValid() const { return (bool)_image; }
       bool isLoad() const { return _tbo > 0; }

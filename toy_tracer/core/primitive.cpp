@@ -40,7 +40,19 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
       shader->use();
-
+      // set lights
+      uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
+      const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
+      for (int i = 0; i < pointLights.size(); i++) {
+            shader->setUniformF(startPos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
+            shader->setUniformF(startPos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
+      }
+      // set other lights' radiance to zero
+      startPos += 1;
+      for (int i = pointLights.size(); i < Shader::maxPointLightNum; i++) {
+            shader->setUniformF(startPos, 0.f, 0.f, 0.f);
+            startPos += 2;
+      }
       if (rt_m->_albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->_albedo_map.tbo());
