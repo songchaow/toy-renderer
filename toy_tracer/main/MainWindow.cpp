@@ -67,6 +67,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
       if(!obj.isNull()) {
             RendererObject* o = static_cast<RendererObject*>(obj.value<void*>());
             bool toggled = i->checkState() == Qt::Checked;
+            o->setLoad(toggled);
             switch (o->typeID())
             {
             case RendererObject::TypeID::Primitive:
@@ -101,7 +102,7 @@ void MainWindow::refreshResource() {
       for (const RendererObject* obj : rec_list) {
             auto* item_name = new QTableWidgetItem(obj->name());
             item_name->setData(Qt::UserRole, QVariant::fromValue((void*)obj));
-            item_name->setCheckState(Qt::Unchecked);
+            item_name->setCheckState(obj->isLoad() ? Qt::Checked : Qt::Unchecked);
             auto* item_type = new QTableWidgetItem(obj->type_name());
             resourceWidget->setItem(idx, 0, item_name);
             resourceWidget->setItem(idx, 1, item_type);

@@ -36,6 +36,7 @@ public:
 private:
       TypeID _typeID;
 protected:
+      bool _load = false;
       QString& nameRef() { return id; }
 public:
       virtual void addProperties(QWidget* parent) const;
@@ -43,6 +44,10 @@ public:
       const TypeID typeID() const { return _typeID; }
       const QString type_name() const { return TypeIDMap.at(_typeID); }
       void rename(QString newname) { id = newname; }
+      bool isLoad() const { return _load; }
+      void load() { _load = true; }
+      void setLoad(bool l) { _load = l; }
+      void unload() { _load = false; }
       RendererObject(TypeID type_id, QString name) : _typeID(type_id), id(name) {}
       RendererObject(TypeID type_id) : _typeID(type_id) {}
 };
