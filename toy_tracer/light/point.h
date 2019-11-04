@@ -14,7 +14,7 @@ public:
       bool Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pwi) const override;
       virtual bool isSingular() const override { return false; }
       Point3f pos() const { return _posWorld; }
-      Point3f rpos() { return _posWorld; }
+      Point3f& rpos() { return _posWorld; }
       const Transform& obj2world() const { return Translate(_posWorld.x, _posWorld.y, _posWorld.z); }
       Transform world2obj() const { return Translate(-_posWorld.x, -_posWorld.y, -_posWorld.z); }
 };
