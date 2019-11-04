@@ -67,6 +67,19 @@ public:
       bool isValid() const { return _m != nullptr; }
 };
 
+class RGB_Spectrum_Ui : public QObject {
+      mutable QLineEdit* _r;
+      mutable QLineEdit* _g;
+      mutable QLineEdit* _b;
+      RGBSpectrum* _m;
+
+public:
+      RGB_Spectrum_Ui(RGBSpectrum* _m) : _m(_m) {}
+      void addProperties(QWidget* parent) const;
+public slots:
+      void updateProperties();
+};
+
 class Primitive_Ui : public RendererObject {
       Primitive* _m = nullptr;
       // Child UI

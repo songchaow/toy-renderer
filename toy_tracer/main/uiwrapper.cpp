@@ -147,6 +147,28 @@ void Point3f_Ui::updateProperties() {
       *_m = Point3f(posX->text().toFloat(), posY->text().toFloat(), posZ->text().toFloat());
 }
 
+void RGB_Spectrum_Ui::updateProperties() {
+      *_m = RGBSpectrum(_r->text().toFloat(), _g->text().toFloat(), _b->text().toFloat());
+}
+
+void RGB_Spectrum_Ui::addProperties(QWidget* parent) const {
+      QWidget* lineWidget_t = new QWidget;
+      QHBoxLayout* lineLayout_t = new QHBoxLayout;
+      lineWidget_t->setLayout(lineLayout_t);
+      QLabel* pos_text = new QLabel("Color:");
+      _r = new QLineEdit(QString::number(_m->rgb[0]));
+      _g = new QLineEdit(QString::number(_m->rgb[1]));
+      _b = new QLineEdit(QString::number(_m->rgb[2]));
+      lineLayout_t->addWidget(_r);
+      lineLayout_t->addWidget(_g);
+      lineLayout_t->addWidget(_b);
+      parent->layout()->addWidget(lineWidget_t);
+      // connect
+      QObject::connect(_r, &QLineEdit::returnPressed, this, &RGB_Spectrum_Ui::updateProperties);
+      QObject::connect(_g, &QLineEdit::returnPressed, this, &RGB_Spectrum_Ui::updateProperties);
+      QObject::connect(_b, &QLineEdit::returnPressed, this, &RGB_Spectrum_Ui::updateProperties);
+}
+
 void Point3f_Ui::addProperties(QWidget * parent) const
 {
       QWidget* lineWidget_t = new QWidget;
@@ -162,7 +184,7 @@ void Point3f_Ui::addProperties(QWidget * parent) const
       lineLayout_t->addWidget(posZ);
       parent->layout()->addWidget(lineWidget_t);
       // connect
-      QObject::connect(posX, SIGNAL(returnPressed()), this, SLOT(updateProperties()));
-      QObject::connect(posY, SIGNAL(returnPressed()), this, SLOT(updateProperties()));
-      QObject::connect(posZ, SIGNAL(returnPressed()), this, SLOT(updateProperties()));
+      QObject::connect(posX, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
+      QObject::connect(posY, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
+      QObject::connect(posZ, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
 }
