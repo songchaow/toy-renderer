@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
-#include <QOpenGLExtraFunctions>
+#include <QOpenGLFunctions_4_0_Core>
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/spectrum.h"
@@ -50,9 +50,9 @@ public:
       bool isValid() const { return (bool)_image; }
       bool isLoad() const { return _tbo > 0; }
       // create a tbo and load the image
-      void load(QOpenGLExtraFunctions* f);
+      void load(QOpenGLFunctions_4_0_Core* f);
       // tbo unchanged, but reload the image
-      void update(QOpenGLExtraFunctions* f);
+      void update(QOpenGLFunctions_4_0_Core* f);
       RGBSpectrum Evaluate(Float u, Float v) override;
       GLuint tbo() const { return _tbo; }
       const std::string& path() const { return _path; }

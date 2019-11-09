@@ -22,7 +22,7 @@ Primitive* CreatePrimitiveFromModelFile(std::string path) {
       return p;
 }
 
-void Primitive::load(QOpenGLExtraFunctions* f) {
+void Primitive::load(QOpenGLFunctions_4_0_Core* f) {
       for (auto* mesh : _meshes) {
             mesh->load(f);
       }
@@ -36,7 +36,7 @@ void Primitive::load(QOpenGLExtraFunctions* f) {
       shader = rt_m->shader();
 }
 
-void Primitive::draw(QOpenGLExtraFunctions* f) {
+void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
       shader->use();
@@ -79,7 +79,7 @@ void Primitive::draw(QOpenGLExtraFunctions* f) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             GLenum err = f->glGetError();
-            f->glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
+            f->glDrawElements(GL_TRIANGLES, 3 * m->face_count()*2, GL_UNSIGNED_INT, 0);
             err = f->glGetError();
       }
 }

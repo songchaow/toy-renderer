@@ -11,6 +11,7 @@
 constexpr Float MIN_DISTANCE = 0.01f;
 
 struct Interaction;
+class TriangleMesh;
 class Shape {
 protected:
       Transform world2obj, obj2world;
@@ -29,12 +30,14 @@ public:
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const = 0;
       virtual Point3f PointfromUV(Float u, Float v, Normal3f* n) const = 0;
       virtual Point3f SamplePoint(Point2f& random, Interaction& i, Normal3f& n, Float* pdf) const = 0;
+      virtual std::vector<TriangleMesh*> GenMesh(unsigned int uSlide = 50, unsigned int vSlide = 50) const = 0;
 };
 
 class Sphere : public Shape {
       Float radius; // radius in object space
 public:
       Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
+      Sphere() : Sphere(1.f, Transform::Identity()) {}
       virtual std::string shapeName() const { return "Sphere"; }
       virtual Float Area() const override { return 4 * Pi*radius*radius; }
       virtual bool Intercept(const Ray& r, Interaction& i) const override;
@@ -42,7 +45,7 @@ public:
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const override;
       virtual Point3f PointfromUV(Float u, Float v, Normal3f* n) const override;
       virtual Point3f SamplePoint(Point2f& random, Interaction& i, Normal3f& n, Float* pdf) const override;
-
+      virtual std::vector<TriangleMesh*> GenMesh(unsigned int uSlide = 50, unsigned int vSlide = 50) const;
 };
 
 Vector3f SampleUnitSphere(const Point2f& sample);
@@ -72,4 +75,5 @@ public:
       void setMeshes(std::vector<TriangleMesh*> ms) { _meshes = ms; }
       const std::vector<TriangleMesh*>& meshes() { return _meshes; }
       const Shape* shape() const { return _shape; }
+      void GenMeshes() { if (_shape) _meshes = _shape->GenMesh(); }
 };

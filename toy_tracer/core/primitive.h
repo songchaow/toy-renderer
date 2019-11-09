@@ -18,8 +18,8 @@ public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), material(m) {}
       Material* getMaterial() const { return material; }
       PBRMaterial* getPBRMaterial() const { return rt_m; }
-      void load(QOpenGLExtraFunctions* f);
-      void draw(QOpenGLExtraFunctions* f);
+      void load(QOpenGLFunctions_4_0_Core* f);
+      void draw(QOpenGLFunctions_4_0_Core* f);
 };
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);

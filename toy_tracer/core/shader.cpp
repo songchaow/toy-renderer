@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const std::string & vertex_path, const std::string & fragment_path, QOpenGLExtraFunctions* f)
+Shader::Shader(const std::string & vertex_path, const std::string & fragment_path, QOpenGLFunctions_4_0_Core* f)
 {
       std::ifstream vertex_file, fragment_file;
       vertex_file.exceptions(std::ifstream::failbit);
@@ -29,7 +29,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       this->f = f;
 }
 
-void Shader::compile(QOpenGLExtraFunctions* f) {
+void Shader::compile(QOpenGLFunctions_4_0_Core* f) {
       this->f = f;
       char infoLog[1024];
       const char* v_shader_str_ptr = vertex_shader_code.c_str();
@@ -136,7 +136,7 @@ void Shader::setUniformI(const std::string& name, const int val)
 
 static std::map<std::string, Shader> shaderStore;
 
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f) {
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLFunctions_4_0_Core* f) {
       std::string id = vertex_path + fragment_path;
       if (shaderStore.find(id) != shaderStore.end())
             return &shaderStore[id];

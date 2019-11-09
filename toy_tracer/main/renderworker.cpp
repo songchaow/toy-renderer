@@ -45,8 +45,11 @@ void RenderWorker::renderLoop() {
             if (_canvas->keyPressed())
                   cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
             // add pending primitives
-            std::vector<Primitive*> pendingAddPrimitives;
-            if (primitiveQueue.readAll(pendingAddPrimitives)) {
+            std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
+            if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {
+                  for (auto* d : pendingDelPrimitives) {
+
+                  }
                   // loading
                   for (auto* o : pendingAddPrimitives) {
                         // o is primitive now
@@ -65,8 +68,13 @@ void RenderWorker::renderLoop() {
                   }
             }
             // add pending lights
-            std::vector<PointLight*> pendingLights;
-            if (lightQueue.readAll(pendingLights)) {
+            std::vector<PointLight*> pendingLights, pendingDelLights;
+            if (lightQueue.readAll(pendingLights, pendingDelLights)) {
+                  for (auto* d : pendingDelLights) {
+                        auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
+                        if (it != _pointLights.end())
+                              _pointLights.erase(it);
+                  }
                   for (auto* l : pendingLights) {
                         _pointLights.push_back(l);
                   }
@@ -78,6 +86,7 @@ void RenderWorker::renderLoop() {
             err = glGetError();
             //glViewport(0, 0, _canvas->width(), _canvas->height());
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             for (auto &p : primitives) {
                  if (p->getPBRMaterial()->dirty())
                        p->getPBRMaterial()->update(this);
@@ -95,4 +104,8 @@ void RenderWorker::loadObject(Primitive* p)
 void RenderWorker::loadPointLight(PointLight * l)
 {
       while (!lightQueue.addElement(l));
+}
+
+void RenderWorker::removePointLight(PointLight* l) {
+      while (!lightQueue.addDeleteElement(l));
 }

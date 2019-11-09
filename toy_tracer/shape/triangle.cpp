@@ -15,8 +15,8 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             uint16_t curr_strip = 0;
             // points
             {
-                  TriangleMesh::LayoutItem meshLayout = {};
-                  meshLayout.type = TriangleMesh::ArrayType::ARRAY_VERTEX;
+                  LayoutItem meshLayout;
+                  meshLayout.type = ArrayType::ARRAY_VERTEX;
                   meshLayout.e_count = 3;
                   meshLayout.e_format = GL_FLOAT;
                   meshLayout.e_size = sizeof(ai_real);
@@ -27,8 +27,8 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             }
             // check if have normals
             if (mesh->HasNormals()) {
-                  TriangleMesh::LayoutItem normLayout = {};
-                  normLayout.type = TriangleMesh::ArrayType::ARRAY_NORMAL;
+                  LayoutItem normLayout = {};
+                  normLayout.type = ArrayType::ARRAY_NORMAL;
                   normLayout.e_count = 3;
                   // ai_real(float) same size as GL_FLOAT?
                   normLayout.e_format = GL_FLOAT;
@@ -41,8 +41,8 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             // check if have texture coordinates
             for (int i = 0; i < 2; i++)
                   if (mesh->HasTextureCoords(i)) {
-                        TriangleMesh::LayoutItem texcoordLayout;
-                        texcoordLayout.type = TriangleMesh::ArrayType::ARRAY_TEX_UV;
+                        LayoutItem texcoordLayout;
+                        texcoordLayout.type = ArrayType::ARRAY_TEX_UV;
                         texcoordLayout.e_count = 2;
                         texcoordLayout.e_format = GL_FLOAT;
                         texcoordLayout.e_size = sizeof(ai_real);
@@ -89,13 +89,13 @@ std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene) {
       return meshes;
 }
 
-static std::map<TriangleMesh::ArrayType, uint16_t> ShaderLocMap = {
-      {TriangleMesh::ARRAY_VERTEX, 0},
-      {TriangleMesh::ARRAY_TEX_UV, 1},
-      {TriangleMesh::ARRAY_NORMAL, 2},
+static std::map<ArrayType, uint16_t> ShaderLocMap = {
+      {ArrayType::ARRAY_VERTEX, 0},
+      {ArrayType::ARRAY_TEX_UV, 1},
+      {ArrayType::ARRAY_NORMAL, 2},
 };
 
-void TriangleMesh::load(QOpenGLExtraFunctions* f) {
+void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
       f->glGenVertexArrays(1, &_vao);
       f->glBindVertexArray(_vao);
       // vbo
@@ -106,7 +106,7 @@ void TriangleMesh::load(QOpenGLExtraFunctions* f) {
       f->glGenBuffers(1, &_ebo);
       f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
       // each int32_t contains 4 bytes
-      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
+      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (auto& l : layout) {
             if (ShaderLocMap.find(l.type) == ShaderLocMap.end())

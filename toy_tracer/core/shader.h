@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <QOpenGLExtraFunctions>
+#include <QOpenGLFunctions_4_0_Core>
 #include <core/transform.h>
 
 class Shader {
@@ -9,13 +9,13 @@ class Shader {
       std::string fragment_shader_code;
       bool _loaded = false;
       unsigned int program_id;
-      QOpenGLExtraFunctions* f = nullptr;
+      QOpenGLFunctions_4_0_Core* f = nullptr;
 public:
-      Shader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f = nullptr);
+      Shader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLFunctions_4_0_Core* f = nullptr);
       Shader() = default;
       static const size_t maxPointLightNum = 4;
       bool loaded() const { return _loaded; }
-      void compile(QOpenGLExtraFunctions* f);
+      void compile(QOpenGLFunctions_4_0_Core* f);
       void use() const;
       void setUniformF(const std::string& name, const float val);
       void setUniformF(const std::string& name, const float val, const float val2);
@@ -32,4 +32,4 @@ public:
 
 };
 
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLExtraFunctions* f);
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLFunctions_4_0_Core* f);

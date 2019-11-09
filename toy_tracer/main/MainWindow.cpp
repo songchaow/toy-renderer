@@ -6,6 +6,7 @@
 #include <QMenu>
 
 MainWindow* _mainWindow;
+void addCreateShapeMenu(QMenu* shapeMenu);
 
 MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       _mainWindow = this;
@@ -15,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       QMenu *menu = new QMenu(this);
       QAction* primitiveAdd = menu->addAction("Primitive...");
       QAction* pointLightAdd = menu->addAction("Point Light");
+      QMenu *shapeMenu = new QMenu("Shapes", this);
+      addCreateShapeMenu(shapeMenu);
+      menu->addMenu(shapeMenu);
       loadResButton->setMenu(menu);
 
       QObject::connect(primitiveAdd, SIGNAL(triggered()), this, SLOT(importObj()));
@@ -76,6 +80,9 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
                   if (toggled) {
                         RenderWorker::Instance()->loadObject(pUi->m());
                   }
+                  else {
+
+                  }
                   break;
             }
                   
@@ -84,6 +91,9 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
                   PointLight_Ui* lUi = static_cast<PointLight_Ui*>(o);
                   if (toggled) {
                         RenderWorker::Instance()->loadPointLight(lUi->m());
+                  }
+                  else {
+                        RenderWorker::Instance()->removePointLight(lUi->m());
                   }
                   break;
             }
@@ -96,6 +106,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
 
 void MainWindow::refreshResource() {
       //resourceWidget->clear();
+      resourceWidget->blockSignals(true);
       std::vector<RendererObject*> rec_list = ResourceManager::getInstance()->getResourceList();
       resourceWidget->setRowCount(rec_list.size());
       int idx = 0;
@@ -108,6 +119,7 @@ void MainWindow::refreshResource() {
             resourceWidget->setItem(idx, 1, item_type);
             idx++;
       }
+      resourceWidget->blockSignals(false);
 }
 
 MainWindow* MainWindow::getInstance() {

@@ -20,7 +20,7 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
       return _image->SpectrumPixel(coordX, coordY);
 }
 
-void ImageTexture::load(QOpenGLExtraFunctions* f) {
+void ImageTexture::load(QOpenGLFunctions_4_0_Core* f) {
       f->glGenTextures(1, &_tbo);
       f->glBindTexture(GL_TEXTURE_2D, _tbo);
       // default tex params
@@ -39,7 +39,7 @@ void ImageTexture::load(QOpenGLExtraFunctions* f) {
       f->glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void ImageTexture::update(QOpenGLExtraFunctions* f) {
+void ImageTexture::update(QOpenGLFunctions_4_0_Core* f) {
       // if unloaded
       if (_tbo == 0) {
             load(f);

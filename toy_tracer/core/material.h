@@ -5,7 +5,7 @@
 #include <memory>
 #include <algorithm>
 #include <vector>
-#include <QOpenGLExtraFunctions>
+#include <QOpenGLFunctions_4_0_Core>
 #include <QLineEdit>
 #include "core/spectrum.h"
 #include "core/texture.h"
@@ -91,9 +91,9 @@ protected:
       volatile bool _dirty; // need to update some of those `tbo`s.
 
 public:
-      void load(QOpenGLExtraFunctions* f);
+      void load(QOpenGLFunctions_4_0_Core* f);
       Shader* shader() const { return _shader; }
-      void update(QOpenGLExtraFunctions* f);
+      void update(QOpenGLFunctions_4_0_Core* f);
       bool dirty() const { return _dirty; }
       void setDirty() { _dirty = true; }
       ImageTexture& albedo_map() { return _albedo_map; }

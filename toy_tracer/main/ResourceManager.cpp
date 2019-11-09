@@ -19,3 +19,7 @@ void ResourceManager::loadFile(QString path) {
       }
 }
 
+void ResourceManager::addPrimitive(Primitive* p) {
+      Primitive_Ui* p_ui = new Primitive_Ui(p);
+      _loadList.emplace_back(p_ui);
+}

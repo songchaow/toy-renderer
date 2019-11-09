@@ -4,9 +4,10 @@
 #include <QtWidgets/qwidget.h>
 #include <QWindow>
 #include <QOpenGLExtraFunctions>
+#include <QOpenGLFunctions_4_0_Core>
 #include <QMouseEvent>
 
-class Canvas : public QWindow, public QOpenGLFunctions {
+class Canvas : public QWindow, public QOpenGLFunctions_4_0_Core {
       QOpenGLContext* m_context;
       volatile bool _drag = false;
       volatile bool _resized = false;
