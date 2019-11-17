@@ -62,6 +62,7 @@ protected:
       Shape* _shape; // nullptr means it's contructed directly by mesh
       ShapeID s_id;
       std::vector<TriangleMesh*> _meshes;
+      AnimatedTransform _obj2world;
 public:
       Shapeable(Shape* shape, ShapeID s_id) : _shape(shape), s_id(s_id) {}
       Float Area() const { return _shape->Area(); }
@@ -76,4 +77,5 @@ public:
       const std::vector<TriangleMesh*>& meshes() { return _meshes; }
       const Shape* shape() const { return _shape; }
       void GenMeshes() { if (_shape) _meshes = _shape->GenMesh(); }
+      AnimatedTransform& obj2world() { return _obj2world; }
 };

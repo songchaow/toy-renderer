@@ -90,9 +90,9 @@ void Transform_Ui::addProperties(QWidget * parent) const
       QHBoxLayout* lineLayout_t = new QHBoxLayout;
       lineWidget_t->setLayout(lineLayout_t);
       QLabel* translation_text = new QLabel("Translate:");
-      translationX = new QLineEdit(QString::number(srt.translationX));
-      translationY = new QLineEdit(QString::number(srt.translationY));
-      translationZ = new QLineEdit(QString::number(srt.translationZ));
+      translationX = new QLineEdit(QString::number(srt.translation.x));
+      translationY = new QLineEdit(QString::number(srt.translation.y));
+      translationZ = new QLineEdit(QString::number(srt.translation.z));
       lineLayout_t->addWidget(translation_text);
       lineLayout_t->addWidget(translationX);
       lineLayout_t->addWidget(translationY);

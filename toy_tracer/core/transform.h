@@ -14,9 +14,9 @@ struct Matrix3 {
 };
 struct Transform;
 struct SRT {
-      Float translationX, translationY, translationZ;
-      Float rotationX, rotationY, rotationZ;
-      Float scaleX, scaleY, scaleZ;
+      Point3f translation;
+      Float rotationX = 0.f, rotationY = 0.f, rotationZ = 0.f;
+      Float scaleX = 1.f, scaleY = 1.f, scaleZ = 1.f;
       Matrix4 toMatrix4();
 };
 
@@ -85,4 +85,27 @@ struct Transform {
       Transform operator*(const Transform& rhs) const;
 
       static Transform Identity() { return Scale(1.f, 1.f, 1.f); }
+};
+
+struct AnimatedTransform : public Transform {
+      SRT srt;
+      AnimatedTransform(SRT srt) : srt(srt), Transform(srt.toMatrix4()) {}
+      AnimatedTransform(const Matrix4& m) : srt(m.toSRT()), Transform(m) {}
+      AnimatedTransform() = default;
+      void rotate(Float angleX, Float angleY, Float angleZ) {
+            // modify srt and update Transform
+            srt.rotationX += angleX;
+            srt.rotationY += angleY;
+            srt.rotationZ += angleZ;
+            m = srt.toMatrix4();
+            // TODO: implement srt.toInvMatrix4()
+            mInv = ::Inverse(m);
+      }
+      void move(Float offX, Float offY, Float offZ) {
+            srt.translation.x += offX; srt.translation.y += offY; srt.translation.z += offZ;
+            m = srt.toMatrix4();
+            mInv = ::Inverse(m);
+      }
+      void update() { m = srt.toMatrix4(); mInv = ::Inverse(m); }
+      Point3f& translation() { return srt.translation; }
 };

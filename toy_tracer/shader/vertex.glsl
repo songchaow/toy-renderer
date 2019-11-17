@@ -19,5 +19,5 @@ void main()
       posWorld = vec3(obj2world * vec4(posLocal,1.0));
       TexCoord = texCoord;
       ver_color = pColor;
-      normalWorld = vec3(transpose(inverse(cam2ndc * world2cam * obj2world)) * vec4(normalLocal,0));
+      normalWorld = vec3(transpose(inverse(obj2world)) * vec4(normalLocal,0));
 }

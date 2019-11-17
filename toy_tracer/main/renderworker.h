@@ -24,6 +24,9 @@ class RenderWorker : public QObject, QOpenGLFunctions_4_0_Core {
       static Camera* cam;
       Canvas* _canvas;
 
+public:
+      Primitive* curr_primitive;
+
 public slots:
       void initialize();
       void renderLoop();
@@ -34,6 +37,7 @@ public:
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }
       void setCanvas(Canvas* c) { _canvas = c; }
+      Canvas* canvas() { return _canvas; }
       static inline RenderWorker* Instance() { return &_worker; }
       const std::vector<PointLight*>& pointLights() const { return _pointLights; }
 };

@@ -7,7 +7,7 @@ static const int nCIESamples = 471;
 extern const Float CIE_X[nCIESamples];
 extern const Float CIE_Y[nCIESamples];
 extern const Float CIE_Z[nCIESamples];
-static const Float CIE_Y_integral = 106.856895;
+static const Float CIE_Y_integral = 106.856895F;
 static const int nRGB2SpectSamples = 32;
 extern const Float RGB2SpectLambda[nRGB2SpectSamples];
 extern const Float RGBRefl2SpectWhite[nRGB2SpectSamples];

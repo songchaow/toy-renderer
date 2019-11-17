@@ -45,14 +45,18 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
       const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
       for (int i = 0; i < pointLights.size(); i++) {
             shader->setUniformF(startPos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
+            
+      }
+      startPos += Shader::maxPointLightNum - pointLights.size();
+      for (int i = 0; i < pointLights.size(); i++) {
             shader->setUniformF(startPos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
       }
       // set other lights' radiance to zero
-      startPos += 1;
+      /*startPos += 1;
       for (int i = pointLights.size(); i < Shader::maxPointLightNum; i++) {
             shader->setUniformF(startPos, 0.f, 0.f, 0.f);
             startPos += 2;
-      }
+      }*/
       if (rt_m->_albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->_albedo_map.tbo());
@@ -68,14 +72,16 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
             f->glBindTexture(GL_TEXTURE_2D, rt_m->_rough_map.tbo());
             shader->setUniformI("roughnessSampler", 2);
       }
-      
+      // set camera
+      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
+      shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       for (auto& m : _meshes) {
             f->glBindVertexArray(m->vao());
             // set MVP
             // TODO: obj2world could be stored for each mesh's shader program
-            shader->setUniformF("obj2world", m->obj2world().getRowMajorData());
+            shader->setUniformF("obj2world", _obj2world.getRowMajorData());
             shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
-            shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
+            
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             GLenum err = f->glGetError();

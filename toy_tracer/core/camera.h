@@ -53,6 +53,7 @@ public:
       void setTransform(Float offsetX, Float offsetY);
       void applyRotation();
       void applyTranslation(volatile bool* statuses, Float deltaT);
+      Point3f pos() const { return _pos; }
       
 };
 

@@ -1,5 +1,6 @@
 #include "main/renderworker.h"
 #include "main/uiwrapper.h"
+#include "main/MainWindow.h"
 #include <QWindow>
 #include <QThread>
 #include <QDebug>
@@ -42,8 +43,14 @@ void RenderWorker::renderLoop() {
             if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
             }
-            if (_canvas->keyPressed())
-                  cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
+            if (_canvas->keyPressed()) {
+                  if (_canvas->CameraorObject())
+                        cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
+                  else {
+                        applyTranslation(curr_primitive->obj2world().translation(), _canvas->keyStatuses(), 0.01f, Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f));
+                        curr_primitive->obj2world().update();
+                  }
+            }
             // add pending primitives
             std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {

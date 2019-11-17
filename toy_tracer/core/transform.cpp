@@ -56,7 +56,7 @@ Matrix4::Matrix4(const Matrix3& m3) {
 }
 
 Matrix4 SRT::toMatrix4() {
-      Matrix4 translate = TranslateM(translationX, translationY, translationZ);
+      Matrix4 translate = TranslateM(translation.x, translation.y, translation.z);
       // order: T.S.(rz.ry.rx).M
       Matrix4 rotate = RotateM(rotationX, rotationY, rotationZ);
       Matrix4 scale = ScaleM(scaleX, scaleY, scaleZ);
@@ -77,7 +77,7 @@ Matrix4 Matrix4::operator*(const Matrix4& m) const {
 SRT Matrix4::toSRT() const {
       SRT ret;
       // Translate
-      ret.translationX = m_matrix[0][3]; ret.translationY = m_matrix[1][3]; ret.translationZ = m_matrix[2][3];
+      ret.translation = {m_matrix[0][3], m_matrix[1][3], m_matrix[2][3]};
       ///start[0] = Matrix3(Translate(m_matrix[0][3], m_matrix[1][3], m_matrix[2][3]).m);
       // The order of scale and rotate doesn't matter
       // Scale

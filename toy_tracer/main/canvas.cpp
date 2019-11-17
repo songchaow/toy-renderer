@@ -1,5 +1,7 @@
 #include "main/canvas.h"
 #include "main/renderworker.h"
+#include "main/MainWindow.h"
+#include "main/uiwrapper.h"
 
 Canvas::Canvas() {
       QWindow::resize(800, 800);
@@ -18,7 +20,20 @@ void Canvas::mouseReleaseEvent(QMouseEvent *ev) {
 void Canvas::mouseMoveEvent(QMouseEvent *ev) {
       if (_drag) {
             // apply transform: cam()->setTransform(t)
-            RenderWorker::getCamera()->setTransform(ev->pos().x() - _pos0.x, ev->pos().y() - _pos0.y);
+            Float dx = ev->pos().x() - _pos0.x, dy = ev->pos().y() - _pos0.y;
+            _pendingRotation = Rotate(dx / 50.f, dy / 50.f);
+            if (camera_obj)
+                  // TODO: Camera's setTransform's parameters should be of type Transform
+                  RenderWorker::getCamera()->setTransform(dx, dy);
+            else {
+                  RendererObject* robj = MainWindow::getInstance()->getCurrentItem();
+                  if (robj == nullptr)
+                        return;
+                  if (robj->typeID() == RendererObject::TypeID::Primitive) {
+                        static_cast<Primitive_Ui*>(robj)->m()->obj2world().rotate(dx / 50.f, dy / 50.f, 0);
+                  }
+            }
+                  ;
             _pos0 = ev->pos();
       }
 }

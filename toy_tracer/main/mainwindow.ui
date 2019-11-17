@@ -21,13 +21,6 @@
     </sizepolicy>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="3" column="0">
-     <widget class="QPushButton" name="loadResButton">
-      <property name="text">
-       <string>Load</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="1">
      <widget class="QFrame" name="materialWidget">
       <property name="sizePolicy">
@@ -44,6 +37,22 @@
       </property>
      </widget>
     </item>
+    <item row="1" column="2">
+     <widget class="QFrame" name="properties">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Panel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="0">
      <widget class="QLineEdit" name="resourcePath"/>
     </item>
@@ -51,6 +60,13 @@
      <widget class="QLabel" name="scene_label">
       <property name="text">
        <string>Scene</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QPushButton" name="loadResButton">
+      <property name="text">
+       <string>Load</string>
       </property>
      </widget>
     </item>
@@ -81,21 +97,30 @@
       </column>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QFrame" name="properties">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Panel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Control</string>
       </property>
      </widget>
+    </item>
+    <item row="3" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="controlCam">
+        <property name="text">
+         <string>Camera</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="controlObj">
+        <property name="text">
+         <string>Object</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
    <zorder>materialWidget</zorder>
@@ -105,6 +130,8 @@
    <zorder>loadResButton</zorder>
    <zorder>resourceWidget</zorder>
    <zorder>properties</zorder>
+   <zorder>label</zorder>
+   <zorder>horizontalLayoutWidget</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>

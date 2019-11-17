@@ -125,7 +125,8 @@ std::vector<TriangleMesh*> Sphere::GenMesh(unsigned int uSlide, unsigned int vSl
                   Float phi = 2 * Pi / vSlide * v;
                   Point3f pos(radiusZ*std::cos(phi), radiusZ*std::sin(phi), z);
                   Point2f uv(uPos, Float(v) / vSlide);
-                  Point3f normal(std::cos(phi), std::sin(phi), z / radius);
+                  Point3f normal(std::cos(phi), std::sin(phi), z / radius); // wrong?
+                  normal = pos / radius;
                   *(Point3f*)vertex_data_ptr = pos;
                   vertex_data_ptr += 3;
                   *(Point2f*)vertex_data_ptr = uv;

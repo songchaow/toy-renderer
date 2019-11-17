@@ -26,15 +26,28 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       QObject::connect(pointLightAdd, SIGNAL(triggered()), this, SLOT(addPointLight()), Qt::DirectConnection);
       QObject::connect(resourceWidget, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem* ,QTableWidgetItem *)));
       QObject::connect(resourceWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(objLoadToggled(QTableWidgetItem *)));
+      QObject::connect(controlObj, &QAbstractButton::toggled, this, &MainWindow::viewToggled);
+      QObject::connect(controlCam, &QAbstractButton::toggled, this, &MainWindow::viewToggled);
+}
+
+void MainWindow::viewToggled(bool checked) {
+      if (checked) {
+            if (controlCam->isChecked())
+                  RenderWorker::Instance()->canvas()->setControlCamera();
+            else
+                  RenderWorker::Instance()->canvas()->setControlObject();
+      }
 }
 
 void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
       RendererObject* robj = static_cast<RendererObject*>(obj->data(Qt::UserRole).value<void*>());
+      _currobj = robj;
       if (robj) {
             robj->addProperties(properties);
             if (robj->typeID() == RendererObject::TypeID::Primitive) {
                   //PBRMaterial_Ui new_Ui = PBRMaterial_Ui(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
                   Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
+                  RenderWorker::Instance()->curr_primitive = pUi->m();
                   pUi->setMaterialUi(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
                   if (pUi->isValid() && pUi->materialUi().isValid()) {
                         pUi->materialUi().addProperties(materialWidget);
