@@ -71,8 +71,8 @@ R8G8B8 Image::R8G8B8Pixel(int i, int j)
       return static_cast<::R8G8B8*>(_data)[i * _resolution.x + _resolution.y];
 }
 
-RGBSpectrum Image::SpectrumPixel(int i, int j)
+RGBSpectrum Image::SpectrumPixel(int col, int row)
 {
       if(!_data) return ::RGBSpectrum(0.f);
-      return static_cast<::RGBSpectrum*>(_data)[j * _resolution.x + i];
+      return static_cast<::RGBSpectrum*>(_data)[row * _resolution.x + col];
 }

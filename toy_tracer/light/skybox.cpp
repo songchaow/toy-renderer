@@ -1,9 +1,8 @@
 #include "light/skybox.h"
 
 Spectrum Skybox::Li(Vector3f& w) const {
-      // TODO: use an image map
       Float u = SphericalTheta(w) / Pi;
-      Float v = SphericalPhi(w) / Pi;
+      Float v = SphericalPhi(w) / 2.f / Pi;
       return _texture->Evaluate(u, v);
 }
 

@@ -13,12 +13,13 @@ class Film {
       std::shared_ptr<Float[]> weight_sum;
       Filter* filter = nullptr;
       Sampler sampler;
-      Float& WeightSum(const Point2i& index) { assert(index.x < width && index.y < height); return weight_sum[index.y*width + index.x]; }
-      RGBSpectrum& ContribSum(const Point2i& index) { assert(index.x < width && index.y < height); return matrix[index.y*width + index.x]; }
+      // x: from top to down, 0-height-1 y: from left to right, 0-width-1
+      Float& WeightSum(const Point2i& index) { assert(index.y < width && index.x < height); return weight_sum[index.x*width + index.y]; }
+      RGBSpectrum& ContribSum(const Point2i& index) { assert(index.y < width && index.x < height); return matrix[index.x*width + index.y]; }
 public:
       Film(const Point2i& size) : width(size.x), height(size.y), matrix(new RGBSpectrum[width*height]()),
             weight_sum(new Float[width*height]()) {}
-      const RGBSpectrum& ContribSum(const Point2i& index) const { assert(index.x < width && index.y < height); return matrix[index.y*width + index.x]; }
+      const RGBSpectrum& ContribSum(const Point2i& index) const { assert(index.y < width && index.x < height); return matrix[index.x*width + index.y]; }
       const int getWidth() const { return width; }
       const int getHeight() const { return height; }
       void addRay(Spectrum& Li, Point2f& pFilm);

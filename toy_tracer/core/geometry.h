@@ -1041,9 +1041,22 @@ inline Float CaconicalSphericalPhi(const Vector3f &v) {
     return (p < 0) ? (p + 2 * Pi) : p;
 }
 
+/* Cheat Sheet for phi(x,z):
+      x>0, z>0: res = res
+      x<0, z>0: res += pi
+      x<0, z<0: res += pi
+      x>0, z<0: res += 2pi
+      final p is in [0,2Pi]
+*/
 inline Float SphericalPhi(const Vector3f &v) {
       Float p = std::atan2(v.z, v.x);
-      return (p < 0) ? (p + Pi) : p;
+      //if (v.x < 0)
+      //      ;// p += Pi;
+      //if (v.x > 0 && v.z < 0)
+      //      p += 2 * Pi;
+      if (v.y < 0)
+            p += 2 * Pi;
+      return p;
 }
 
 inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {

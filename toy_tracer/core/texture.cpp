@@ -14,8 +14,8 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
             if (u<0.f || u>1.f || v<0.f || v>1.f)
                   return 0;
       }
-      unsigned int coordX = u * (_image->resolution().x - 0.001);
-      unsigned int coordY = v * (_image->resolution().y - 0.001);
+      unsigned int coordY = u * (_image->resolution().y - 0.001);
+      unsigned int coordX = v * (_image->resolution().x - 0.001);
       // use the box filter
       return _image->SpectrumPixel(coordX, coordY);
 }

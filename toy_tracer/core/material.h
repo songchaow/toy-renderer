@@ -87,9 +87,10 @@ public:
       ImageTexture _rough_map;
 
 protected:
+      // TODO: seems _shader can be shared among multiple PBRMaterials
       Shader* _shader = nullptr;
       volatile bool _dirty; // need to update some of those `tbo`s.
-
+      RGBSpectrum _globalEmission;
 public:
       void load(QOpenGLFunctions_4_0_Core* f);
       Shader* shader() const { return _shader; }
@@ -99,6 +100,7 @@ public:
       ImageTexture& albedo_map() { return _albedo_map; }
       ImageTexture& metallic_map() { return _metallic_map; }
       ImageTexture& rough_map() {return _rough_map; }
+      RGBSpectrum& globalEmission() { return _globalEmission; }
 };
 
 class GlossSurface;

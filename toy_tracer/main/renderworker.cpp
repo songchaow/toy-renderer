@@ -79,11 +79,16 @@ void RenderWorker::renderLoop() {
             if (lightQueue.readAll(pendingLights, pendingDelLights)) {
                   for (auto* d : pendingDelLights) {
                         auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
-                        if (it != _pointLights.end())
+                        if (it != _pointLights.end()) {
                               _pointLights.erase(it);
+                              // TODO: delete primitive if there is one, or add to pendingDelPrimitives
+                        }
                   }
                   for (auto* l : pendingLights) {
                         _pointLights.push_back(l);
+                        if (l->primitive()) {
+                              primitives.push_back(l->primitive());
+                        }
                   }
             }
             // rendering

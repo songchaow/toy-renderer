@@ -57,6 +57,7 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
             shader->setUniformF(startPos, 0.f, 0.f, 0.f);
             startPos += 2;
       }*/
+      shader->setUniformF("globalEmission", rt_m->globalEmission()[0], rt_m->globalEmission()[1], rt_m->globalEmission()[2]);
       if (rt_m->_albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m->_albedo_map.tbo());

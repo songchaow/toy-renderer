@@ -8,7 +8,10 @@ in vec3 normalWorld;
 uniform sampler2D albedoSampler; // vec3
 uniform sampler2D metallicSampler; // float
 uniform sampler2D roughnessSampler; // float
+uniform sampler2D emissionSampler; // vec3
 uniform sampler2D aoSampler;
+
+uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
 
 // lights
 struct PointLight {
@@ -126,12 +129,16 @@ void main()
     
     // reflectance equation
     vec3 Lo = addDirectLight(V, N, albedo, roughness, metallic, ao);
-    
+    vec3 Le;
+    if(globalEmission == vec3(0.0,0.0,0.0))
+        Le = vec3(texture(emissionSampler, TexCoord));
+    else
+        Le = globalEmission;
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.03) * albedo * ao;
 
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo + Le;
 
     // HDR tonemapping
     color = color / (color + vec3(1.0));

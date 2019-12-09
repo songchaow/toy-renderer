@@ -46,6 +46,8 @@ public:
       ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {}
       ImageTexture() = default;
       void resetImage(Image* i) { _image = i; }
+      Float height() { if (!_image) return 0.f; return _image->resolution().x; }
+      Float width() { if (!_image) return 0.f; return _image->resolution().y; }
       bool loadable() override { return true; }
       bool isValid() const { return (bool)_image; }
       bool isLoad() const { return _tbo > 0; }
