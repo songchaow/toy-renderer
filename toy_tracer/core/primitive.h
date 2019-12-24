@@ -11,13 +11,15 @@ class Primitive : public Shapeable
 {
 private:
       Material* material = nullptr;
-      PBRMaterial* rt_m = nullptr;
+      // TODO: don't use pointer, or modify the dctor
+      PBRMaterial rt_m;
       Shader* shader = nullptr; // acquired from material
       RGBTexture* reflection; // currently not used
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), material(m) {}
+      Primitive(Shape* shape, PBRMaterial m) : Shapeable(shape, ShapeID::Primitive), rt_m(m), material(nullptr) {}
       Material* getMaterial() const { return material; }
-      PBRMaterial* getPBRMaterial() const { return rt_m; }
+      PBRMaterial* getPBRMaterial() { return &rt_m; }
       void load(QOpenGLFunctions_4_0_Core* f);
       void draw(QOpenGLFunctions_4_0_Core* f);
 };

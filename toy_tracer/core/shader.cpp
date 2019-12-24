@@ -138,8 +138,10 @@ static std::map<std::string, Shader> shaderStore;
 
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLFunctions_4_0_Core* f) {
       std::string id = vertex_path + fragment_path;
-      if (shaderStore.find(id) != shaderStore.end())
+      if (shaderStore.find(id) != shaderStore.end()) {
+            DLOG(INFO) << "Shader already exists";
             return &shaderStore[id];
+      }
       else {
             Shader s(vertex_path, fragment_path, f);
             if (s.loaded()) {

@@ -80,6 +80,28 @@ if(MSVC)
       ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
 endif (MSVC)
 
+file(GLOB BALL_SRC
+  main/canvas.cpp
+  main/canvas.h
+  main/ball.cpp
+  main/renderworker.cpp
+  main/renderworker.h
+  main/TwoTheadQueue.h
+  )
+
+add_executable (ball ${BALL_SRC} ${ui_headers})
+target_link_libraries(ball tracer_lib)
+
+# copy shader files to the binary directory
+add_custom_command(TARGET ball POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
+if(MSVC)
+  add_custom_command(TARGET ball POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+      ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
+endif (MSVC)
+
 # TODO: 如有需要，请添加测试并安装目标。
 ENABLE_TESTING()
 

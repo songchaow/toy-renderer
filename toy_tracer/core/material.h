@@ -80,11 +80,11 @@ public:
 
 class PBRMaterial {
 public:
-      ImageTexture _albedo_map;
+      ImageTexture albedo_map;
       //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
       //ImageTexture* specular_map = nullptr; // replaced by metallic
-      ImageTexture _metallic_map;
-      ImageTexture _rough_map;
+      ImageTexture metallic_map;
+      ImageTexture rough_map;
 
 protected:
       // TODO: seems _shader can be shared among multiple PBRMaterials
@@ -97,9 +97,6 @@ public:
       void update(QOpenGLFunctions_4_0_Core* f);
       bool dirty() const { return _dirty; }
       void setDirty() { _dirty = true; }
-      ImageTexture& albedo_map() { return _albedo_map; }
-      ImageTexture& metallic_map() { return _metallic_map; }
-      ImageTexture& rough_map() {return _rough_map; }
       RGBSpectrum& globalEmission() { return _globalEmission; }
 };
 

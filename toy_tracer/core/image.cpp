@@ -1,6 +1,7 @@
 #include "core/image.h"
 #include "ext/std_image/include/stb_image.h"
 #include <map>
+#include <utility>
 
 static std::map<std::string, Image> _imageStore;
 
@@ -10,6 +11,32 @@ Image* Image::CreateImageFromFile(std::string path) {
       _imageStore.emplace(path, path);
       return &_imageStore[path];
 }
+
+// color in sRGB
+Image * Image::CreateColorImage(std::string path, ::R8G8B8 color, bool alpha, Float val_alpha)
+{
+      _imageStore.emplace(path, Image(color, alpha, val_alpha));
+      return &_imageStore[path];
+}
+
+// color and val_alpha in sRGB
+Image::Image(const ::R8G8B8& color, bool alpha, Float val_alpha) {
+      // assume we store float internally
+      numChannel = alpha ? 4 : 3;
+      if (alpha)
+            flags = RGBASpectrum;
+      else
+            flags = RGBSpectrum;
+      _resolution.x = _resolution.y = 1;
+      _data = new Float[numChannel];
+      _elementType = GL_FLOAT;
+      for (int i = 0; i < 3; i++)
+            static_cast<Float*>(_data)[i] = InverseGammaCorrection(color[i]);
+      if (alpha)
+            static_cast<Float*>(_data)[3] = GammaInvTransform(val_alpha);
+      loaded = true;
+}
+
 
 bool Image::LoadFromFile(std::string path)
 {
@@ -27,7 +54,8 @@ bool Image::LoadFromFile(std::string path)
                   // apply GammaInvTransform
                   for(int i = 0; i < x*y ; i++) {
                         for(int j = 0; j < numChannel; j++) {
-                              static_cast<char*>(_data)[numChannel * i + j] = GammaInvTransform(static_cast<char*>(_data)[numChannel * i + j]);
+                              // here's WRONG param and return value should be char
+                              static_cast<char*>(_data)[numChannel * i + j] = GammaInvTransform(static_cast<char*>(_data)[numChannel * i + j] / 256.0f)*256.0f;
                         }
                   }
             }

@@ -2,7 +2,7 @@
 #include <atomic>
 #include <vector>
 
-constexpr size_t ttqueue_pool_size = 200;
+constexpr size_t ttqueue_pool_size = 600;
 
 template <class ElementT>
 class TwoThreadQueue {

@@ -4,7 +4,6 @@
 #include <vector>
 
 class ResourceManager {
-      Scene _scene;
       std::vector<RendererObject*> _loadList;
 public:
       static const QStringList filters;

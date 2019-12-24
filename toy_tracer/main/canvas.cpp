@@ -22,16 +22,18 @@ void Canvas::mouseMoveEvent(QMouseEvent *ev) {
             // apply transform: cam()->setTransform(t)
             Float dx = ev->pos().x() - _pos0.x, dy = ev->pos().y() - _pos0.y;
             _pendingRotation = Rotate(dx / 50.f, dy / 50.f);
-            if (camera_obj)
+            if (camera_obj) {
                   // TODO: Camera's setTransform's parameters should be of type Transform
-                  RenderWorker::getCamera()->setTransform(dx, dy);
+                  //RenderWorker::getCamera()->setOrientationTransform(dx, dy);
+                  RenderWorker::getCamera()->setSpinTransform(dx, Point3f(0.f, 0.f, 0.f));
+            }
             else {
-                  RendererObject* robj = MainWindow::getInstance()->getCurrentItem();
-                  if (robj == nullptr)
-                        return;
-                  if (robj->typeID() == RendererObject::TypeID::Primitive) {
-                        static_cast<Primitive_Ui*>(robj)->m()->obj2world().rotate(dx / 50.f, dy / 50.f, 0);
-                  }
+                  // RendererObject* robj = MainWindow::getInstance()->getCurrentItem();
+                  // if (robj == nullptr)
+                  //       return;
+                  // if (robj->typeID() == RendererObject::TypeID::Primitive) {
+                  //       static_cast<Primitive_Ui*>(robj)->m()->obj2world().rotate(dx / 50.f, dy / 50.f, 0);
+                  // }
             }
                   ;
             _pos0 = ev->pos();

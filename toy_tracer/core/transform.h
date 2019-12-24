@@ -18,6 +18,14 @@ struct SRT {
       Float rotationX = 0.f, rotationY = 0.f, rotationZ = 0.f;
       Float scaleX = 1.f, scaleY = 1.f, scaleZ = 1.f;
       Matrix4 toMatrix4();
+      static SRT fromTranslation(const Point3f& t) { SRT ret; ret.translation = t; return ret; }
+      static SRT fromTranslation(Float x, Float y, Float z) {
+            SRT ret; 
+            ret.translation.x = x;
+            ret.translation.y = y;
+            ret.translation.z = z;
+            return ret;
+      }
 };
 
 struct Matrix4 {
@@ -87,6 +95,7 @@ struct Transform {
       static Transform Identity() { return Scale(1.f, 1.f, 1.f); }
 };
 
+// used by track sphere
 struct AnimatedTransform : public Transform {
       SRT srt;
       AnimatedTransform(SRT srt) : srt(srt), Transform(srt.toMatrix4()) {}

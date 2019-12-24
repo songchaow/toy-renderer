@@ -21,8 +21,12 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
 }
 
 void ImageTexture::load(QOpenGLFunctions_4_0_Core* f) {
-      f->glGenTextures(1, &_tbo);
-      f->glBindTexture(GL_TEXTURE_2D, _tbo);
+      if (*_tbo != 0) { // already loaded
+            DLOG(INFO) << "Texture already loaded";
+            return;
+      }
+      f->glGenTextures(1, _tbo);
+      f->glBindTexture(GL_TEXTURE_2D, *_tbo);
       // default tex params
       f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -34,18 +38,18 @@ void ImageTexture::load(QOpenGLFunctions_4_0_Core* f) {
             image_format = GL_RGB;
       else if (_image->format() == Image::Format::R8G8B8A8)
             image_format = GL_RGBA;
-      f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      //f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
       f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       f->glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void ImageTexture::update(QOpenGLFunctions_4_0_Core* f) {
       // if unloaded
-      if (_tbo == 0) {
+      if (*_tbo == 0) {
             load(f);
             return;
       }
-      f->glBindTexture(GL_TEXTURE_2D, _tbo);
+      f->glBindTexture(GL_TEXTURE_2D, *_tbo);
       GLuint image_format;
       if (_image->format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
             image_format = GL_RGB;

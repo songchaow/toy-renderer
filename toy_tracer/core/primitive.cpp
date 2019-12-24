@@ -27,13 +27,8 @@ void Primitive::load(QOpenGLFunctions_4_0_Core* f) {
             mesh->load(f);
       }
       // TODO: consider other types of RTMaterial
-      if (rt_m == nullptr) {
-            rt_m = new PBRMaterial();
-            // // move from the render thrad to the UI thread
-            // rt_m->moveToThread(thread());
-      }
-      rt_m->load(f);
-      shader = rt_m->shader();
+      rt_m.load(f);
+      shader = rt_m.shader();
 }
 
 void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
@@ -57,20 +52,20 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
             shader->setUniformF(startPos, 0.f, 0.f, 0.f);
             startPos += 2;
       }*/
-      shader->setUniformF("globalEmission", rt_m->globalEmission()[0], rt_m->globalEmission()[1], rt_m->globalEmission()[2]);
-      if (rt_m->_albedo_map.isLoad()) {
+      shader->setUniformF("globalEmission", rt_m.globalEmission()[0], rt_m.globalEmission()[1], rt_m.globalEmission()[2]);
+      if (rt_m.albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->_albedo_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m.albedo_map.tbo());
             shader->setUniformI("albedoSampler", 0);
       }
-      if (rt_m->_metallic_map.isLoad()) {
+      if (rt_m.metallic_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE1);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->_metallic_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m.metallic_map.tbo());
             shader->setUniformI("metallicSampler", 1);
       }
-      if (rt_m->_rough_map.isLoad()) {
+      if (rt_m.rough_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE2);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m->_rough_map.tbo());
+            f->glBindTexture(GL_TEXTURE_2D, rt_m.rough_map.tbo());
             shader->setUniformI("roughnessSampler", 2);
       }
       // set camera

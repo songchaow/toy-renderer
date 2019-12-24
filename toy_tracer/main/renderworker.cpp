@@ -7,15 +7,16 @@
 
 RenderWorker _worker;
 
-Camera* RenderWorker::cam;
+Camera* RenderWorker::cam = nullptr;
 
 Camera* CreateRTCamera(const Point2i& screen_size) {
-      return new Camera(nullptr, Translate(0.f, 0.f, -10.f), screen_size, 40.f * Pi / 180);
+      return new Camera(nullptr, Translate(0.f, 0.f, -30.f), screen_size, 40.f * Pi / 180);
 }
 
 void RenderWorker::initialize() {
       qDebug() << "RenderWorker Thread:" << QThread::currentThread();
-      cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
+      if(!cam)
+            cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
       m_context = new QOpenGLContext();
       m_context->setFormat(_canvas->requestedFormat());
       m_context->create();
@@ -43,6 +44,8 @@ void RenderWorker::renderLoop() {
             if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
             }
+            else
+                  cam->LookAt();
             if (_canvas->keyPressed()) {
                   if (_canvas->CameraorObject())
                         cam->applyTranslation(_canvas->keyStatuses(), 0.01f);

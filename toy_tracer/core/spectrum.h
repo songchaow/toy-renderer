@@ -2,6 +2,7 @@
 #include "core/common.h"
 #include "utils/array.h"
 #include "utils/utils.h"
+#include <cassert>
 
 static const int nCIESamples = 471;
 extern const Float CIE_X[nCIESamples];
@@ -106,7 +107,7 @@ SampledSpectrum operator/(const SampledSpectrum& lhs, const SampledSpectrum& rhs
 struct R8G8B8;
 
 struct RGBSpectrum {
-      Float rgb[3];
+      Float rgb[3] = { 0.f };
       RGBSpectrum() = default;
       RGBSpectrum(Float val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
       RGBSpectrum(Float r, Float g, Float b) {rgb[0] = r; rgb[1] = g; rgb[2] = b;}
@@ -141,7 +142,8 @@ struct R8G8B8 {
       R8G8B8() = default;
       explicit R8G8B8(char val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
       R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b; }
-      unsigned char& operator [](int idx) { return rgb[idx]; }
+      unsigned char& operator [](int idx) { assert(idx >= 0 && idx < 3); return rgb[idx]; }
+      const unsigned char& operator [](int idx) const { assert(idx >= 0 && idx < 3); return rgb[idx]; }
       R8G8B8 operator/(Float div) { R8G8B8 ret(rgb[0] / div, rgb[1] / div, rgb[2] / div); return ret; }
       RGBSpectrum toRGBSpectrum() { return RGBSpectrum((Float)(rgb[0]) / 255, (Float)(rgb[1]) / 255, (Float)(rgb[2]) / 255); }
 };

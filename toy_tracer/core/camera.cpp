@@ -12,50 +12,63 @@ Transform Camera::Cam2NDC() const
 {
       Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
             0, 0, 1, 0);
-      // Scale
+      // Shift and Scale
       Float height_original = film.getHeight() / film_distance;
       Float width_original = film.getWidth() / film_distance;
-      Transform t = Translate(Vector3f(width_original / 2, height_original / 2, 0));
+      //Transform t = Translate(Vector3f(width_original / 2, height_original / 2, 0));
+      Transform t = Translate(Vector3f(0, 0, 0));
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
       return s * t * Transform(persp);
 }
 
-void Camera::setTransform(Float offsetX, Float offsetY) {
+void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
       _rotation = Rotate(offsetY/50.f, offsetX/50.f);
       _rotationXTrigger = true;
 }
 
-void Camera::LookAt() {
-      // newZ = _viewDir;
-      newX = Normalize(Cross(_viewDir, Vector3f(0.f, 1.f, 0.f)));
-      newY = Normalize(Cross(newX, _viewDir));
-      Matrix4& m = _world2cam.m;
-      m[0][0] = newX.x; m[1][0] = newX.y; m[2][0] = newX.z; m[3][0] = 0.f;
-      m[0][1] = newY.x; m[1][1] = newY.y; m[2][1] = newY.z; m[3][1] = 0.f;
-      m[0][2] = _viewDir.x; m[1][2] = _viewDir.y; m[2][2] = _viewDir.z; m[3][2] = 0.f;
-      m[0][3] = _pos.x; m[1][3] = _pos.y; m[2][3] = _pos.z; m[3][3] = 1.f;
-      
-      _world2cam = Transform(Inverse(m), m);
+// assume the axis is z for now
+// offsest: the angle
+void Camera::setSpinTransform(Float offset, const Point3f& refPoint) {
+      spinRefPoint = refPoint;
+      // accumulate spinAngle
+      spinAngle += offset / 50.f;
+      while (spinAngle < 0) spinAngle += 2 * Pi;
+      while (spinAngle >= 2 * Pi) spinAngle -= 2 * Pi;
 }
 
-void Camera::applyTranslation(volatile bool* statuses, Float deltaT) {
+void Camera::LookAt() {
+      // newZ = _viewDir;
+      localX = Normalize(Cross(_viewDir, Vector3f(0.f, 1.f, 0.f)));
+      localY = Normalize(Cross(localX, _viewDir));
+      Matrix4& m = _world2cam.m;
+      m[0][0] = localX.x; m[1][0] = localX.y; m[2][0] = localX.z; m[3][0] = 0.f;
+      m[0][1] = localY.x; m[1][1] = localY.y; m[2][1] = localY.z; m[3][1] = 0.f;
+      m[0][2] = _viewDir.x; m[1][2] = _viewDir.y; m[2][2] = _viewDir.z; m[3][2] = 0.f;
+      m[0][3] = _pos.x; m[1][3] = _pos.y; m[2][3] = _pos.z; m[3][3] = 1.f;
+      // apply spinning
+      //Rotate(spinAngle, 0.f);
+      Matrix4 spinM = RotateM(0.f, spinAngle, 0.f) * m;
+      _world2cam = Transform(Inverse(spinM), spinM);
+}
+
+void Camera::applyTranslation(volatile bool* keyStatuses, Float deltaT) {
       static Float offset = deltaT * _speed;
-      if (statuses[0] && statuses[1])
+      if (keyStatuses[0] && keyStatuses[1])
             ; // Skiped
-      else if (statuses[0])
+      else if (keyStatuses[0])
             // Front
             _pos += offset * _viewDir;
-      else if (statuses[1])
+      else if (keyStatuses[1])
             // Back
             _pos -= offset * _viewDir;
-      if (statuses[2] && statuses[3])
+      if (keyStatuses[2] && keyStatuses[3])
             ; // Skipped
-      else if (statuses[2])
+      else if (keyStatuses[2])
             // Left
-            _pos -= offset * newX;
-      else if (statuses[3])
+            _pos -= offset * localX;
+      else if (keyStatuses[3])
             // Right
-            _pos += offset * newX;
+            _pos += offset * localX;
       LookAt();
 }
 

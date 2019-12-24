@@ -33,7 +33,8 @@ extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 class ImageTexture : public RGBSpectrumTexture {
       Image* _image;
       std::string _path;
-      GLuint _tbo = 0;
+      GLuint* _tbo;
+      unsigned int* _ref;
 public:
       enum WrapMode {
             LOOP,
@@ -42,20 +43,56 @@ public:
 private:
       WrapMode _wrapMode = LOOP;
 public:
-      ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(new Image(img_path)) {}
-      ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {}
-      ImageTexture() = default;
+      ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(new Image(img_path)) {
+            _tbo = new GLuint();
+            _ref = new unsigned int(1);
+      }
+      ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image), _ref(0) {
+            _tbo = new GLuint();
+            _ref = new unsigned int(1);
+      }
+      ImageTexture() : _ref(0) {
+            _tbo = new GLuint();
+            _ref = new unsigned int(1);
+      }
+      ImageTexture(const ImageTexture& i) :_image(i._image), _path(i._path), _tbo(i._tbo), _ref(i._ref) {
+            ++*_ref;
+      }
+      ImageTexture& operator=(const ImageTexture& i) {
+            --*_ref;
+            _image = i._image;
+            _path = i._path;
+            /*GLuint* newtbo = i._tbo;
+            unsigned int* newref = i._ref;*/
+            ++*i._ref;
+            if (*_ref == 0) {
+                  // TODO: destruct
+            }
+            _ref = i._ref;
+            return *this;
+      }
+      ~ImageTexture() {
+            --*_ref;
+            if (*_ref == 0) {
+                  if (*_tbo > 0) {
+                        // free the texture
+                        // free tbo int
+                  }
+                  // free the image
+                  // free the ref int
+            }
+      }
       void resetImage(Image* i) { _image = i; }
       Float height() { if (!_image) return 0.f; return _image->resolution().x; }
       Float width() { if (!_image) return 0.f; return _image->resolution().y; }
       bool loadable() override { return true; }
       bool isValid() const { return (bool)_image; }
-      bool isLoad() const { return _tbo > 0; }
+      bool isLoad() const { return *_tbo > 0; }
       // create a tbo and load the image
       void load(QOpenGLFunctions_4_0_Core* f);
       // tbo unchanged, but reload the image
       void update(QOpenGLFunctions_4_0_Core* f);
       RGBSpectrum Evaluate(Float u, Float v) override;
-      GLuint tbo() const { return _tbo; }
+      GLuint tbo() const { return *_tbo; }
       const std::string& path() const { return _path; }
 };
