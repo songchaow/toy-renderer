@@ -8,11 +8,11 @@
 
 void PBRMaterial_Ui::updateProperties() {
       if (!albedo_text->text().isEmpty())
-            _m->albedo_map().resetImage(Image::CreateImageFromFile(albedo_text->text().toStdString()));
+            _m->albedo_map.resetImage(Image::CreateImageFromFile(albedo_text->text().toStdString()));
       if (!metallic_text->text().isEmpty())
-            _m->metallic_map().resetImage(Image::CreateImageFromFile(metallic_text->text().toStdString()));
+            _m->metallic_map.resetImage(Image::CreateImageFromFile(metallic_text->text().toStdString()));
       if (!rough_text->text().isEmpty())
-            _m->rough_map().resetImage(Image::CreateImageFromFile(rough_text->text().toStdString()));
+            _m->rough_map.resetImage(Image::CreateImageFromFile(rough_text->text().toStdString()));
       _m->setDirty();
 }
 
@@ -35,9 +35,9 @@ void PBRMaterial_Ui::addProperties(QWidget* parent) const {
             }
       }
       parent->setLayout(globalLayout);
-      albedo_text = RendererObject::addFileDialog("Albedo Map:", "Open", parent, QString::fromStdString(_m->albedo_map().path()));
-      metallic_text = RendererObject::addFileDialog("Metallic Map:", "Open:", parent, QString::fromStdString(_m->metallic_map().path()));
-      rough_text = RendererObject::addFileDialog("Rough Map:", "Open:", parent, QString::fromStdString(_m->rough_map().path()));
+      albedo_text = RendererObject::addFileDialog("Albedo Map:", "Open", parent, QString::fromStdString(_m->albedo_map.path()));
+      metallic_text = RendererObject::addFileDialog("Metallic Map:", "Open:", parent, QString::fromStdString(_m->metallic_map.path()));
+      rough_text = RendererObject::addFileDialog("Rough Map:", "Open:", parent, QString::fromStdString(_m->rough_map.path()));
       // add create menu
       auto* parentLayout = parent->layout();
       QPushButton* update = new QPushButton("Update Material");

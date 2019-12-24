@@ -53,21 +53,23 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
             startPos += 2;
       }*/
       shader->setUniformF("globalEmission", rt_m.globalEmission()[0], rt_m.globalEmission()[1], rt_m.globalEmission()[2]);
+      shader->setUniformI("albedoSampler", 0);
       if (rt_m.albedo_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE0);
             f->glBindTexture(GL_TEXTURE_2D, rt_m.albedo_map.tbo());
-            shader->setUniformI("albedoSampler", 0);
       }
+      shader->setUniformI("metallicSampler", 1);
       if (rt_m.metallic_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE1);
             f->glBindTexture(GL_TEXTURE_2D, rt_m.metallic_map.tbo());
-            shader->setUniformI("metallicSampler", 1);
       }
+      shader->setUniformI("roughnessSampler", 2);
       if (rt_m.rough_map.isLoad()) {
             f->glActiveTexture(GL_TEXTURE2);
             f->glBindTexture(GL_TEXTURE_2D, rt_m.rough_map.tbo());
-            shader->setUniformI("roughnessSampler", 2);
       }
+      shader->setUniformI("emissionSampler", 3);
+      shader->setUniformI("aoSampler", 4);
       // set camera
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);

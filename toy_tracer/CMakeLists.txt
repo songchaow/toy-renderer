@@ -59,8 +59,21 @@ endif (MSVC)
 # TODO: add link statements for Linux
 
 file(GLOB TRACER_EXE
-    main/*.cpp
-    main/*.h
+    main/canvas.cpp
+    main/canvas.h
+    main/main.cpp
+    main/MainWindow.cpp
+    main/MainWindow.h
+    main/meshgen.cpp
+    main/renderworker.cpp
+    main/renderworker.h
+    main/ResourceManager.cpp
+    main/ResourceManager.h
+    main/scene_object.cpp
+    main/scne_object.h
+    main/TwoThreadWQueue.h
+    main/uiwrapper.cpp
+    main/uiwrapper.h
 )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})

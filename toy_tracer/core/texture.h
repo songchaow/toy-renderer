@@ -51,7 +51,7 @@ public:
             _tbo = new GLuint();
             _ref = new unsigned int(1);
       }
-      ImageTexture() : _ref(0) {
+      ImageTexture() : _ref(0), _image(nullptr) {
             _tbo = new GLuint();
             _ref = new unsigned int(1);
       }

@@ -126,7 +126,8 @@ void main()
     float metallic = texture(metallicSampler, TexCoord).r;
     float roughness = texture(roughnessSampler, TexCoord).r;
     float ao = texture(aoSampler, TexCoord).r;
-    
+    // ao is invalid now, so use 1 instead
+    ao = 1;
     // reflectance equation
     vec3 Lo = addDirectLight(V, N, albedo, roughness, metallic, ao);
     vec3 Le;
