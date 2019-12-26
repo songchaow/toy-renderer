@@ -12,7 +12,7 @@
 int renderTest() {
       // Scene object initialization
       
-      RGBSpectrumTexture* board_texture = new CheckerBoard(R8G8B8(255, 255, 255), R8G8B8(255, 0, 0), 40);
+      RGBSpectrumTexture2D* board_texture = new CheckerBoard(R8G8B8(255, 255, 255), R8G8B8(255, 0, 0), 40);
       ConstColorTexture<RGBSpectrum>* skycolor = new ConstColorTexture<RGBSpectrum>(RGBSpectrum(1.f, 1.f, 1.f));
       ImageTexture* sphereMap = new ImageTexture("sph2.jpg", ImageTexture::WrapMode::BLACK);
       Float eq_radius = sphereMap->width() / 2 / Pi;

@@ -6,6 +6,7 @@
 #include "core/transform.h"
 #include "core/renderoption.h"
 #include "core/tracer.h"
+#include "light/point.h"
 #include <cmath>
 
 class Camera {
@@ -30,8 +31,10 @@ class Camera {
       // Config Used in RTR
       Float clip_near = 0.1f;
       Float clip_far = 1000.f;
-      
-
+      // Associated light
+      bool light_associated;
+      PointLight light;
+      // Off-line
       Scene* s;
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
@@ -51,6 +54,12 @@ public:
       bool rotationXTrigger() const { return _rotationXTrigger; }
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
+
+      bool lightAssociated() const { return light_associated; }
+      PointLight* associatedLight() { return &light; }
+      void setAssociatedLight(PointLight l);
+
+      void disociateLight();
       void setOrientationTransform(Float offsetX, Float offsetY);
       void setSpinTransform(Float offset, const Point3f& refPoint);
       void applyRotation();

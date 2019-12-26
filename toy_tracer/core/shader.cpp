@@ -102,14 +102,29 @@ void Shader::setUniformF(const std::string & name, const float val, const float 
       f->glUniform4f(loc, val, val2, val3, val4);
 }
 
+void Shader::setUniformF(const std::string& name, const Vector3f& vec3) {
+      int loc = f->glGetUniformLocation(program_id, name.c_str());
+      f->glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
+}
+
 void Shader::setUniformF(const std::string& name, const Matrix4* data) {
       int loc = f->glGetUniformLocation(program_id, name.c_str());
       f->glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)data);
 }
 
+void Shader::setUniformBool(const std::string & name, bool val)
+{
+      int loc = f->glGetUniformLocation(program_id, name.c_str());
+      f->glUniform1i(loc, val);
+}
+
 void Shader::setUniformF(unsigned int loc, const float val)
 {
       f->glUniform1f(loc, val);
+}
+
+void Shader::setUniformBool(unsigned int loc, bool val) {
+      f->glUniform1i(loc, val);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val, const float val2)
@@ -120,6 +135,10 @@ void Shader::setUniformF(unsigned int loc, const float val, const float val2)
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3)
 {
       f->glUniform3f(loc, val, val2, val3);
+}
+
+void Shader::setUniformF(unsigned int loc, const Vector3f& vec3) {
+      f->glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4)

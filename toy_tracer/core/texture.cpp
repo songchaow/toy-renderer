@@ -28,8 +28,8 @@ void ImageTexture::load(QOpenGLFunctions_4_0_Core* f) {
       f->glGenTextures(1, _tbo);
       f->glBindTexture(GL_TEXTURE_2D, *_tbo);
       // default tex params
-      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER); // GL_REPEAT
+      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
       f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // level: 0
@@ -57,5 +57,26 @@ void ImageTexture::update(QOpenGLFunctions_4_0_Core* f) {
             image_format = GL_RGBA;
       f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       f->glBindTexture(GL_TEXTURE_2D, 0);
+
+}
+
+void RTRGBArrayTexture1D::load(QOpenGLFunctions_4_0_Core* f) {
+      if (*_tbo != 0) { // already loaded
+            DLOG(INFO) << "Texture already loaded";
+            return;
+      }
+      f->glGenTextures(1, _tbo);
+      f->glBindTexture(GL_TEXTURE_1D, *_tbo);
+      // default tex params
+      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // level: 0
+      //f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
+      f->glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, _data->size(), 0, GL_RGB, GL_FLOAT, _data->data());
+      f->glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void RTRGBArrayTexture1D::update(QOpenGLFunctions_4_0_Core* f) {
 
 }

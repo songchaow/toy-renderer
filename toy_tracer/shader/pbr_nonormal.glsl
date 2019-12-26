@@ -124,7 +124,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
 
 void main()
 {		
-    vec3 N = normalize(normalWorld);
+    //vec3 N = normalize(normalWorld);
     vec3 V = normalize(camPos - posWorld);
 
     

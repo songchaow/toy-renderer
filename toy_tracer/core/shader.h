@@ -21,11 +21,15 @@ public:
       void setUniformF(const std::string& name, const float val, const float val2);
       void setUniformF(const std::string& name, const float val, const float val2, const float val3);
       void setUniformF(const std::string& name, const float val, const float val2, const float val3, const float val4);
+      void setUniformF(const std::string& name, const Vector3f& vec3);
       void setUniformF(const std::string& name, const Matrix4* data);
+      void setUniformBool(const std::string& name, bool val);
       void setUniformF(unsigned int loc, const float val);
       void setUniformF(unsigned int loc, const float val, const float val2);
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3);
+      void setUniformF(unsigned int loc, const Vector3f& vec3);
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4);
+      void setUniformBool(unsigned int loc, bool val);
       void setUniformI(const std::string& name, const int val);
       void setUniformI(unsigned int loc, const int val);
       unsigned int getUniformLocation(const std::string& name) { return f->glGetUniformLocation(program_id, name.c_str()); }

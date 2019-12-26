@@ -1,7 +1,7 @@
 #pragma once
 #include "core/texture.h"
 
-class CheckerBoard : public RGBSpectrumTexture {
+class CheckerBoard : public RGBSpectrumTexture2D {
       // all in radiance
       RGBSpectrum _colorASpectrum;
       RGBSpectrum _colorBSpectrum;

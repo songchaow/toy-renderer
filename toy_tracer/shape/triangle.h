@@ -35,49 +35,6 @@ struct LayoutItem {
       LayoutItem() = default;
 };
 
-class TriangleMesh {
-      // for generated meshes, those transforms are copied from the Shape object.
-      Transform _world2obj, _obj2world;
-      uint32_t vertex_num = 0;
-      uint32_t vbuffer_size = 0;
-      void* vertex_data = nullptr;
-      uint32_t face_num = 0;
-      void* index_data = nullptr;
-      GLuint _vao = 0; // vertex array object
-      GLuint _vbo = 0; // vertex buffer object
-      GLuint _ebo = 0; // element buffer object
-public:
-      using Layout = std::vector<LayoutItem>;
-private:
-      Layout layout;
-      GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
-public:
-
-      TriangleMesh() = default;
-      TriangleMesh(void* raw_data, Layout l, uint32_t vb_size, uint32_t vertex_num, void* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
-            : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
-            index_data(index_data), face_num(index_num), indexFormat(idxFormat) {
-            obj2world.Inverse(&_world2obj);
-            obj2world.setInverse(&_world2obj);
-            _world2obj.setInverse(&obj2world);
-      }
-      TriangleMesh(const TriangleMesh& t) : _world2obj(t._world2obj), _obj2world(t._obj2world), vertex_num(t.vertex_num),
-      vbuffer_size(t.vbuffer_size), face_num(t.face_num), layout(t.layout), indexFormat(t.indexFormat) {
-            vertex_data = new char[vbuffer_size];
-            std::memcpy(vertex_data, t.vertex_data, vbuffer_size);
-            index_data = new char[3 * 4 * face_num];
-            std::memcpy(index_data, t.index_data, 3  * face_num);
-      }
-      void load(QOpenGLFunctions_4_0_Core* f);
-      GLuint vao() const { return _vao; }
-      GLuint vbo() const { return _vbo; }
-      GLuint ebo() const { return _ebo; }
-      GLuint face_count() const { return face_num; }
-      const Transform& obj2world() const { return _obj2world; }
-      const Transform& world2obj() const { return _world2obj; }
-      ~TriangleMesh() { if (vertex_data) delete[] (char*)vertex_data; }
-};
-
 struct Layout {
       std::vector<LayoutItem> _data;
       Layout() = default;
@@ -99,7 +56,72 @@ struct Layout {
             _data.emplace_back(newStrip, type, e_format, e_size, e_count, normalized,
                   currOffset, nullptr);
       }
+      void push_back(const LayoutItem& l) {
+            uint16_t newStrip = 0;
+            uint16_t currOffset = 0;
+            if (_data.size() == 0)
+                  newStrip = l.e_size * l.e_count;
+            else {
+                  newStrip = _data.back().strip + l.e_size * l.e_count;
+                  currOffset = _data.back().strip;
+                  for (auto& i : _data)
+                        i.strip = newStrip;
+            }
+            _data.push_back(l);
+      }
       uint16_t strip() const { return _data.front().strip; }
+      size_t size() { return _data.size(); }
+      LayoutItem& operator[](unsigned int idx) { return _data[idx]; }
+      const LayoutItem* getLayout(ArrayType t);
+};
+
+class TriangleMesh {
+      // for generated meshes, those transforms are copied from the Shape object.
+      Transform _world2obj, _obj2world;
+      uint32_t vertex_num = 0;
+      // size in byte
+      uint32_t vbuffer_size = 0;
+      void* vertex_data = nullptr;
+      uint32_t face_num = 0;
+      uint32_t* index_data = nullptr;
+      GLuint _vao = 0; // vertex array object
+      GLuint _vbo = 0; // vertex buffer object
+      GLuint _ebo = 0; // element buffer object
+public:
+      //using Layout = std::vector<LayoutItem>;
+private:
+      Layout layout;
+      GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
+public:
+
+      TriangleMesh() = default;
+      TriangleMesh(void* raw_data, Layout l, uint32_t vb_size, uint32_t vertex_num, uint32_t* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
+            : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
+            index_data(index_data), face_num(index_num), indexFormat(idxFormat) {
+            obj2world.Inverse(&_world2obj);
+            obj2world.setInverse(&_world2obj);
+            _world2obj.setInverse(&obj2world);
+      }
+      TriangleMesh(const TriangleMesh& t) : _world2obj(t._world2obj), _obj2world(t._obj2world), vertex_num(t.vertex_num),
+      vbuffer_size(t.vbuffer_size), face_num(t.face_num), layout(t.layout), indexFormat(t.indexFormat) {
+            vertex_data = new char[vbuffer_size];
+            std::memcpy(vertex_data, t.vertex_data, vbuffer_size);
+            index_data = new uint32_t[3 * face_num];
+            std::memcpy(index_data, t.index_data, 3 * sizeof(uint32_t) * face_num);
+      }
+      void load(QOpenGLFunctions_4_0_Core* f);
+      GLuint vao() const { return _vao; }
+      GLuint vbo() const { return _vbo; }
+      GLuint ebo() const { return _ebo; }
+      GLuint face_count() const { return face_num; }
+      GLuint vertex_count() const { return vertex_num; }
+      const Transform& obj2world() const { return _obj2world; }
+      const Transform& world2obj() const { return _world2obj; }
+      ~TriangleMesh() { 
+            if (vertex_data) delete[](char*)vertex_data; 
+            if (index_data) delete[](char*)index_data;
+      }
+      const uint32_t* face_triangle(int faceIdx) const { return index_data + faceIdx * 3; }
 };
 
 class Triangle : public Shape {

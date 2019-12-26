@@ -38,14 +38,27 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
       // set lights
       uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
       const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
+      // 1: vec3 pos
       for (int i = 0; i < pointLights.size(); i++) {
             shader->setUniformF(startPos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
             
       }
       startPos += Shader::maxPointLightNum - pointLights.size();
+      // 2: vec3 irradiance
       for (int i = 0; i < pointLights.size(); i++) {
             shader->setUniformF(startPos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
       }
+      startPos += Shader::maxPointLightNum - pointLights.size();
+      // 3: bool directional
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformBool(startPos++, pointLights[i]->isDirectionalLight());
+      startPos += Shader::maxPointLightNum - pointLights.size();
+      // 4: vec3 direction
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformF(startPos++, pointLights[i]->direction());
+      startPos += Shader::maxPointLightNum - pointLights.size();
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformF(startPos++, pointLights[i]->HalfAngle());
       // set other lights' radiance to zero
       /*startPos += 1;
       for (int i = pointLights.size(); i < Shader::maxPointLightNum; i++) {

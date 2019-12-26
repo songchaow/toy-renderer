@@ -41,6 +41,8 @@ struct Matrix4 {
       Float* operator[](const int n) { return m_matrix[n]; }
       const Float* operator[](const int n) const { return m_matrix[n]; }
       Matrix4 operator*(const Matrix4& m) const;
+      Vector3f operator()(const Vector3f& v) const;
+      Point3f operator()(const Point3f& p) const;
       SRT toSRT() const;
 };
 

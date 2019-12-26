@@ -70,9 +70,9 @@ private:
 class SimpleMaterial : public Material
 {
       Surface* surface;
-      RGBSpectrumTexture* albedo_texture;
+      RGBSpectrumTexture2D* albedo_texture;
 public:
-      SimpleMaterial(Surface* s, RGBSpectrumTexture* t = &whiteConstantTexture) : surface(s), albedo_texture(t) {}
+      SimpleMaterial(Surface* s, RGBSpectrumTexture2D* t = &whiteConstantTexture) : surface(s), albedo_texture(t) {}
       virtual Spectrum sample_f(Interaction& i, Point2f sample, Float* pdf) override;
       virtual Spectrum f(const Interaction& i) override;
       virtual bool isFlat() override { return surface->isFlatSurface(); }

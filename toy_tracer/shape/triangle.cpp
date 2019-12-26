@@ -11,7 +11,7 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
       for (int idx = 0; idx < node->mNumMeshes; idx++) {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[idx]];
             unsigned int vertex_count = mesh->mNumVertices;
-            TriangleMesh::Layout layout;
+            Layout layout;
             uint16_t curr_strip = 0;
             // points
             {
@@ -54,7 +54,8 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
 
             // at last, the strip is decided and we fill in data.
             void* raw_data = new char[curr_strip*vertex_count];
-            for (auto& item : layout) {
+            for (int i = 0; i < layout.size(); i++) {
+                  auto& item = layout[i];
                   item.strip = curr_strip;
                   char* p_char = (char*)raw_data + item.offset;
                   char* p_src = (char*)item.data_ptr;
@@ -108,7 +109,8 @@ void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
       // each int32_t contains 4 bytes
       f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
-      for (auto& l : layout) {
+      for (int i = 0; i < layout.size(); i++) {
+            auto& l = layout[i];
             if (ShaderLocMap.find(l.type) == ShaderLocMap.end())
                   // not yet configured in vertex shader
                   continue;
@@ -120,4 +122,11 @@ void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
       f->glBindVertexArray(0);
       f->glBindBuffer(GL_ARRAY_BUFFER, 0);
       f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+const LayoutItem* Layout::getLayout(ArrayType t) {
+      for (auto& l : _data) {
+            if (l.type == t)
+                  return &l;
+      }
 }

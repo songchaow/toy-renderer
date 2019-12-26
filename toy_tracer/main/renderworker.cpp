@@ -10,7 +10,7 @@ RenderWorker _worker;
 Camera* RenderWorker::cam = nullptr;
 
 Camera* CreateRTCamera(const Point2i& screen_size) {
-      return new Camera(nullptr, Translate(0.f, 0.f, -10.f), screen_size, 40.f * Pi / 180);
+      return new Camera(nullptr, Translate(0.f, 0.f, -5.f), screen_size, 40.f * Pi / 180);
 }
 
 void RenderWorker::initialize() {
@@ -25,8 +25,8 @@ void RenderWorker::initialize() {
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
-      err = glGetError();
-      err = glGetError();
+      if (cam->lightAssociated())
+            loadPointLight(cam->associatedLight());
 }
 
 void RenderWorker::renderLoop() {

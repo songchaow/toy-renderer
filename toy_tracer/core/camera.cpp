@@ -47,8 +47,32 @@ void Camera::LookAt() {
       m[0][3] = _pos.x; m[1][3] = _pos.y; m[2][3] = _pos.z; m[3][3] = 1.f;
       // apply spinning
       //Rotate(spinAngle, 0.f);
-      Matrix4 spinM = RotateM(0.f, spinAngle, 0.f) * m;
+      //Matrix4 spinM = RotateM(0.f, spinAngle, 0.f) * m;
+      Matrix4 spinM = RotateM(0.f, 0, 0.f) * m;
       _world2cam = Transform(Inverse(spinM), spinM);
+      if (light_associated) {
+            //light.rpos() = spinM(_pos); // apply spinM to camera's pos
+            light.rpos() = _pos;
+            if(light.isDirectionalLight())
+                  //light.direction() = spinM(_viewDir); // apply spinM to _viewDir
+                  light.direction() = _viewDir; // apply spinM to _viewDir
+      }
+}
+
+void Camera::disociateLight() {
+      if (light_associated) {
+            light_associated = false;
+            // TODO: add the light to delete queue
+      }
+}
+
+void Camera::setAssociatedLight(PointLight l) { 
+      if (!light_associated) {
+            light_associated = true; 
+            // TODO: add the light to queue
+            
+      }
+      light = l;
 }
 
 void Camera::applyTranslation(volatile bool* keyStatuses, Float deltaT) {
