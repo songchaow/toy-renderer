@@ -88,6 +88,7 @@ add_custom_command(TARGET toytracer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
 if(MSVC)
+  target_compile_options(toytracer PRIVATE "/MP")
   add_custom_command(TARGET toytracer POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
       ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
@@ -110,6 +111,7 @@ add_custom_command(TARGET ball POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
 if(MSVC)
+  target_compile_options(ball PRIVATE "/MP")
   add_custom_command(TARGET ball POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
       ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
