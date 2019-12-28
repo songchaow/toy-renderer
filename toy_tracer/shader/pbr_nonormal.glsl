@@ -2,7 +2,8 @@
 out vec4 FragColor;
 in vec2 TexCoord;
 in vec3 posWorld;
-in vec3 normalWorld;
+in int gl_PrimitiveID;
+//in vec3 normalWorld;
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
@@ -10,6 +11,8 @@ uniform sampler2D metallicSampler; // float
 uniform sampler2D roughnessSampler; // float
 uniform sampler2D emissionSampler; // vec3
 uniform sampler2D aoSampler;
+
+uniform samplerBuffer normalSampler;
 
 uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
 
@@ -125,6 +128,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
 void main()
 {		
     //vec3 N = normalize(normalWorld);
+    vec3 N = vec3(texelFetch(normalSampler, gl_PrimitiveID));
     vec3 V = normalize(camPos - posWorld);
 
     
@@ -153,7 +157,7 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);
-    
+    FragColor = vec4(N, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

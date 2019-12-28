@@ -10,12 +10,17 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       fragment_file.exceptions(std::ifstream::failbit);
       try {
             std::stringstream vertex_code, fragment_code;
-            vertex_file.open(vertex_path);
-            fragment_file.open(fragment_path);
-            vertex_code << vertex_file.rdbuf();
-            fragment_code << fragment_file.rdbuf();
-            vertex_shader_code = vertex_code.str();
-            fragment_shader_code = fragment_code.str();
+            if (vertex_path.size() > 0) {
+                  vertex_file.open(vertex_path);
+                  vertex_code << vertex_file.rdbuf();
+                  vertex_shader_code = vertex_code.str();
+            }
+            if (fragment_path.size() > 0) {
+                  fragment_file.open(fragment_path);
+                  fragment_code << fragment_file.rdbuf();
+                  fragment_shader_code = fragment_code.str();
+            }
+            
       }
       catch (std::ifstream::failure) {
             std::cout << "Read shader files failed." << std::endl;
@@ -24,7 +29,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       path = vertex_path + fragment_path;
       // compile
       if (f) {
-            compile(f);
+            compileAndLink(f);
       }
       this->f = f;
 }
@@ -36,33 +41,93 @@ void Shader::compile(QOpenGLFunctions_4_0_Core* f) {
       const char* f_shader_str_ptr = fragment_shader_code.c_str();
       GLenum err;
       err = f->glGetError();
-      unsigned int vertex = f->glCreateShader(GL_VERTEX_SHADER);
+      vertex_shader_id = f->glCreateShader(GL_VERTEX_SHADER);
       err = f->glGetError();
-      unsigned int fragment = f->glCreateShader(GL_FRAGMENT_SHADER);
-      f->glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
-      f->glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
+      fragment_shader_id = f->glCreateShader(GL_FRAGMENT_SHADER);
+      f->glShaderSource(vertex_shader_id, 1, &v_shader_str_ptr, NULL);
+      f->glShaderSource(fragment_shader_id, 1, &f_shader_str_ptr, NULL);
 
-      f->glCompileShader(vertex);
+      f->glCompileShader(vertex_shader_id);
       int success = 0;
       int len = 0;
-      f->glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+      f->glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &success);
       if (!success) {
-            f->glGetShaderInfoLog(vertex, 512, &len, infoLog);
+            f->glGetShaderInfoLog(vertex_shader_id, 512, &len, infoLog);
             infoLog[len] = 0;
             std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
       }
-      f->glCompileShader(fragment);
-      f->glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-      if (!success) {
-            f->glGetShaderInfoLog(fragment, 1024, &len, infoLog);
-            infoLog[len] = 0;
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+      if (fragment_shader_code.size() > 0) {
+            f->glCompileShader(fragment_shader_id);
+            f->glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                  f->glGetShaderInfoLog(fragment_shader_id, 1024, &len, infoLog);
+                  infoLog[len] = 0;
+                  std::cout << "ERROR::SHADER::fragment_shader_id::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
       }
+            
+}
 
+void Shader::link(QOpenGLFunctions_4_0_Core* f) {
+      int success = 0;
+      char infoLog[1024];
+      program_id = f->glCreateProgram();
+      f->glAttachShader(program_id, vertex_shader_id);
+      if (fragment_shader_code.size() > 0)
+            f->glAttachShader(program_id, fragment_shader_id);
+      f->glLinkProgram(program_id);
+      f->glGetProgramiv(program_id, GL_LINK_STATUS, &success);
+      if (!success) {
+            f->glGetProgramInfoLog(program_id, 1024, NULL, infoLog);
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+      }
+}
+
+void Shader::compileAndLink(QOpenGLFunctions_4_0_Core* f) {
+      this->f = f;
+      char infoLog[1024];
+      const char* v_shader_str_ptr = vertex_shader_code.c_str();
+      const char* f_shader_str_ptr = fragment_shader_code.c_str();
+      GLenum err;
+      err = f->glGetError();
+      vertex_shader_id = f->glCreateShader(GL_VERTEX_SHADER);
+      err = f->glGetError();
+      fragment_shader_id = f->glCreateShader(GL_FRAGMENT_SHADER);
+      f->glShaderSource(vertex_shader_id, 1, &v_shader_str_ptr, NULL);
+      f->glShaderSource(fragment_shader_id, 1, &f_shader_str_ptr, NULL);
+
+      f->glCompileShader(vertex_shader_id);
+      int success = 0;
+      int len = 0;
+      f->glGetShaderiv(vertex_shader_id, GL_COMPILE_STATUS, &success);
+      if (!success) {
+            f->glGetShaderInfoLog(vertex_shader_id, 512, &len, infoLog);
+            infoLog[len] = 0;
+            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+      }
+      if (fragment_shader_code.size() > 0) {
+            f->glCompileShader(fragment_shader_id);
+            f->glGetShaderiv(fragment_shader_id, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                  f->glGetShaderInfoLog(fragment_shader_id, 1024, &len, infoLog);
+                  infoLog[len] = 0;
+                  std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
+      }
+      
       // link
       program_id = f->glCreateProgram();
-      f->glAttachShader(program_id, vertex);
-      f->glAttachShader(program_id, fragment);
+      f->glAttachShader(program_id, vertex_shader_id);
+      if (fragment_shader_code.size() > 0)
+            f->glAttachShader(program_id, fragment_shader_id);
+      if (!feedback_vars.empty()) {
+            std::vector<const GLchar*> ptr_char_array;
+            for (auto& v : feedback_vars) {
+                  ptr_char_array.push_back(v.c_str());
+            }
+            f->glTransformFeedbackVaryings(program_id, feedback_vars.size(), ptr_char_array.data(), feedback_buffmode);
+            GLenum res = f->glGetError();
+      }
       f->glLinkProgram(program_id);
       f->glGetProgramiv(program_id, GL_LINK_STATUS, &success);
       if (!success) {
@@ -71,8 +136,8 @@ void Shader::compile(QOpenGLFunctions_4_0_Core* f) {
       }
 
       // delete shader objects
-      f->glDeleteShader(vertex);
-      f->glDeleteShader(fragment);
+      f->glDeleteShader(vertex_shader_id);
+      f->glDeleteShader(fragment_shader_id);
       _loaded = true;
 }
 
@@ -163,10 +228,13 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
       }
       else {
             Shader s(vertex_path, fragment_path, f);
-            if (s.loaded()) {
+            if (!f || s.loaded()) {
                   shaderStore[id] = s;
                   return &shaderStore[id];
             }
-            else return nullptr;
+            else {
+                  LOG(ERROR) << "Shader load failed.";
+                  return nullptr;
+            }
       }
 }

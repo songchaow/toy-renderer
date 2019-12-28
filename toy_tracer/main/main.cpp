@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
       workerThread.start();
       
       // load ground mesh
-      Image* roughness = Image::CreateColorImage("roughness", R8G8B8(128, 0, 0));
+      /*Image* roughness = Image::CreateColorImage("roughness", R8G8B8(128, 0, 0));
       Image* spec_color = Image::CreateColorImage("black", R8G8B8(0.f, 0.f, 0.f), false);
       ImageTexture ground_albedo("resources/gc_tex.png");
       ImageTexture rough(roughness);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
       Primitive* ground = CreatePrimitiveFromModelFile("resources/gc_tex_refined.obj");
 
       ground->setPBRMaterial(ground_m);
-      RenderWorker::Instance()->loadObject(ground);
+      RenderWorker::Instance()->loadObject(ground);*/
 
       a.exec();
 	return 0;

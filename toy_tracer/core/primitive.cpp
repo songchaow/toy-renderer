@@ -83,6 +83,10 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
       }
       shader->setUniformI("emissionSampler", 3);
       shader->setUniformI("aoSampler", 4);
+      // normal texture of type buffer texture 
+      f->glActiveTexture(GL_TEXTURE0);
+      f->glBindTexture(GL_TEXTURE_BUFFER, _meshes[0]->normalTexture());
+      shader->setUniformI("normalSampler", 0);
       // set camera
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
