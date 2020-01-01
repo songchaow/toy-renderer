@@ -216,8 +216,8 @@ void PBRMaterial::load(QOpenGLFunctions_4_0_Core* f) {
             metallic_map.load(f);
       if (rough_map.isValid())
             rough_map.load(f);
-      //_shader = LoadShader("shader/vertex.glsl", "shader/pbr_pixel.glsl", f);
-      _shader = LoadShader("shader/vertex.glsl", "shader/pbr_nonormal.glsl", f);
+      _shader = LoadShader("shader/vertex.glsl", "shader/pbr_pixel.glsl", f);
+      //_shader = LoadShader("shader/vertex.glsl", "shader/pbr_nonormal.glsl", f);
 }
 
 void PBRMaterial::update(QOpenGLFunctions_4_0_Core* f) {

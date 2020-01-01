@@ -89,12 +89,16 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     {
         // calculate per-light radiance
         vec3 L = normalize(pointLights[i].pos - posWorld);
-        if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
+        float shrink = 1.0;
+        float cosAngle = dot(-L, pointLights[i].direction);
+        if(pointLights[i].directional && cosAngle < pointLights[i].cosAngle)
             continue; // skip
+        if(pointLights[i].directional && cosAngle >=pointLights[i].cosAngle)
+            shrink = cosAngle - pointLights[i].cosAngle;
         vec3 H = normalize(wi + L);
         float distance = length(pointLights[i].pos - posWorld);
         float attenuation = 1.0 / (distance * distance);
-        vec3 radiance = pointLights[i].irradiance * attenuation;
+        vec3 radiance = pointLights[i].irradiance * attenuation * shrink;
 
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(normal, H, roughness);   
@@ -157,7 +161,7 @@ void main()
     color = pow(color, vec3(1.0/2.2)); 
 
     FragColor = vec4(color, 1.0);
-    FragColor = vec4(N, 1.0);
+    //FragColor = vec4(N, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

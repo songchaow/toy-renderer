@@ -11,7 +11,7 @@ void main() {
       vec3 v1 = p2 - p1;
       vec3 v2 = p3 - p1;
       gl_Position = vec4(0.5, 0.5, 1.0, 1.0);
-      faceNormal = normalize(cross(v2, v1));
+      faceNormal = normalize(cross(v1, v2));
 //      float newX = float(faceIdx.x);
 //      newX = newX / 2452;
 //      float newY = float(faceIdx.y);

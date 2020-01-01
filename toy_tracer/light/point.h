@@ -15,6 +15,7 @@ public:
             _directional(true), _angle(angle), _direction(dir) {}
       virtual Spectrum Li(Vector3f &w) const override { return irradiance; }
       Spectrum radiance() const { return irradiance; }
+      Spectrum& rradiance() { return irradiance; }
       // fills i.wo
       bool Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Float* pwi) const override;
       virtual bool isSingular() const override { return false; }

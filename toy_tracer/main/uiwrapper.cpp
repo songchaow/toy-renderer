@@ -70,6 +70,8 @@ void PointLight_Ui::addProperties(QWidget * parent) const {
       pl_group->setLayout(currentLayout);
       _pos.reset(&_m->rpos());
       _pos.addProperties(pl_group);
+      _rgb.reset(&_m->rradiance());
+      _pos.addProperties(pl_group);
       parent->layout()->addWidget(pl_group);
 }
 
@@ -188,3 +190,4 @@ void Point3f_Ui::addProperties(QWidget * parent) const
       QObject::connect(posY, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
       QObject::connect(posZ, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
 }
+

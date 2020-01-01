@@ -74,10 +74,11 @@ class RGB_Spectrum_Ui : public QObject {
       RGBSpectrum* _m;
 
 public:
-      RGB_Spectrum_Ui(RGBSpectrum* _m) : _m(_m) {}
+      
       void addProperties(QWidget* parent) const;
 public slots:
       void updateProperties();
+      void reset(RGBSpectrum* _mIn) { _m = _mIn; }
 };
 
 class Primitive_Ui : public RendererObject {
@@ -102,6 +103,7 @@ class PointLight_Ui : public RendererObject {
       PointLight* _m = nullptr;
       // Child UI
       mutable Point3f_Ui _pos;
+      mutable RGB_Spectrum_Ui _rgb;
 public:
       void addProperties(QWidget * parent) const override;
       PointLight_Ui(PointLight* l) : _m(l), RendererObject(TypeID::Light) {}
