@@ -97,6 +97,12 @@ static std::map<ArrayType, uint16_t> ShaderLocMap = {
 };
 
 void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
+      // GLuint norms = GenFaceNormal_GPU(*this, f);
+      // // normal texture
+      // f->glGenTextures(1, &_normTexture);
+      // f->glBindTexture(GL_TEXTURE_BUFFER, _normTexture);
+      // //f->glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tmp_buff);
+      // f->glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, norms);
       f->glGenVertexArrays(1, &_vao);
       f->glBindVertexArray(_vao);
       // vbo
@@ -109,8 +115,8 @@ void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
       // each int32_t contains 4 bytes
       f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
-      for (int i = 0; i < layout.size(); i++) {
-            auto& l = layout[i];
+      for (int i = 0; i < _layout.size(); i++) {
+            auto& l = _layout[i];
             if (ShaderLocMap.find(l.type) == ShaderLocMap.end())
                   // not yet configured in vertex shader
                   continue;
@@ -124,7 +130,7 @@ void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
       f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-const LayoutItem* Layout::getLayout(ArrayType t) {
+const LayoutItem* Layout::getLayoutItem(ArrayType t) const {
       for (auto& l : _data) {
             if (l.type == t)
                   return &l;

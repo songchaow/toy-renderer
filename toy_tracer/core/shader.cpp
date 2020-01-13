@@ -22,47 +22,80 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
             return;
       }
       path = vertex_path + fragment_path;
-      // compile
-      if (f) {
-            compile(f);
-      }
+      _complete = true;
+
       this->f = f;
 }
 
-void Shader::compile(QOpenGLFunctions_4_0_Core* f) {
+Shader::Shader(const std::string & vertex_path, QOpenGLFunctions_4_0_Core* f/* = nullptr*/) {
+      std::ifstream vertex_file;
+      vertex_file.exceptions(std::ifstream::failbit);
+      try {
+            std::stringstream vertex_code;
+            vertex_file.open(vertex_path);
+            vertex_code << vertex_file.rdbuf();
+             vertex_shader_code = vertex_code.str();
+      }
+      catch (std::ifstream::failure) {
+            std::cout << "Read shader files failed." << std::endl;
+            return;
+      }
+      path = vertex_path;
+      _complete = true;
+
+      this->f = f;
+}
+
+void Shader::compileAndLink(QOpenGLFunctions_4_0_Core* f) {
       this->f = f;
       char infoLog[1024];
-      const char* v_shader_str_ptr = vertex_shader_code.c_str();
-      const char* f_shader_str_ptr = fragment_shader_code.c_str();
-      GLenum err;
-      err = f->glGetError();
-      unsigned int vertex = f->glCreateShader(GL_VERTEX_SHADER);
-      err = f->glGetError();
-      unsigned int fragment = f->glCreateShader(GL_FRAGMENT_SHADER);
-      f->glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
-      f->glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
-
-      f->glCompileShader(vertex);
       int success = 0;
       int len = 0;
-      f->glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-      if (!success) {
-            f->glGetShaderInfoLog(vertex, 512, &len, infoLog);
-            infoLog[len] = 0;
-            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+      unsigned int vertex = 0, fragment = 0;
+      if(vertex_shader_code.size()>0) {
+            const char* v_shader_str_ptr = vertex_shader_code.c_str();
+            vertex = f->glCreateShader(GL_VERTEX_SHADER);
+            f->glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
+            f->glCompileShader(vertex);
+            f->glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                  f->glGetShaderInfoLog(vertex, 512, &len, infoLog);
+                  infoLog[len] = 0;
+                  std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
       }
-      f->glCompileShader(fragment);
-      f->glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-      if (!success) {
-            f->glGetShaderInfoLog(fragment, 1024, &len, infoLog);
-            infoLog[len] = 0;
-            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+      else {
+            LOG(ERROR) << "Vertex shader is empty.";
+            return;
       }
+      if(fragment_shader_code.size()>0) {
+            fragment = f->glCreateShader(GL_FRAGMENT_SHADER);
+            const char* f_shader_str_ptr = fragment_shader_code.c_str();
+            f->glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
+            f->glCompileShader(fragment);
+            f->glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                  f->glGetShaderInfoLog(fragment, 1024, &len, infoLog);
+                  infoLog[len] = 0;
+                  std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
+      }
+      
 
       // link
       program_id = f->glCreateProgram();
       f->glAttachShader(program_id, vertex);
-      f->glAttachShader(program_id, fragment);
+      if(fragment > 0)
+            f->glAttachShader(program_id, fragment);
+      // configure transform feedback
+      if (!feedback_vars.empty()) {
+            std::vector<const GLchar*> ptr_char_array;
+            for (auto& v : feedback_vars) {
+                  ptr_char_array.push_back(v.c_str());
+            }
+            f->glTransformFeedbackVaryings(program_id, feedback_vars.size(), ptr_char_array.data(), feedback_buffmode);
+            //GLenum res = f->glGetError();
+      }
       f->glLinkProgram(program_id);
       f->glGetProgramiv(program_id, GL_LINK_STATUS, &success);
       if (!success) {
@@ -163,6 +196,10 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
       }
       else {
             Shader s(vertex_path, fragment_path, f);
+            if(!s.complete())
+                  return nullptr;
+            if(f)
+                  s.compileAndLink(f);
             if (s.loaded()) {
                   shaderStore[id] = s;
                   return &shaderStore[id];
