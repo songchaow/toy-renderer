@@ -101,7 +101,7 @@ Point3f Sphere::SamplePoint(Point2f & random, Interaction & i, Normal3f & n, Flo
       return obj2world(Point3f(p_n*radius));
 }
 
-std::vector<TriangleMesh*> Sphere::GenMesh(unsigned int uSlide, unsigned int vSlide) const {
+std::vector<TriangleMesh*> Sphere::GenMesh() const {
       // First, generate all vertices
       // attributes: position, uv, normal, 
       Layout layout;

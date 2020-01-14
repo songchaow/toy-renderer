@@ -95,9 +95,9 @@ private:
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* raw_data, Layout l, uint32_t vb_size, uint32_t vertex_num, uint32_t* index_data, uint16_t index_num, GLenum idxFormat, Transform obj2world)
+      TriangleMesh(void* raw_data, Layout l, uint32_t vb_size, uint32_t vertex_num, uint32_t* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
             : vertex_data(raw_data), layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
-            index_data(index_data), face_num(index_num), indexFormat(idxFormat) {
+            index_data(index_data), face_num(faceNum), indexFormat(idxFormat) {
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);

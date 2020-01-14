@@ -4,6 +4,7 @@
 #include "core/primitive.h"
 #include "main/ResourceManager.h"
 #include "main/MainWindow.h"
+#include "shape/rectangular.h"
 #include <QString>
 #include <QMenu>
 
@@ -20,7 +21,11 @@ static void fromShapeFunc(std::function<Shape*(void)> shapeFunc) {
       ResourceManager::getInstance()->addPrimitive(p);
       MainWindow::getInstance()->refreshResource();
 }
-ShapeTableEntry shapeTable[] = { {"Sphere", []() {return new Sphere(); }} };
+ShapeTableEntry shapeTable[] = {
+      {"Sphere", []() {return new Sphere(); }},
+      {"Rectangular", []() {return new Rectangular(); }},
+      
+};
 
 void addCreateShapeMenu(QMenu* shapeMenu) {
       for (auto& e : shapeTable) {

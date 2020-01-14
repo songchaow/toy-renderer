@@ -16,7 +16,12 @@ class Shape {
 protected:
       Transform world2obj, obj2world;
 public:
-      Shape(Transform& obj2world) :obj2world(obj2world) {
+      Shape(Transform& obj2worldIn) :obj2world(obj2worldIn) {
+            obj2world.Inverse(&world2obj);
+            obj2world.setInverse(&world2obj);
+            world2obj.setInverse(&obj2world);
+      }
+      Shape(Transform&& obj2worldIn) :obj2world(obj2worldIn) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
             world2obj.setInverse(&obj2world);
@@ -30,11 +35,15 @@ public:
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const = 0;
       virtual Point3f PointfromUV(Float u, Float v, Normal3f* n) const = 0;
       virtual Point3f SamplePoint(Point2f& random, Interaction& i, Normal3f& n, Float* pdf) const = 0;
-      virtual std::vector<TriangleMesh*> GenMesh(unsigned int uSlide = 50, unsigned int vSlide = 50) const = 0;
+      virtual std::vector<TriangleMesh*> GenMesh() const = 0;
 };
 
 class Sphere : public Shape {
       Float radius; // radius in object space
+
+      // GenMesh configs
+      unsigned int uSlide = 50;
+      unsigned int vSlide = 50;
 public:
       Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
       Sphere() : Sphere(1.f, Transform::Identity()) {}
@@ -45,7 +54,7 @@ public:
       virtual bool ComputeDiff(const Ray& r, Interaction* i) const override;
       virtual Point3f PointfromUV(Float u, Float v, Normal3f* n) const override;
       virtual Point3f SamplePoint(Point2f& random, Interaction& i, Normal3f& n, Float* pdf) const override;
-      virtual std::vector<TriangleMesh*> GenMesh(unsigned int uSlide = 50, unsigned int vSlide = 50) const;
+      virtual std::vector<TriangleMesh*> GenMesh() const;
 };
 
 Vector3f SampleUnitSphere(const Point2f& sample);
