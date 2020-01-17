@@ -8,6 +8,15 @@ Ray Camera::GenerateRay(const Point2f& pFilm)
       return _cam2world(localRay);
 }
 
+Transform toNDCPerspective(Float n, Float f, Float hwRatio, Float fov) {
+      Float sinHalfFov = std::sin(fov / 2);
+      Matrix4 persp(1.f / sinHalfFov / hwRatio, 0, 0, 0,
+            0, 1.f / sinHalfFov, 0, 0,
+            0, 0, f / (f - n), -f * n / (f - n),
+            0, 0, 1, 0);
+      return Transform(persp);
+}
+
 Transform Camera::Cam2NDC() const
 {
       Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
@@ -18,6 +27,7 @@ Transform Camera::Cam2NDC() const
       //Transform t = Translate(Vector3f(width_original / 2, height_original / 2, 0));
       Transform t = Translate(Vector3f(0, 0, 0));
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
+      return toNDCPerspective(clip_near, clip_far, film.getHeight() / film.getWidth(), 45.f / Pi);
       return s * t * Transform(persp);
 }
 
