@@ -19,6 +19,7 @@ Transform toNDCPerspective(Float n, Float f, Float hwRatio, Float fov) {
 
 Transform Camera::Cam2NDC() const
 {
+#if 0
       Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
             0, 0, 1, 0);
       // Shift and Scale
@@ -27,8 +28,10 @@ Transform Camera::Cam2NDC() const
       //Transform t = Translate(Vector3f(width_original / 2, height_original / 2, 0));
       Transform t = Translate(Vector3f(0, 0, 0));
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
-      return toNDCPerspective(clip_near, clip_far, film.getHeight() / film.getWidth(), 45.f / Pi);
       return s * t * Transform(persp);
+#endif
+      return toNDCPerspective(clip_near, clip_far, film.getHeight() / film.getWidth(), 45.f / Pi);
+      
 }
 
 void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
@@ -46,6 +49,18 @@ void Camera::setSpinTransform(Float offset, const Point3f& refPoint) {
       while (spinAngle >= 2 * Pi) spinAngle -= 2 * Pi;
 }
 
+void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec, Matrix4& world2cam) {
+      // First calculate cam2world
+      Vector3f localX = Normalize(Cross(viewDir, upVec));
+      Vector3f localY = Normalize(Cross(localX, viewDir));
+      world2cam[0][0] = localX.x; world2cam[1][0] = localX.y; world2cam[2][0] = localX.z; world2cam[3][0] = 0.f;
+      world2cam[0][1] = localY.x; world2cam[1][1] = localY.y; world2cam[2][1] = localY.z; world2cam[3][1] = 0.f;
+      world2cam[0][2] = viewDir.x; world2cam[1][2] = viewDir.y; world2cam[2][2] = viewDir.z;
+      world2cam[0][3] = -pos.x; world2cam[1][3] = -pos.y; world2cam[2][3] = -pos.z;
+
+      world2cam = Inverse(world2cam);
+}
+
 void Camera::LookAt() {
       // newZ = _viewDir;
       localX = Normalize(Cross(_viewDir, Vector3f(0.f, 1.f, 0.f)));
@@ -55,11 +70,14 @@ void Camera::LookAt() {
       m[0][1] = localY.x; m[1][1] = localY.y; m[2][1] = localY.z; m[3][1] = 0.f;
       m[0][2] = _viewDir.x; m[1][2] = _viewDir.y; m[2][2] = _viewDir.z; m[3][2] = 0.f;
       m[0][3] = _pos.x; m[1][3] = _pos.y; m[2][3] = _pos.z; m[3][3] = 1.f;
+#if 0
       // apply spinning
       //Rotate(spinAngle, 0.f);
       //Matrix4 spinM = RotateM(0.f, spinAngle, 0.f) * m;
       Matrix4 spinM = RotateM(0.f, 0, 0.f) * m;
       _world2cam = Transform(Inverse(spinM), spinM);
+#endif
+      _world2cam = Transform(Inverse(m), m);
       if (light_associated) {
             //light.rpos() = spinM(_pos); // apply spinM to camera's pos
             light.rpos() = _pos;
