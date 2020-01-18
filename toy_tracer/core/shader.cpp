@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const std::string & vertex_path, const std::string & fragment_path, QOpenGLFunctions_4_0_Core* f)
+Shader::Shader(const std::string & vertex_path, const std::string & fragment_path)
 {
       std::ifstream vertex_file, fragment_file;
       vertex_file.exceptions(std::ifstream::failbit);
@@ -23,11 +23,9 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
       }
       path = vertex_path + fragment_path;
       _complete = true;
-
-      this->f = f;
 }
 
-Shader::Shader(const std::string & vertex_path, QOpenGLFunctions_4_0_Core* f/* = nullptr*/) {
+Shader::Shader(const std::string & vertex_path) {
       std::ifstream vertex_file;
       vertex_file.exceptions(std::ifstream::failbit);
       try {
@@ -42,24 +40,21 @@ Shader::Shader(const std::string & vertex_path, QOpenGLFunctions_4_0_Core* f/* =
       }
       path = vertex_path;
       _complete = true;
-
-      this->f = f;
 }
 
-void Shader::compileAndLink(QOpenGLFunctions_4_0_Core* f) {
-      this->f = f;
+void Shader::compileAndLink() {
       char infoLog[1024];
       int success = 0;
       int len = 0;
       unsigned int vertex = 0, fragment = 0;
       if(vertex_shader_code.size()>0) {
             const char* v_shader_str_ptr = vertex_shader_code.c_str();
-            vertex = f->glCreateShader(GL_VERTEX_SHADER);
-            f->glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
-            f->glCompileShader(vertex);
-            f->glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+            vertex = glCreateShader(GL_VERTEX_SHADER);
+            glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
+            glCompileShader(vertex);
+            glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
             if (!success) {
-                  f->glGetShaderInfoLog(vertex, 512, &len, infoLog);
+                  glGetShaderInfoLog(vertex, 512, &len, infoLog);
                   infoLog[len] = 0;
                   std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
             }
@@ -69,13 +64,13 @@ void Shader::compileAndLink(QOpenGLFunctions_4_0_Core* f) {
             return;
       }
       if(fragment_shader_code.size()>0) {
-            fragment = f->glCreateShader(GL_FRAGMENT_SHADER);
+            fragment = glCreateShader(GL_FRAGMENT_SHADER);
             const char* f_shader_str_ptr = fragment_shader_code.c_str();
-            f->glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
-            f->glCompileShader(fragment);
-            f->glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+            glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);
+            glCompileShader(fragment);
+            glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
             if (!success) {
-                  f->glGetShaderInfoLog(fragment, 1024, &len, infoLog);
+                  glGetShaderInfoLog(fragment, 1024, &len, infoLog);
                   infoLog[len] = 0;
                   std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
             }
@@ -83,123 +78,123 @@ void Shader::compileAndLink(QOpenGLFunctions_4_0_Core* f) {
       
 
       // link
-      program_id = f->glCreateProgram();
-      f->glAttachShader(program_id, vertex);
+      program_id = glCreateProgram();
+      glAttachShader(program_id, vertex);
       if(fragment > 0)
-            f->glAttachShader(program_id, fragment);
+            glAttachShader(program_id, fragment);
       // configure transform feedback
       if (!feedback_vars.empty()) {
             std::vector<const GLchar*> ptr_char_array;
             for (auto& v : feedback_vars) {
                   ptr_char_array.push_back(v.c_str());
             }
-            f->glTransformFeedbackVaryings(program_id, feedback_vars.size(), ptr_char_array.data(), feedback_buffmode);
+            glTransformFeedbackVaryings(program_id, feedback_vars.size(), ptr_char_array.data(), feedback_buffmode);
             //GLenum res = f->glGetError();
       }
-      f->glLinkProgram(program_id);
-      f->glGetProgramiv(program_id, GL_LINK_STATUS, &success);
+      glLinkProgram(program_id);
+      glGetProgramiv(program_id, GL_LINK_STATUS, &success);
       if (!success) {
-            f->glGetProgramInfoLog(program_id, 1024, NULL, infoLog);
+            glGetProgramInfoLog(program_id, 1024, NULL, infoLog);
             std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
       }
 
       // delete shader objects
-      f->glDeleteShader(vertex);
-      f->glDeleteShader(fragment);
+      glDeleteShader(vertex);
+      glDeleteShader(fragment);
       _loaded = true;
 }
 
-void Shader::use() const { f->glUseProgram(program_id); }
+void Shader::use() { glUseProgram(program_id); }
 
 void Shader::setUniformF(const std::string & name, const float val)
 {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform1f(loc, val);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform1f(loc, val);
 }
 
 void Shader::setUniformF(const std::string & name, const float val, const float val2)
 {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform2f(loc, val, val2);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform2f(loc, val, val2);
 }
 
 void Shader::setUniformF(const std::string & name, const float val, const float val2, const float val3)
 {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform3f(loc, val, val2, val3);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform3f(loc, val, val2, val3);
 }
 
 void Shader::setUniformF(const std::string & name, const float val, const float val2, const float val3, const float val4)
 {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform4f(loc, val, val2, val3, val4);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform4f(loc, val, val2, val3, val4);
 }
 
 void Shader::setUniformF(const std::string& name, const Vector3f& vec3) {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
 }
 
 void Shader::setUniformF(const std::string& name, const Matrix4* data) {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)data);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)data);
 }
 
 void Shader::setUniformBool(const std::string & name, bool val)
 {
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform1i(loc, val);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform1i(loc, val);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val)
 {
-      f->glUniform1f(loc, val);
+      glUniform1f(loc, val);
 }
 
 void Shader::setUniformBool(unsigned int loc, bool val) {
-      f->glUniform1i(loc, val);
+      glUniform1i(loc, val);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val, const float val2)
 {
-      f->glUniform2f(loc, val, val2);
+      glUniform2f(loc, val, val2);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3)
 {
-      f->glUniform3f(loc, val, val2, val3);
+      glUniform3f(loc, val, val2, val3);
 }
 
 void Shader::setUniformF(unsigned int loc, const Vector3f& vec3) {
-      f->glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
+      glUniform3f(loc, vec3[0], vec3[1], vec3[2]);
 }
 
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4)
 {
-      f->glUniform4f(loc, val, val2, val3, val4);
+      glUniform4f(loc, val, val2, val3, val4);
 }
 
 void Shader::setUniformI(const std::string& name, const int val)
 {
       const char* test = name.c_str();
-      int loc = f->glGetUniformLocation(program_id, name.c_str());
-      f->glUniform1i(loc, val);
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform1i(loc, val);
 }
 
 static std::map<std::string, Shader> shaderStore;
 
-Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, QOpenGLFunctions_4_0_Core* f) {
+Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile) {
       std::string id = vertex_path + fragment_path;
       if (shaderStore.find(id) != shaderStore.end()) {
             DLOG(INFO) << "Shader already exists";
             return &shaderStore[id];
       }
       else {
-            Shader s(vertex_path, fragment_path, f);
+            Shader s(vertex_path, fragment_path);
             if(!s.complete())
                   return nullptr;
-            if(f)
-                  s.compileAndLink(f);
+            if(compile)
+                  s.compileAndLink();
             if (s.loaded()) {
                   shaderStore[id] = s;
                   return &shaderStore[id];
