@@ -71,9 +71,9 @@ GLuint GenFaceNormal_GPU(const TriangleMesh& mesh, QOpenGLFunctions_4_0_Core* f)
       f->glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, faceNormObj);
 
       // Shader and varyings
-      Shader* normGenShader = LoadShader("shader/faceNormalGen.vs", "", nullptr); // do not link first
+      Shader* normGenShader = LoadShader("shader/faceNormalGen.vs", "", false); // do not link first
       normGenShader->setTransformFeedback(std::vector<std::string>(1, "faceNormal"));
-      normGenShader->compileAndLink(f);
+      normGenShader->compileAndLink();
       normGenShader->use();
       normGenShader->setUniformI("posSampler", 0);
       // configure vertex attribute pointer

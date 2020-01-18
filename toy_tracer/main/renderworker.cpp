@@ -29,6 +29,19 @@ void RenderWorker::initialize() {
             loadPointLight(cam->associatedLight());
 }
 
+void RenderWorker::renderScene() {
+      GLenum err = glGetError();
+      glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+      //glViewport(0, 0, _canvas->width(), _canvas->height());
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      for (auto &p : primitives) {
+            if (p->getPBRMaterial()->dirty())
+                  p->getPBRMaterial()->update(this);
+            p->draw(this);
+      }
+}
+
 void RenderWorker::renderLoop() {
       int loopN = 0;
       // fbo
@@ -105,17 +118,7 @@ void RenderWorker::renderLoop() {
             }
             // rendering
             loopN++;
-            GLenum err = glGetError();
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            err = glGetError();
-            //glViewport(0, 0, _canvas->width(), _canvas->height());
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            for (auto &p : primitives) {
-                 if (p->getPBRMaterial()->dirty())
-                       p->getPBRMaterial()->update(this);
-                 p->draw(this);
-            }
+            renderScene();
             m_context->swapBuffers(_canvas);
       }
 }

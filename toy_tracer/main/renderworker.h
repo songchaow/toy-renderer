@@ -43,5 +43,6 @@ public:
       Canvas* canvas() { return _canvas; }
       static inline RenderWorker* Instance() { return &_worker; }
       const std::vector<PointLight*>& pointLights() const { return _pointLights; }
+      void renderScene();
 };
 

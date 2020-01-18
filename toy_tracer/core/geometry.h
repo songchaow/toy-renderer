@@ -605,6 +605,11 @@ class Vector3 {
     }
     Vector3() { x = y = z = 0; }
     Vector3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!HasNaNs()); }
+    Vector3(std::initializer_list<T> i) {
+          x = *i.begin();
+          y = *(i.begin() + 1);
+          z = *(i.begin() + 2);
+    }
     bool HasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
     explicit Vector3(const Point3<T> &p);
 #ifndef NDEBUG
