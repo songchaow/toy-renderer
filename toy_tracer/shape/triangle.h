@@ -23,9 +23,9 @@ enum ArrayType {
 struct LayoutItem {
       uint16_t strip;   // same in all items
       ArrayType type;
-      GLenum e_format;    // element type in one unit
-      GLint e_size;     // element size(in byte)
-      uint16_t e_count; // element count in one unit
+      GLenum e_format;    // type of element in one item
+      GLint e_size;     // size of one element
+      uint16_t e_count; // element count in one item
       GLenum normalized = GL_FALSE;
       GLint offset;     // offset in the strip
       void* data_ptr;
@@ -70,7 +70,7 @@ struct Layout {
             _data.push_back(l);
       }
       uint16_t strip() const { return _data.front().strip; }
-      size_t size() { return _data.size(); }
+      size_t size() const { return _data.size(); }
       LayoutItem& operator[](unsigned int idx) { return _data[idx]; }
       const LayoutItem* getLayoutItem(ArrayType t) const;
 };

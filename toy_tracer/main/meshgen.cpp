@@ -33,3 +33,12 @@ void addCreateShapeMenu(QMenu* shapeMenu) {
       }
       ;
 }
+
+// TODO: add and use this whenever we need to create a vertex buffer
+void* collectVertexBuffer(std::vector<void*>& pointers, const Layout& l, uint32_t vertex_count) {
+      if (l.size() > pointers.size())
+            return nullptr;
+      unsigned char* ret = new unsigned char[l.strip()*vertex_count];
+
+      return nullptr;
+}

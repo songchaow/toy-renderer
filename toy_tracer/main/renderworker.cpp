@@ -31,6 +31,25 @@ void RenderWorker::initialize() {
 
 void RenderWorker::renderLoop() {
       int loopN = 0;
+      // fbo
+      GLuint fbo;
+      glGenFramebuffers(1, &fbo);
+      glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+      // depth map
+      GLuint depthMap;
+      glGenTextures(1, &depthMap);
+      glBindTexture(GL_TEXTURE_2D, depthMap);
+      constexpr unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
       for(;;) {
             // resize the camera if needed
             assert(_canvas);
@@ -65,16 +84,6 @@ void RenderWorker::renderLoop() {
                         // o is primitive now
                         o->load(this);
                         primitives.push_back(o);
-                        // if (o->typeID() == RendererObject::TypeID::Primitive) {
-                        //       Primitive_Ui* p = static_cast<Primitive_Ui*>(o);
-                        //       p->m()->load(this);
-                        //       qDebug() << "Primitive " << p << " thread:" << p->thread();
-                        //       // TODO: maybe check duplicate in the future
-                        //       // time-consuming, but only happens when loading
-                        //       primitives.push_back(p->m());
-                        // }
-                        // else if (o->typeID() == RendererObject::TypeID::Light)
-                        //       ;
                   }
             }
             // add pending lights
