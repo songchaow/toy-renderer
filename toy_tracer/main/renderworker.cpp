@@ -1,6 +1,7 @@
 #include "main/renderworker.h"
 #include "main/uiwrapper.h"
 #include "main/MainWindow.h"
+#include "core/cubemap.h"
 #include <QWindow>
 #include <QThread>
 #include <QDebug>
@@ -47,21 +48,15 @@ void RenderWorker::renderLoop() {
       // fbo
       GLuint fbo;
       glGenFramebuffers(1, &fbo);
-      glBindFramebuffer(GL_FRAMEBUFFER, fbo);
       // depth map
-      GLuint depthMap;
-      glGenTextures(1, &depthMap);
-      glBindTexture(GL_TEXTURE_2D, depthMap);
+      CubeMap depthMap;
       constexpr unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
       glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-      glDrawBuffer(GL_NONE);
-      glReadBuffer(GL_NONE);
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      
 
       for(;;) {
             // resize the camera if needed
@@ -116,6 +111,13 @@ void RenderWorker::renderLoop() {
                         }
                   }
             }
+            // shadow map
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        
+            depthMap.GenCubeDepthMap();
+
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glBindTexture(GL_TEXTURE_2D, 0);
             // rendering
             loopN++;
             renderScene();

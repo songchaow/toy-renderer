@@ -59,12 +59,7 @@ void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
       startPos += Shader::maxPointLightNum - pointLights.size();
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(startPos++, pointLights[i]->HalfAngle());
-      // set other lights' radiance to zero
-      /*startPos += 1;
-      for (int i = pointLights.size(); i < Shader::maxPointLightNum; i++) {
-            shader->setUniformF(startPos, 0.f, 0.f, 0.f);
-            startPos += 2;
-      }*/
+
       shader->setUniformF("globalEmission", rt_m.globalEmission()[0], rt_m.globalEmission()[1], rt_m.globalEmission()[2]);
       shader->setUniformI("albedoSampler", 0);
       if (rt_m.albedo_map.isLoad()) {

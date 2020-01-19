@@ -30,7 +30,7 @@ Transform Camera::Cam2NDC() const
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
       return s * t * Transform(persp);
 #endif
-      return toNDCPerspective(clip_near, clip_far, film.getHeight() / film.getWidth(), 45.f / Pi);
+      return toNDCPerspective(clip_near, clip_far, film.getHeight() / film.getWidth(), 45.f/ 180.f * Pi);
       
 }
 

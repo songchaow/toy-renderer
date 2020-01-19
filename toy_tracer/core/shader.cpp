@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <cassert>
 
 Shader::Shader(const std::string & vertex_path, const std::string & fragment_path)
 {
@@ -201,4 +202,9 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
             }
             else return nullptr;
       }
+}
+
+Shader* GetDefaultShader() {
+      assert(shaderStore.find(std::string("shader/vertex.glsl") + std::string("shader/pbr_pixel.glsl")) != shaderStore.end());
+      return &shaderStore.at(std::string("shader/vertex.glsl") + std::string("shader/pbr_pixel.glsl"));
 }

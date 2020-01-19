@@ -47,3 +47,4 @@ public:
 
 // Convenience functions
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile);
+Shader* GetDefaultShader();
