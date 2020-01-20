@@ -4,6 +4,14 @@
 #include <iostream>
 #include <cassert>
 
+static std::map<std::string, Shader> shaderStore;
+
+std::map<ShaderType, ShaderPath> shaderConfig = {
+//    Type        Vertex                  Geometry    Fragment
+      {PBR,       {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"}},
+      {DEPTH_MAP, {"shader/vertex.glsl",  "",         "shader/depth.fs"}}
+};
+
 Shader::Shader(const std::string & vertex_path, const std::string & fragment_path)
 {
       std::ifstream vertex_file, fragment_file;
@@ -41,6 +49,18 @@ Shader::Shader(const std::string & vertex_path) {
       }
       path = vertex_path;
       _complete = true;
+}
+
+Shader& Shader::operator=(const Shader& i) {
+      path = i.path;
+      vertex_shader_code = i.vertex_shader_code;
+      fragment_shader_code = i.fragment_shader_code;
+      _complete = i._complete;
+      _loaded = i._loaded;
+      program_id = i.program_id;
+      feedback_vars = i.feedback_vars;
+      feedback_buffmode = i.feedback_buffmode;
+      return *this;
 }
 
 void Shader::compileAndLink() {
@@ -182,7 +202,7 @@ void Shader::setUniformI(const std::string& name, const int val)
       glUniform1i(loc, val);
 }
 
-static std::map<std::string, Shader> shaderStore;
+
 
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile) {
       std::string id = vertex_path + fragment_path;
@@ -195,6 +215,27 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
             if(!s.complete())
                   return nullptr;
             if(compile)
+                  s.compileAndLink();
+            if (s.loaded()) {
+                  shaderStore[id] = s;
+                  return &shaderStore[id];
+            }
+            else return nullptr;
+      }
+}
+
+Shader* LoadShader(ShaderType t, bool compile) {
+      assert(shaderConfig.find(t) != shaderConfig.end());
+      std::string id = shaderConfig[t].vertex + shaderConfig[t].fragment;
+      if (shaderStore.find(id) != shaderStore.end()) {
+            DLOG(INFO) << "Shader already exists";
+            return &shaderStore[id];
+      }
+      else {
+            Shader s(shaderConfig[t].vertex, shaderConfig[t].fragment);
+            if (!s.complete())
+                  return nullptr;
+            if (compile)
                   s.compileAndLink();
             if (s.loaded()) {
                   shaderStore[id] = s;

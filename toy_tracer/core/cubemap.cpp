@@ -20,10 +20,11 @@ void CubeMap::GenCubeDepthMap() {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubeMapObj, 0);
             // set world2cam, cam2ndc, assuming shader is configured
             // fetch the shader from shader store
-            GetDefaultShader()->use();
+            Shader* depthMapShader = LoadShader(ShaderType::DEPTH_MAP, true);
+            depthMapShader->use();
             Transform world2cam = Translate(-o.x, -o.y, -o.z)*o2cam[i];
-            GetDefaultShader()->setUniformF("world2cam", &world2cam.m);
-            GetDefaultShader()->setUniformF("cam2ndc", &camtoNDC.m);
+            depthMapShader->setUniformF("world2cam", &world2cam.m);
+            depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
             RenderWorker::Instance()->renderScene();
       }
 }

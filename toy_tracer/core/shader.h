@@ -15,6 +15,7 @@ class Shader : public QOpenGLFunctions_4_0_Core {
 public:
       Shader(const std::string& vertex_path, const std::string& fragment_path);
       Shader(const std::string & vertex_path);
+      Shader& operator=(const Shader& i);
       Shader() = default;
       static const size_t maxPointLightNum = 4;
       bool loaded() const { return _loaded; }
@@ -45,6 +46,18 @@ public:
 
 };
 
+struct ShaderPath {
+      std::string vertex;
+      std::string geometry;
+      std::string fragment;
+};
+
+enum ShaderType {
+      PBR,
+      DEPTH_MAP
+};
+
 // Convenience functions
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile);
+Shader* LoadShader(ShaderType t, bool compile);
 Shader* GetDefaultShader();
