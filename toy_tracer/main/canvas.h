@@ -4,12 +4,9 @@
 
 #include <QtWidgets/qwidget.h>
 #include <QWindow>
-#include <QOpenGLExtraFunctions>
-#include <QOpenGLFunctions_4_0_Core>
 #include <QMouseEvent>
 
-class Canvas : public QWindow, public QOpenGLFunctions_4_0_Core {
-      QOpenGLContext* m_context;
+class Canvas : public QWindow {
       volatile bool _drag = false;
       volatile bool _resized = false;
       volatile bool _keyPressed = false;
@@ -20,18 +17,6 @@ class Canvas : public QWindow, public QOpenGLFunctions_4_0_Core {
 public:
       Canvas();
 
-      // deprecated
-      void initialize() {
-            m_context = new QOpenGLContext();
-            m_context->setFormat(requestedFormat());
-            m_context->create();
-            m_context->makeCurrent(this);
-            initializeOpenGLFunctions();
-      }
-      // deprecated
-      void resize() {
-            glViewport(0, 0, size().width(), size().height());
-      }
       bool resized() const { return _resized; }
       bool keyPressed() const { return _keyPressed; }
       void clearResized() { _resized = false; }

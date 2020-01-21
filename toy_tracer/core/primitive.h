@@ -13,7 +13,6 @@ private:
       Material* material = nullptr;
       // TODO: don't use pointer, or modify the dctor
       PBRMaterial rt_m;
-      Shader* shader = nullptr; // acquired from material
       RGBTexture2D* reflection; // currently not used
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), material(m) {}
@@ -21,8 +20,8 @@ public:
       Material* getMaterial() const { return material; }
       PBRMaterial* getPBRMaterial() { return &rt_m; }
       void setPBRMaterial(PBRMaterial m) { rt_m = m; }
-      void load(QOpenGLFunctions_4_0_Core* f);
-      void draw(QOpenGLFunctions_4_0_Core* f);
+      void load();
+      void draw(Shader* shader);
 };
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);

@@ -1,4 +1,5 @@
 #include "core/primitive.h"
+#include <glad/glad.h>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -22,76 +23,40 @@ Primitive* CreatePrimitiveFromModelFile(std::string path) {
       return p;
 }
 
-void Primitive::load(QOpenGLFunctions_4_0_Core* f) {
+void Primitive::load() {
       for (auto* mesh : _meshes) {
-            mesh->load(f);
+            mesh->load();
       }
       // TODO: consider other types of RTMaterial
-      rt_m.load(f);
-      shader = rt_m.shader();
+      rt_m.load();
 }
 
-void Primitive::draw(QOpenGLFunctions_4_0_Core* f) {
+void Primitive::draw(Shader* shader) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
-      shader->use();
-      // set lights
-      uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
-      const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
-      // 1: vec3 pos
-      for (int i = 0; i < pointLights.size(); i++) {
-            shader->setUniformF(startPos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
-            
-      }
-      startPos += Shader::maxPointLightNum - pointLights.size();
-      // 2: vec3 irradiance
-      for (int i = 0; i < pointLights.size(); i++) {
-            shader->setUniformF(startPos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
-      }
-      startPos += Shader::maxPointLightNum - pointLights.size();
-      // 3: bool directional
-      for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformBool(startPos++, pointLights[i]->isDirectionalLight());
-      startPos += Shader::maxPointLightNum - pointLights.size();
-      // 4: vec3 direction
-      for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformF(startPos++, pointLights[i]->direction());
-      startPos += Shader::maxPointLightNum - pointLights.size();
-      for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformF(startPos++, pointLights[i]->HalfAngle());
 
       shader->setUniformF("globalEmission", rt_m.globalEmission()[0], rt_m.globalEmission()[1], rt_m.globalEmission()[2]);
-      shader->setUniformI("albedoSampler", 0);
+      
       if (rt_m.albedo_map.isLoad()) {
-            f->glActiveTexture(GL_TEXTURE0);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m.albedo_map.tbo());
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt_m.albedo_map.tbo());
       }
-      shader->setUniformI("metallicSampler", 1);
       if (rt_m.metallic_map.isLoad()) {
-            f->glActiveTexture(GL_TEXTURE1);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m.metallic_map.tbo());
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, rt_m.metallic_map.tbo());
       }
-      shader->setUniformI("roughnessSampler", 2);
       if (rt_m.rough_map.isLoad()) {
-            f->glActiveTexture(GL_TEXTURE2);
-            f->glBindTexture(GL_TEXTURE_2D, rt_m.rough_map.tbo());
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, rt_m.rough_map.tbo());
       }
-      shader->setUniformI("emissionSampler", 3);
-      shader->setUniformI("aoSampler", 4);
-      // set camera
-      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
-      shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
+      
       for (auto& m : _meshes) {
-            f->glBindVertexArray(m->vao());
-            // set MVP
-            // TODO: obj2world could be stored for each mesh's shader program
+            glBindVertexArray(m->vao());
             shader->setUniformF("obj2world", _obj2world.getRowMajorData());
-            shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
-            
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
-            GLenum err = f->glGetError();
-            f->glDrawElements(GL_TRIANGLES, 3 * m->face_count()*2, GL_UNSIGNED_INT, 0);
-            err = f->glGetError();
+            GLenum err = glGetError();
+            glDrawElements(GL_TRIANGLES, 3 * m->face_count()*2, GL_UNSIGNED_INT, 0);
+            err = glGetError();
       }
 }

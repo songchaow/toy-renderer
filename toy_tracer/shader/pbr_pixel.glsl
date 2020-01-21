@@ -10,6 +10,8 @@ uniform sampler2D metallicSampler; // float
 uniform sampler2D roughnessSampler; // float
 uniform sampler2D emissionSampler; // vec3
 uniform sampler2D aoSampler;
+uniform samplerCube depthSampler;
+uniform float far;
 
 uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
 
@@ -84,8 +86,13 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
     for(int i = 0; i < POINT_LIGHT_NUM; i++)
     {
-        // calculate per-light radiance
         vec3 L = normalize(pointLights[i].pos - posWorld);
+        
+        float depth = texture(depthSampler, L).r * far;
+        float actualDepth = length(pointLights[i].pos - posWorld);
+        if(depth < actualDepth)
+            continue;
+        // calculate per-light radiance
         if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
             continue; // skip
         vec3 H = normalize(wi + L);

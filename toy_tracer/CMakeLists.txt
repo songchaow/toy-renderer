@@ -16,6 +16,8 @@ ADD_SUBDIRECTORY(${CMAKE_CURRENT_SOURCE_DIR}/ext/glog)
 SET_PROPERTY(TARGET glog logging_unittest demangle_unittest utilities_unittest stl_logging_unittest PROPERTY FOLDER "ext")
 INCLUDE_DIRECTORIES (
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/glog/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/ext/std_image/include
   ${CMAKE_BINARY_DIR}/toy_tracer/ext/glog
 )
 message(STATUS "Binary dir: " ${CMAKE_BINARY_DIR})
@@ -24,6 +26,8 @@ message(STATUS "Binary dir: " ${CMAKE_BINARY_DIR})
 file(GLOB IMAGE_IO ext/std_image/include/*.h
   ext/std_image/src/*.cpp
 )
+# glad
+file(GLOB GLAD ${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/src/*.c)
 
 # assimp
 INCLUDE_DIRECTORIES (
@@ -51,7 +55,7 @@ shape/*.cpp
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
-add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO})
+add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO} ${GLAD})
 target_link_libraries(tracer_lib glog Qt5::Widgets)
 if (MSVC)
   target_link_libraries(tracer_lib ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp.lib)

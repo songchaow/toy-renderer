@@ -1,5 +1,5 @@
 #include "core/image.h"
-#include "ext/std_image/include/stb_image.h"
+#include "stb_image.h"
 #include <map>
 #include <utility>
 

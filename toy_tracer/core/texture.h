@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
-#include <QOpenGLFunctions_4_0_Core>
+#include <glad/glad.h>
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/spectrum.h"
@@ -89,9 +89,9 @@ public:
       bool isValid() const { return (bool)_image; }
       bool isLoad() const { return *_tbo > 0; }
       // create a tbo and load the image
-      void load(QOpenGLFunctions_4_0_Core* f);
+      void load();
       // tbo unchanged, but reload the image
-      void update(QOpenGLFunctions_4_0_Core* f);
+      void update();
       RGBSpectrum Evaluate(Float u, Float v) override;
       GLuint tbo() const { return *_tbo; }
       const std::string& path() const { return _path; }
@@ -147,7 +147,7 @@ struct RTRGBArrayTexture1D : public ArrayTexture1D<RGBSpectrum> {
             }
       }
       // create a tbo and load the array
-      void load(QOpenGLFunctions_4_0_Core* f);
+      void load();
       // tbo unchanged, but reload the image
-      void update(QOpenGLFunctions_4_0_Core* f);
+      void update();
 };

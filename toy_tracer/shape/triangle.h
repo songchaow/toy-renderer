@@ -1,6 +1,6 @@
 #pragma once
 #include "core/shape.h"
-#include <QOpenGLFunctions_4_0_Core>
+#include <glad/glad.h>
 #include <string>
 #include <memory>
 #include <assimp/scene.h>           // Output data structure
@@ -110,7 +110,7 @@ public:
             index_data = new uint32_t[3 * face_num];
             std::memcpy(index_data, t.index_data, 3 * sizeof(uint32_t) * face_num);
       }
-      void load(QOpenGLFunctions_4_0_Core* f);
+      void load();
       GLuint vao() const { return _vao; }
       GLuint vbo() const { return _vbo; }
       GLuint ebo() const { return _ebo; }

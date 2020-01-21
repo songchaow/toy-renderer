@@ -29,8 +29,8 @@ class Camera {
       Film film;
       Float fov_Vertical;
       // Config Used in RTR
-      Float clip_near = 0.1f;
-      Float clip_far = 1000.f;
+      Float _near = 0.1f;
+      Float _far = 1000.f;
       // Associated light
       bool light_associated;
       PointLight light;
@@ -54,7 +54,8 @@ public:
       bool rotationXTrigger() const { return _rotationXTrigger; }
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
-
+      Float nearPlane() const { return _near; }
+      Float farPlane() const { return _far; }
       bool lightAssociated() const { return light_associated; }
       PointLight* associatedLight() { return &light; }
       void setAssociatedLight(PointLight l);

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <cassert>
+#include <map>
 
 static std::map<std::string, Shader> shaderStore;
 
@@ -110,7 +111,7 @@ void Shader::compileAndLink() {
                   ptr_char_array.push_back(v.c_str());
             }
             glTransformFeedbackVaryings(program_id, feedback_vars.size(), ptr_char_array.data(), feedback_buffmode);
-            //GLenum res = f->glGetError();
+            //GLenum res = glGetError();
       }
       glLinkProgram(program_id);
       glGetProgramiv(program_id, GL_LINK_STATUS, &success);
@@ -228,7 +229,6 @@ Shader* LoadShader(ShaderType t, bool compile) {
       assert(shaderConfig.find(t) != shaderConfig.end());
       std::string id = shaderConfig[t].vertex + shaderConfig[t].fragment;
       if (shaderStore.find(id) != shaderStore.end()) {
-            DLOG(INFO) << "Shader already exists";
             return &shaderStore[id];
       }
       else {

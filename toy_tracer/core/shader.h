@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include <QOpenGLFunctions_4_0_Core>
+#include <glad/glad.h>
 #include <core/transform.h>
 
-class Shader : public QOpenGLFunctions_4_0_Core {
+class Shader {
       std::string path;
       std::string vertex_shader_code;
       std::string fragment_shader_code;

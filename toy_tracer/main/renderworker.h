@@ -4,6 +4,7 @@
 #include <mutex>
 #include "core/primitive.h"
 #include "core/camera.h"
+#include "core/cubemap.h"
 #include "light/point.h"
 #include "main/TwoThreadQueue.h"
 #include "main/canvas.h"
@@ -13,7 +14,7 @@ extern RenderWorker _worker;
 
 Camera* CreateRTCamera(const Point2i& screen_size);
 
-class RenderWorker : public QObject, QOpenGLFunctions_4_0_Core {
+class RenderWorker : public QObject {
       Q_OBJECT
       QOpenGLContext* m_context;
       TwoThreadQueue<Primitive*> primitiveQueue;
@@ -23,6 +24,7 @@ class RenderWorker : public QObject, QOpenGLFunctions_4_0_Core {
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
+      CubeMap* depthMap;
 
 public:
       Primitive* curr_primitive;
@@ -43,6 +45,7 @@ public:
       Canvas* canvas() { return _canvas; }
       static inline RenderWorker* Instance() { return &_worker; }
       const std::vector<PointLight*>& pointLights() const { return _pointLights; }
-      void renderScene();
+      void renderPassPBR();
+      void renderPassDepth();
 };
 

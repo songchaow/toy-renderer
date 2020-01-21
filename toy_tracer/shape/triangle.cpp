@@ -96,24 +96,24 @@ static std::map<ArrayType, uint16_t> ShaderLocMap = {
       {ArrayType::ARRAY_NORMAL, 2},
 };
 
-void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
+void TriangleMesh::load() {
       // GLuint norms = GenFaceNormal_GPU(*this, f);
       // // normal texture
-      // f->glGenTextures(1, &_normTexture);
-      // f->glBindTexture(GL_TEXTURE_BUFFER, _normTexture);
-      // //f->glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tmp_buff);
-      // f->glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, norms);
-      f->glGenVertexArrays(1, &_vao);
-      f->glBindVertexArray(_vao);
+      // glGenTextures(1, &_normTexture);
+      // glBindTexture(GL_TEXTURE_BUFFER, _normTexture);
+      // //glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tmp_buff);
+      // glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, norms);
+      glGenVertexArrays(1, &_vao);
+      glBindVertexArray(_vao);
       // vbo
-      f->glGenBuffers(1, &_vbo);
-      f->glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-      f->glBufferData(GL_ARRAY_BUFFER, vbuffer_size, vertex_data, GL_STATIC_DRAW);
+      glGenBuffers(1, &_vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+      glBufferData(GL_ARRAY_BUFFER, vbuffer_size, vertex_data, GL_STATIC_DRAW);
       // ebo
-      f->glGenBuffers(1, &_ebo);
-      f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
+      glGenBuffers(1, &_ebo);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
       // each int32_t contains 4 bytes
-      f->glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (int i = 0; i < _layout.size(); i++) {
             auto& l = _layout[i];
@@ -121,13 +121,13 @@ void TriangleMesh::load(QOpenGLFunctions_4_0_Core* f) {
                   // not yet configured in vertex shader
                   continue;
             uint16_t shaderLoc = ShaderLocMap[l.type];
-            f->glVertexAttribPointer(shaderLoc, l.e_count, l.e_format, l.normalized, l.strip, (void*)l.offset);
-            f->glEnableVertexAttribArray(shaderLoc);
+            glVertexAttribPointer(shaderLoc, l.e_count, l.e_format, l.normalized, l.strip, (void*)l.offset);
+            glEnableVertexAttribArray(shaderLoc);
       }
 
-      f->glBindVertexArray(0);
-      f->glBindBuffer(GL_ARRAY_BUFFER, 0);
-      f->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+      glBindVertexArray(0);
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 const LayoutItem* Layout::getLayoutItem(ArrayType t) const {

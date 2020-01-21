@@ -2,9 +2,11 @@
 #include "main/uiwrapper.h"
 #include "main/MainWindow.h"
 #include "core/cubemap.h"
+#include <glad/glad.h>
 #include <QWindow>
 #include <QThread>
 #include <QDebug>
+#include <QOpenGLContext>
 
 RenderWorker _worker;
 
@@ -16,13 +18,18 @@ Camera* CreateRTCamera(const Point2i& screen_size) {
 
 void RenderWorker::initialize() {
       qDebug() << "RenderWorker Thread:" << QThread::currentThread();
-      if(!cam)
-            cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
       m_context = new QOpenGLContext();
       m_context->setFormat(_canvas->requestedFormat());
       m_context->create();
       m_context->makeCurrent(_canvas);
-      initializeOpenGLFunctions();
+      if (!gladLoadGL()) {
+            LOG(ERROR) << "Load GL functions failed";
+            return;
+      }
+      
+      if(!cam)
+            cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
+      //initializeOpenGLFunctions();
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
@@ -30,16 +37,70 @@ void RenderWorker::initialize() {
             loadPointLight(cam->associatedLight());
 }
 
-void RenderWorker::renderScene() {
-      GLenum err = glGetError();
+void RenderWorker::renderPassPBR() {
+      Shader* shader = LoadShader(PBR, true);
+      shader->use();
+      // set lights
+      uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
+      uint16_t pos = startPos;
+      const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
+      // 1: vec3 pos
+      for (int i = 0; i < pointLights.size(); i++) {
+            shader->setUniformF(pos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
+      }
+      pos += Shader::maxPointLightNum - pointLights.size();
+      // 2: vec3 irradiance
+      for (int i = 0; i < pointLights.size(); i++) {
+            shader->setUniformF(pos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
+      }
+      pos += Shader::maxPointLightNum - pointLights.size();
+      // 3: bool directional
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformBool(pos++, pointLights[i]->isDirectionalLight());
+      pos += Shader::maxPointLightNum - pointLights.size();
+      // 4: vec3 direction
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformF(pos++, pointLights[i]->direction());
+      pos += Shader::maxPointLightNum - pointLights.size();
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformF(pos++, pointLights[i]->HalfAngle());
+      // point shadow
+      glActiveTexture(GL_TEXTURE5);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap->cubeMapObj);
+      shader->setUniformI("albedoSampler", 0);
+      shader->setUniformI("metallicSampler", 1);
+      shader->setUniformI("roughnessSampler", 2);
+      shader->setUniformI("emissionSampler", 3);
+      shader->setUniformI("aoSampler", 4);
+      shader->setUniformI("depthSampler", 5);
+      // set camera
+      
+      shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
+      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
+      shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
+      shader->setUniformF("far", RenderWorker::getCamera()->farPlane());
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       //glViewport(0, 0, _canvas->width(), _canvas->height());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       for (auto &p : primitives) {
             if (p->getPBRMaterial()->dirty())
-                  p->getPBRMaterial()->update(this);
-            p->draw(this);
+                  p->getPBRMaterial()->update();
+            p->draw(shader);
+      }
+}
+
+void RenderWorker::renderPassDepth() {
+      Shader* shader = LoadShader(DEPTH_MAP, true);
+      // set camera
+      shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
+      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
+      //shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
+      shader->setUniformF("far", RenderWorker::getCamera()->farPlane());
+      glClearDepth(1.f);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      for (auto &p : primitives) {
+            p->draw(shader);
       }
 }
 
@@ -48,16 +109,7 @@ void RenderWorker::renderLoop() {
       // fbo
       GLuint fbo;
       glGenFramebuffers(1, &fbo);
-      // depth map
-      CubeMap depthMap;
-      constexpr unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      
-
+      depthMap = new CubeMap();
       for(;;) {
             // resize the camera if needed
             assert(_canvas);
@@ -90,7 +142,7 @@ void RenderWorker::renderLoop() {
                   // loading
                   for (auto* o : pendingAddPrimitives) {
                         // o is primitive now
-                        o->load(this);
+                        o->load();
                         primitives.push_back(o);
                   }
             }
@@ -113,14 +165,13 @@ void RenderWorker::renderLoop() {
             }
             // shadow map
             glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-        
-            depthMap.GenCubeDepthMap();
-
+            depthMap->o = _pointLights[0]->pos();
+            depthMap->GenCubeDepthMap();
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glBindTexture(GL_TEXTURE_2D, 0);
+            glViewport(0, 0, _canvas->width(), _canvas->height());
             // rendering
             loopN++;
-            renderScene();
+            renderPassPBR();
             m_context->swapBuffers(_canvas);
       }
 }

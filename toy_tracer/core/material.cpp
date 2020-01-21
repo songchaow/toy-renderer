@@ -209,23 +209,22 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
       
 }
 
-void PBRMaterial::load(QOpenGLFunctions_4_0_Core* f) {
+void PBRMaterial::load() {
       // TODO: use a const texture as the fallback if there're null pointers
       if(albedo_map.isValid())
-            albedo_map.load(f);
+            albedo_map.load();
       if (metallic_map.isValid())
-            metallic_map.load(f);
+            metallic_map.load();
       if (rough_map.isValid())
-            rough_map.load(f);
-      _shader = LoadShader("shader/vertex.glsl", "shader/pbr_pixel.glsl", f);
+            rough_map.load();
 }
 
-void PBRMaterial::update(QOpenGLFunctions_4_0_Core* f) {
+void PBRMaterial::update() {
       if (albedo_map.isValid())
-            albedo_map.update(f);
+            albedo_map.update();
       if (metallic_map.isValid())
-            metallic_map.update(f);
+            metallic_map.update();
       if (rough_map.isValid())
-            rough_map.update(f);
+            rough_map.update();
       _dirty = false;
 }

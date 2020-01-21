@@ -3,7 +3,7 @@
 #include <memory>
 #include <core/geometry.h>
 #include <core/spectrum.h>
-#include <QOpenGLFunctions>
+#include <glad/glad.h>
 
 class Image {
 public:

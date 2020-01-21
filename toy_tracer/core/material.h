@@ -5,7 +5,6 @@
 #include <memory>
 #include <algorithm>
 #include <vector>
-#include <QOpenGLFunctions_4_0_Core>
 #include <QLineEdit>
 #include "core/spectrum.h"
 #include "core/texture.h"
@@ -88,13 +87,11 @@ public:
 
 protected:
       // TODO: seems _shader can be shared among multiple PBRMaterials
-      Shader* _shader = nullptr;
       volatile bool _dirty; // need to update some of those `tbo`s.
       RGBSpectrum _globalEmission;
 public:
-      void load(QOpenGLFunctions_4_0_Core* f);
-      Shader* shader() const { return _shader; }
-      void update(QOpenGLFunctions_4_0_Core* f);
+      void load();
+      void update();
       bool dirty() const { return _dirty; }
       void setDirty() { _dirty = true; }
       RGBSpectrum& globalEmission() { return _globalEmission; }
