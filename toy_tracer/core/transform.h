@@ -103,6 +103,7 @@ struct AnimatedTransform : public Transform {
       AnimatedTransform(SRT srt) : srt(srt), Transform(srt.toMatrix4()) {}
       AnimatedTransform(const Matrix4& m) : srt(m.toSRT()), Transform(m) {}
       AnimatedTransform() = default;
+      AnimatedTransform(const Transform& t) : AnimatedTransform(t.m) {}
       void rotate(Float angleX, Float angleY, Float angleZ) {
             // modify srt and update Transform
             srt.rotationX += angleX;

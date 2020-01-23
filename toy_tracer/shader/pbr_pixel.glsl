@@ -84,14 +84,18 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
-    for(int i = 0; i < POINT_LIGHT_NUM; i++)
+    for(int i = 0; i < 1; i++)
     {
         vec3 L = normalize(pointLights[i].pos - posWorld);
         
-        float depth = texture(depthSampler, L).r * far;
+        float depth = texture(depthSampler, -L).r * far;
         float actualDepth = length(pointLights[i].pos - posWorld);
-        if(depth < actualDepth)
+
+        if(depth < actualDepth - 0.18) {
+            // occluded
+            Lo += vec3(0.5, 0, 0);
             continue;
+        }
         // calculate per-light radiance
         if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
             continue; // skip
@@ -153,7 +157,7 @@ void main()
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = ambient + Lo + Le;
-
+    color = Lo;
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct

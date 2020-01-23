@@ -14,8 +14,10 @@ struct Interaction;
 class TriangleMesh;
 class Shape {
 protected:
+      // TODO: these 2 tranforms are not used
       Transform world2obj, obj2world;
 public:
+      Shape() = default;
       Shape(Transform& obj2worldIn) :obj2world(obj2worldIn) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
@@ -45,6 +47,7 @@ class Sphere : public Shape {
       unsigned int uSlide = 50;
       unsigned int vSlide = 50;
 public:
+      Sphere(Float r) : Shape(), radius(r) {}
       Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
       Sphere() : Sphere(1.f, Transform::Identity()) {}
       virtual std::string shapeName() const { return "Sphere"; }
@@ -73,7 +76,8 @@ protected:
       std::vector<TriangleMesh*> _meshes;
       AnimatedTransform _obj2world;
 public:
-      Shapeable(Shape* shape, ShapeID s_id) : _shape(shape), s_id(s_id) {}
+      Shapeable(Shape* shape, ShapeID s_id, Transform t) : _shape(shape), s_id(s_id), _obj2world(t) {};
+      Shapeable(Shape* shape, ShapeID s_id) : Shapeable(shape, s_id, Transform::Identity()) {}
       Float Area() const { return _shape->Area(); }
       std::string getShapeName() const { return _shape->shapeName(); }
       bool isPrimitive() const { return s_id == Primitive; }

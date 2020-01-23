@@ -32,7 +32,7 @@ class Camera {
       Float _near = 0.1f;
       Float _far = 1000.f;
       // Associated light
-      bool light_associated;
+      bool light_associated = false;
       PointLight light;
       // Off-line
       Scene* s;

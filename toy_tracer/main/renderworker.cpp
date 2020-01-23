@@ -62,6 +62,7 @@ void RenderWorker::renderPassPBR() {
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->direction());
       pos += Shader::maxPointLightNum - pointLights.size();
+      // 5: cosAngle
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->HalfAngle());
       // point shadow
@@ -92,11 +93,7 @@ void RenderWorker::renderPassPBR() {
 
 void RenderWorker::renderPassDepth() {
       Shader* shader = LoadShader(DEPTH_MAP, true);
-      // set camera
-      shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
-      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       //shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
-      shader->setUniformF("far", RenderWorker::getCamera()->farPlane());
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
       for (auto &p : primitives) {

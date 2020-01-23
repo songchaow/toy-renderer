@@ -16,6 +16,7 @@ private:
       RGBTexture2D* reflection; // currently not used
 public:
       Primitive(Shape* shape, Material* m) : Shapeable(shape, ShapeID::Primitive), material(m) {}
+      Primitive(Shape* shape, PBRMaterial m, Transform t) : Shapeable(shape, ShapeID::Primitive, t), rt_m(m), material(nullptr) {}
       Primitive(Shape* shape, PBRMaterial m) : Shapeable(shape, ShapeID::Primitive), rt_m(m), material(nullptr) {}
       Material* getMaterial() const { return material; }
       PBRMaterial* getPBRMaterial() { return &rt_m; }
