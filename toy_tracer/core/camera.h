@@ -13,7 +13,7 @@ class Camera {
       // Orientation
       Transform _cam2world; // not used in RTR
       Transform _world2cam;
-      Vector3f _viewDir = { 0.f,0.f,1.f };
+      Vector3f _viewDir = { 0.f,0.f,-1.f };
       Point3f _pos = { 0.f, 0.f, -10.f };
       // Contrl
       volatile bool _rotationXTrigger = false;
