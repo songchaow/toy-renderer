@@ -10,10 +10,10 @@ Ray Camera::GenerateRay(const Point2f& pFilm)
 
 Transform toNDCPerspective(Float n, Float f, Float hwRatio, Float fov) {
       Float sinHalfFov = std::sin(fov / 2);
-      Matrix4 persp(- 1.f / sinHalfFov / hwRatio, 0, 0, 0,
-            0, -1.f / sinHalfFov, 0, 0,
-            0, 0, f / (f - n), f * n / (f - n),
-            0, 0, 1, 0);
+      Matrix4 persp(1.f / sinHalfFov / hwRatio, 0, 0, 0,
+            0, 1.f / sinHalfFov, 0, 0,
+            0, 0, -f / (f - n), -f * n / (f - n),
+            0, 0, -1, 0);
       return Transform(persp);
 }
 
