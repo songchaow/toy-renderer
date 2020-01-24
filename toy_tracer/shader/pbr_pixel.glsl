@@ -86,14 +86,15 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
     for(int i = 0; i < 1; i++)
     {
-        vec3 L = normalize(pointLights[i].pos - posWorld);
+        vec3 Lraw = pointLights[i].pos - posWorld;
+        vec3 L = normalize(Lraw);
         
-        float depth = texture(depthSampler, -L).r * far;
-        float actualDepth = length(pointLights[i].pos - posWorld);
-
-        if(depth < actualDepth - 0.18) {
+        float depth = texture(depthSampler, -Lraw).r;
+        depth *= far;
+        float actualDepth = length(Lraw);
+        if(depth < actualDepth - 0.15) {
             // occluded
-            Lo += vec3(0.5, 0, 0);
+            Lo += vec3(depth/far);
             continue;
         }
         // calculate per-light radiance

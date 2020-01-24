@@ -12,6 +12,8 @@ struct CubeMap {
       GLuint cubeMapObj;
       static const unsigned int SHADOW_WIDTH = 1024;
       static const unsigned int SHADOW_HEIGHT = 1024;
+      static const Float depthFarPlane;
+      static const Float depthNearPlane;
       static const Transform camtoNDC;
       static const Transform o2cam[6];
       //static const Float cam_near = 1.f; 

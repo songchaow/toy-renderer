@@ -79,7 +79,7 @@ void RenderWorker::renderPassPBR() {
       shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
-      shader->setUniformF("far", RenderWorker::getCamera()->farPlane());
+      shader->setUniformF("far", depthMap->depthFarPlane);
       glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       //glViewport(0, 0, _canvas->width(), _canvas->height());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

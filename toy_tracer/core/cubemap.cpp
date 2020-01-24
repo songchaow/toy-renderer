@@ -3,14 +3,16 @@
 #include "main/renderworker.h"
 #include <fstream>
 
-/*static*/ const Transform CubeMap::camtoNDC { toNDCPerspective(0.1f, 1000.f, 1.f, 90.f/ 180.f * Pi) };
+const Float CubeMap::depthFarPlane = 32.f;
+const Float CubeMap::depthNearPlane = 1.f;
+/*static*/ const Transform CubeMap::camtoNDC { toNDCPerspective(depthNearPlane, CubeMap::depthFarPlane, 1.f, 90.f/ 180.f * Pi) };
 /*static*/ const Transform CubeMap::o2cam[6] = { 
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                            // X+
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(-1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                           // X-
       LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 1.f, 0.f), Vector3f(0.f, 0.f ,1.f)),  // Y+
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f), Vector3f(0.f, 0.f, -1.f)),  // Y-
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f), Vector3f(0.f, -1.f, 0.f)),   // Z+
-      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f))    // Z-
+      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f)),    // Z-
 };
 
 CubeMap::CubeMap(const Point3f& o) : o(o) {
@@ -41,19 +43,26 @@ void CubeMap::GenCubeDepthMap() {
             Transform world2light = o2cam[i] * Translate(-o.x, -o.y, -o.z);
             depthMapShader->setUniformF("world2cam", &world2light.m);
             depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
-            depthMapShader->setUniformF("far", 1000.f);
+            depthMapShader->setUniformF("camPos", o.x, o.y, o.z);
+            depthMapShader->setUniformF("far", depthFarPlane);
             RenderWorker::Instance()->renderPassDepth();
       }
       //// print to file
-      //char* block = new char[SHADOW_HEIGHT*SHADOW_WIDTH*4];
-      //std::ofstream image_block(std::to_string(4) + ".bin");
-      //glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, block);
-      //image_block.write(block, SHADOW_HEIGHT*SHADOW_WIDTH * 4);
-      ////for (int i = 0; i < 6; i++) {
-      ////      std::ofstream image_block(std::to_string(i) + ".bin");
-      ////      glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, GL_FLOAT, block);
-      ////      image_block.write(block, SHADOW_HEIGHT*SHADOW_WIDTH * 4);
-      ////}
-      //delete block;
+#if 0
+      static int ii= 0;
+      char* block = new char[SHADOW_HEIGHT*SHADOW_WIDTH*4];
+      std::ofstream image_block(std::to_string(5) + ".bin");
+      glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + 5, 0, GL_DEPTH_COMPONENT, GL_FLOAT, block);
+      image_block.write(block, SHADOW_HEIGHT*SHADOW_WIDTH * 4);
+      /*for (int i = 0; i < 6; i++) {
+            std::ofstream image_block(std::to_string(i) + ".bin");
+            glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, GL_FLOAT, block);
+            image_block.write(block, SHADOW_HEIGHT*SHADOW_WIDTH * 4);
+      }*/
+      delete block;
+      ii++;
+      if (ii == 1)
+            exit(0);
+#endif
       //glViewport
 }
