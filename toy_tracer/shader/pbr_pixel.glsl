@@ -3,6 +3,8 @@ out vec4 FragColor;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
+#define POINT_LIGHT_NUM 4
+in float depth[POINT_LIGHT_NUM];
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
@@ -27,7 +29,6 @@ struct PointLight {
     float cosAngle;
 
 };
-#define POINT_LIGHT_NUM 4
 uniform PointLight pointLights[POINT_LIGHT_NUM];
 
 uniform vec3 camPos;
@@ -88,13 +89,13 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L = normalize(Lraw);
-        float distance = length(Lraw);
-        float depth = texture(depthSampler, -Lraw).r;
-        depth *= far;
-        if(depth < distance - 0.15) {
+        float distance = depth[i];
+        float maxDepth = texture(depthSampler, -Lraw).r;
+        maxDepth *= far;
+        if(maxDepth < distance - 0.15) {
             // occluded
             // debug
-            //Lo += vec3(depth/far);
+            //Lo += vec3(maxDepth/far);
             continue;
         }
         // calculate per-light radiance
