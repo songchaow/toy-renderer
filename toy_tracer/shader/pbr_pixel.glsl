@@ -88,20 +88,20 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L = normalize(Lraw);
-        
+        float distance = length(Lraw);
         float depth = texture(depthSampler, -Lraw).r;
         depth *= far;
-        float actualDepth = length(Lraw);
-        if(depth < actualDepth - 0.15) {
+        if(depth < distance - 0.15) {
             // occluded
-            Lo += vec3(depth/far);
+            // debug
+            //Lo += vec3(depth/far);
             continue;
         }
         // calculate per-light radiance
         if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
             continue; // skip
         vec3 H = normalize(wi + L);
-        float distance = length(pointLights[i].pos - posWorld);
+        
         float attenuation = 1.0 / (distance * distance);
         vec3 radiance = pointLights[i].irradiance * attenuation;
 
@@ -158,7 +158,6 @@ void main()
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = ambient + Lo + Le;
-    color = Lo;
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct

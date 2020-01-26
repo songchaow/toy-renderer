@@ -26,6 +26,8 @@ int main(int argc, char *argv[])
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
 
+      // Create scene objects here
+
       // create albedo texture for balls
       Image* off_color = Image::CreateColorImage("grey", R8G8B8(25, 25, 25), false);
       Image* on_color = Image::CreateColorImage("yellow", R8G8B8(113, 206.f, 239.f), false);
@@ -41,7 +43,7 @@ int main(int argc, char *argv[])
             m.metallic_map = specular;
             m.rough_map = roughness;
       }
-      Primitive* ball = new Primitive(new Sphere(0.3f), m, Translate(0.f, 0.f, -1.f));
+      Primitive* ball = new Primitive(new Sphere(1.2f), m, Translate(0.7f, -0.5f, 0.f));
       ball->GenMeshes();
       //Primitive* ball2 = new Primitive(new Sphere(1.f), m, Translate(0.f, 0.f, 3.f));
       Primitive* ball2 = new Primitive(new Sphere(4.f), m, Translate(0.f, 0.f, -6.f));
@@ -50,9 +52,9 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadObject(ball);
       RenderWorker::Instance()->loadObject(ball2);
       RenderWorker::Instance()->loadPointLight(l);
-      workerThread.start();
-     
 
+
+      workerThread.start();
       a.exec();
 	return 0;
 }

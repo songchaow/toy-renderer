@@ -161,11 +161,13 @@ void RenderWorker::renderLoop() {
                   }
             }
             // shadow map
-            glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-            depthMap->o = _pointLights[0]->pos();
-            depthMap->GenCubeDepthMap();
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glViewport(0, 0, _canvas->width(), _canvas->height());
+            if (_pointLights.size() > 0) {
+                  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+                  depthMap->o = _pointLights[0]->pos();
+                  depthMap->GenCubeDepthMap();
+                  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                  glViewport(0, 0, _canvas->width(), _canvas->height());
+            }
             // rendering
             loopN++;
             renderPassPBR();
