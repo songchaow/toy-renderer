@@ -33,6 +33,8 @@ void RenderWorker::initialize() {
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
+      glEnable(GL_CULL_FACE);
+
       if (cam->lightAssociated())
             loadPointLight(cam->associatedLight());
 }
