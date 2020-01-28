@@ -1,7 +1,6 @@
 #include "shader.h"
 #include <fstream>
 #include <sstream>
-#include <iostream>
 #include <cassert>
 #include <map>
 
@@ -12,6 +11,49 @@ std::map<ShaderType, ShaderPath> shaderConfig = {
       {PBR,       {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"}},
       {DEPTH_MAP, {"shader/vertex.glsl",  "",         "shader/depth.fs"}}
 };
+
+Shader::Shader(const ShaderPath & path) {
+      _complete = path.complete();
+      if (path.vertex.size() > 0) {
+            std::ifstream vertex_file;
+            vertex_file.exceptions(std::ifstream::failbit);
+            try {
+                  vertex_file.open(path.vertex);
+                  std::stringstream vertex_stream;
+                  vertex_stream << vertex_file.rdbuf();
+                  vertex_shader_code = vertex_stream.str();
+            }
+            catch (std::ifstream::failure) {
+                  LOG(ERROR) << "Read vertex shader file failed." << std::endl;
+            }
+      }
+      if (path.geometry.size() > 0) {
+            std::ifstream geometry_file;
+            geometry_file.exceptions(std::ifstream::failbit);
+            try {
+                  geometry_file.open(path.geometry);
+                  std::stringstream geo_stream;
+                  geo_stream << geometry_file.rdbuf();
+                  geo_shader_code = geo_stream.str();
+            }
+            catch (std::ifstream::failure) {
+                  LOG(ERROR) << "Read geometry shader file failed." << std::endl;
+            }
+      }
+      if (path.fragment.size() > 0) {
+            std::ifstream fragment_file;
+            fragment_file.exceptions(std::ifstream::failbit);
+            try {
+                  fragment_file.open(path.fragment);
+                  std::stringstream frag_stream;
+                  frag_stream << fragment_file.rdbuf();
+                  fragment_shader_code = frag_stream.str();
+            }
+            catch (std::ifstream::failure) {
+                  LOG(ERROR) << "Read fragment shader file failed." << std::endl;
+            }
+      }
+}
 
 Shader::Shader(const std::string & vertex_path, const std::string & fragment_path)
 {
@@ -28,7 +70,7 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
             fragment_shader_code = fragment_code.str();
       }
       catch (std::ifstream::failure) {
-            std::cout << "Read shader files failed." << std::endl;
+            LOG(ERROR) << "Read shader files failed." << std::endl;
             return;
       }
       path = vertex_path + fragment_path;
@@ -45,7 +87,7 @@ Shader::Shader(const std::string & vertex_path) {
              vertex_shader_code = vertex_code.str();
       }
       catch (std::ifstream::failure) {
-            std::cout << "Read shader files failed." << std::endl;
+            LOG(ERROR) << "Read shader files failed." << std::endl;
             return;
       }
       path = vertex_path;
@@ -68,7 +110,7 @@ void Shader::compileAndLink() {
       char infoLog[1024];
       int success = 0;
       int len = 0;
-      unsigned int vertex = 0, fragment = 0;
+      unsigned int vertex = 0, fragment = 0, geometry = 0;
       if(vertex_shader_code.size()>0) {
             const char* v_shader_str_ptr = vertex_shader_code.c_str();
             vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -78,12 +120,24 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(vertex, 512, &len, infoLog);
                   infoLog[len] = 0;
-                  std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
             }
       }
       else {
             LOG(ERROR) << "Vertex shader is empty.";
             return;
+      }
+      if (geo_shader_code.size() > 0) {
+            geometry = glCreateShader(GL_GEOMETRY_SHADER);
+            const char* p_str = geo_shader_code.c_str();
+            glShaderSource(geometry, 1, &p_str, NULL);
+            glCompileShader(geometry);
+            glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
+            if (!success) {
+                  glGetShaderInfoLog(geometry, 1024, &len, infoLog);
+                  infoLog[len] = 0;
+                  LOG(ERROR) << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+            }
       }
       if(fragment_shader_code.size()>0) {
             fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -94,7 +148,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(fragment, 1024, &len, infoLog);
                   infoLog[len] = 0;
-                  std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
             }
       }
       
@@ -102,8 +156,10 @@ void Shader::compileAndLink() {
       // link
       program_id = glCreateProgram();
       glAttachShader(program_id, vertex);
-      if(fragment > 0)
+      if (fragment > 0)
             glAttachShader(program_id, fragment);
+      if (geometry > 0)
+            glAttachShader(program_id, geometry);
       // configure transform feedback
       if (!feedback_vars.empty()) {
             std::vector<const GLchar*> ptr_char_array;
@@ -117,12 +173,13 @@ void Shader::compileAndLink() {
       glGetProgramiv(program_id, GL_LINK_STATUS, &success);
       if (!success) {
             glGetProgramInfoLog(program_id, 1024, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+            LOG(ERROR) << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
       }
 
       // delete shader objects
       glDeleteShader(vertex);
       glDeleteShader(fragment);
+      glDeleteShader(geometry);
       _loaded = true;
 }
 

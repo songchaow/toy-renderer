@@ -7,6 +7,7 @@ class Shader {
       std::string path;
       std::string vertex_shader_code;
       std::string fragment_shader_code;
+      std::string geo_shader_code;
       bool _complete = false;
       bool _loaded = false;
       unsigned int program_id;
@@ -15,6 +16,7 @@ class Shader {
 public:
       Shader(const std::string& vertex_path, const std::string& fragment_path);
       Shader(const std::string & vertex_path);
+      Shader(const ShaderPath & path);
       Shader& operator=(const Shader& i);
       Shader() = default;
       static const size_t maxPointLightNum = 4;
@@ -50,6 +52,7 @@ struct ShaderPath {
       std::string vertex;
       std::string geometry;
       std::string fragment;
+      bool complete() const { return vertex.size() > 0; }
 };
 
 enum ShaderType {
