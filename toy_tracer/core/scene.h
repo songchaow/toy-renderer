@@ -5,7 +5,7 @@
 #include "light/skybox.h"
 #include "light/area.h"
 class Scene {
-      Skybox* _skybox = nullptr;
+      EquiRectSkybox* _skybox = nullptr;
       // including shaped lights and primitives
       std::vector<Shapeable*> shapes;
       std::vector<Light*> lights; // shapeable lights are also included in shapes.
@@ -15,6 +15,6 @@ public:
       bool Visible(Interaction & i, const Vector3f& wi, Light* l) const;
       Spectrum SampleDirectLight(Interaction& i) const;
       void setSkybox(Skybox* skybox) { _skybox = skybox; }
-      Skybox* skybox() const { return _skybox; }
+      EquiRectSkybox* skybox() const { return _skybox; }
       void AddObj(Shapeable* obj);
 };

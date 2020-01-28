@@ -31,7 +31,7 @@ Spectrum PathTracer::Li(Ray& ro) {
 
             }
             if (!scene->Intercept(ro, i)) {
-                  Skybox* sky = scene->skybox();
+                  EquiRectSkybox* sky = scene->skybox();
                   if (sky)
                         Li = prefix * sky->Li(ro.d);
                   else

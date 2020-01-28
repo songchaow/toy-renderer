@@ -16,7 +16,7 @@ int renderTest() {
       ConstColorTexture<RGBSpectrum>* skycolor = new ConstColorTexture<RGBSpectrum>(RGBSpectrum(1.f, 1.f, 1.f));
       ImageTexture* sphereMap = new ImageTexture("sph2.jpg", ImageTexture::WrapMode::BLACK);
       Float eq_radius = sphereMap->width() / 2 / Pi;
-      Skybox* skybox = new Skybox(sphereMap, eq_radius);
+      EquiRectSkybox* skybox = new EquiRectSkybox(sphereMap, eq_radius);
       auto transform = Translate(Vector3f(0, 0.f, 900.f));
       Sphere* sphere_shape = new Sphere(890.f, transform);
       Dielectric* d = new Dielectric();
