@@ -3,6 +3,18 @@
 #include <glad/glad.h>
 #include <core/transform.h>
 
+struct ShaderPath {
+      std::string vertex;
+      std::string geometry;
+      std::string fragment;
+      bool complete() const { return vertex.size() > 0; }
+};
+
+enum ShaderType {
+      PBR,
+      DEPTH_MAP
+};
+
 class Shader {
       std::string path;
       std::string vertex_shader_code;
@@ -48,17 +60,7 @@ public:
 
 };
 
-struct ShaderPath {
-      std::string vertex;
-      std::string geometry;
-      std::string fragment;
-      bool complete() const { return vertex.size() > 0; }
-};
 
-enum ShaderType {
-      PBR,
-      DEPTH_MAP
-};
 
 // Convenience functions
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile);

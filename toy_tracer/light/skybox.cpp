@@ -15,3 +15,33 @@ bool EquiRectSkybox::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Fl
       wi = SampleUnitSphere(sample);
       return true;
 }
+
+static Point3f _worldPositions[] = {
+      {-1.0f,  -1.0f, -1.0f},
+      {-1.0f, -1.0f, 1.0f},
+      {-1.0f, 1.0f, -1.0f},
+      {-1.0f, 1.0f, 1.0f},
+      {1.0f, -1.0f, -1.0f},
+      {1.0f, -1.0f, 1.0f},
+      {1.0f, 1.0f, -1.0f},
+      {1.0f, 1.0f, 1.0f}
+};
+
+static uint32_t indices[] = {
+      1, 0, 4,
+      1, 4, 5,
+      4, 6, 5,
+      5, 6, 7,
+      6, 2, 3,
+      6, 3, 7,
+      0, 1, 2,
+      2, 1, 3,
+      0, 2, 6,
+      0, 6, 4,
+      3, 1, 5,
+      3, 5, 7
+};
+static Layout skyboxLayout;
+
+TriangleMesh Skybox::cube = TriangleMesh(indices, std::vector<LayoutItem>(1, DEFAULT_VERTEX_LAYOUT), 
+      DEFAULT_VERTEX_LAYOUT.strip * 8, indices, 12, GL_UNSIGNED_INT, Transform::Identity());

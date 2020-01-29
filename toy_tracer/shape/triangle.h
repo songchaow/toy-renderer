@@ -35,10 +35,23 @@ struct LayoutItem {
       LayoutItem() = default;
 };
 
+static LayoutItem DEFAULT_VERTEX_LAYOUT = LayoutItem(12, ARRAY_VERTEX, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
+static LayoutItem DEFAULT_TEXUV_LAYOUT = LayoutItem(8, ARRAY_TEX_UV, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
+static LayoutItem DEFAULT_NORMAL_LAYOUT = LayoutItem(12, ARRAY_NORMAL, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
+
 struct Layout {
       std::vector<LayoutItem> _data;
       Layout() = default;
-      Layout(const std::vector<LayoutItem> data) :_data(data) {}
+      Layout(const std::vector<LayoutItem> data) :_data(data) {
+            // fix strip and offset
+            uint16_t curr_offset = 0;
+            for(auto i = _data.begin();i<_data.end();i++) {
+                  i->offset = curr_offset;
+                  curr_offset += i->e_size * i->e_count;
+            }
+            for(auto i = _data.begin();i<_data.end();i++)
+                  i->strip = curr_offset;
+      }
       // TODO
       void emplace_back(const ArrayType& type) {}
       void emplace_back(ArrayType type, GLenum e_format, GLint e_size,
@@ -96,9 +109,10 @@ private:
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* raw_data, Layout l, uint32_t vb_size, uint32_t vertex_num, uint32_t* index_data, uint32_t index_num, GLenum idxFormat, Transform obj2world)
-            : vertex_data(raw_data), _layout(l), vbuffer_size(vb_size), vertex_num(vertex_num), 
-            index_data(index_data), face_num(index_num), indexFormat(idxFormat) {
+      TriangleMesh(void* vbuffer, Layout l, uint32_t vb_size, uint32_t* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
+            : vertex_data(vbuffer), _layout(l), vbuffer_size(vb_size), 
+            index_data(index_data), face_num(faceNum), indexFormat(idxFormat) {
+            vertex_num = vb_size / _layout.strip();
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);
