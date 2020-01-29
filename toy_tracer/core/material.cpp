@@ -211,20 +211,20 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
 
 void PBRMaterial::load() {
       // TODO: use a const texture as the fallback if there're null pointers
-      if(albedo_map.isValid())
+      if(albedo_map.ready2Load())
             albedo_map.load();
-      if (metallic_map.isValid())
+      if (metallic_map.ready2Load())
             metallic_map.load();
-      if (rough_map.isValid())
+      if (rough_map.ready2Load())
             rough_map.load();
 }
 
 void PBRMaterial::update() {
-      if (albedo_map.isValid())
+      if (albedo_map.ready2Load())
             albedo_map.update();
-      if (metallic_map.isValid())
+      if (metallic_map.ready2Load())
             metallic_map.update();
-      if (rough_map.isValid())
+      if (rough_map.ready2Load())
             rough_map.update();
       _dirty = false;
 }

@@ -41,6 +41,7 @@ void ImageTexture::load() {
       //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       glBindTexture(GL_TEXTURE_2D, 0);
+      delete _image;
 }
 
 void ImageTexture::update() {
@@ -57,5 +58,5 @@ void ImageTexture::update() {
             image_format = GL_RGBA;
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementType(), _image->data());
       glBindTexture(GL_TEXTURE_2D, 0);
-
+      delete _image;
 }

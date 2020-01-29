@@ -45,6 +45,9 @@ class PBRMaterial_Ui : public RendererObject {
       mutable QLineEdit* albedo_text;
       mutable QLineEdit* metallic_text;
       mutable QLineEdit* rough_text;
+      QString albedo_path;
+      QString metallic_path;
+      QString rough_path;
 public slots:
       void updateProperties();
 public:
