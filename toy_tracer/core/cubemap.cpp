@@ -2,11 +2,12 @@
 #include "core/shader.h"
 #include "main/renderworker.h"
 #include <fstream>
+#include <cassert>
 
-const Float CubeMap::depthFarPlane = 32.f;
-const Float CubeMap::depthNearPlane = 1.f;
-/*static*/ const Transform CubeMap::camtoNDC { toNDCPerspective(depthNearPlane, CubeMap::depthFarPlane, 1.f, 90.f/ 180.f * Pi) };
-/*static*/ const Transform CubeMap::o2cam[6] = { 
+const Float CubeDepthMap::depthFarPlane = 32.f;
+const Float CubeDepthMap::depthNearPlane = 1.f;
+/*static*/ const Transform CubeDepthMap::camtoNDC { toNDCPerspective(depthNearPlane, CubeDepthMap::depthFarPlane, 1.f, 90.f/ 180.f * Pi) };
+/*static*/ const Transform CubeDepthMap::o2cam[6] = { 
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                            // X+
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(-1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                           // X-
       LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 1.f, 0.f), Vector3f(0.f, 0.f ,1.f)),  // Y+
@@ -15,7 +16,7 @@ const Float CubeMap::depthNearPlane = 1.f;
       LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f)),    // Z-
 };
 
-CubeMap::CubeMap(const Point3f& o) : o(o) {
+CubeDepthMap::CubeDepthMap(const Point3f& o) : o(o) {
       glGenTextures(1, &cubeMapObj);
       glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapObj);
       for (int i = 0; i < 6; i++)
@@ -28,7 +29,7 @@ CubeMap::CubeMap(const Point3f& o) : o(o) {
 
 }
 
-void CubeMap::GenCubeDepthMap() {
+void CubeDepthMap::GenCubeDepthMap() {
       glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapObj);
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
@@ -65,4 +66,34 @@ void CubeMap::GenCubeDepthMap() {
             exit(0);
 #endif
       //glViewport
+}
+
+void CubeMap::loadImage(const std::vector<std::string>& paths)
+{
+      assert(paths.size() >= 6);
+      for (int i = 0; i < 6; i++)
+            if(_image[i])
+                  delete _image[i];
+      for (int i = 0; i < 6; i++)
+            _image[i] = new Image(paths[i]);
+      resolution = _image[0]->resolution();
+}
+
+void CubeMap::glLoad()
+{
+      if (cubeMapObj > 0)
+            return;
+      glGenTextures(1, &cubeMapObj);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapObj);
+      for (int i = 0; i < 6; i++)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, resolution.x, resolution.y, 0, _image[i]->glPixelFormat(), _image[i]->elementFormat(), NULL);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+      for (int i = 0; i < 6; i++) {
+            delete _image[i];
+            _image[i] = nullptr;
+      }
 }

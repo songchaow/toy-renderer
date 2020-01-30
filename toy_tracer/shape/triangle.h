@@ -125,6 +125,7 @@ public:
             std::memcpy(index_data, t.index_data, 3 * sizeof(uint32_t) * face_num);
       }
       void load();
+      void glUse() { glBindVertexArray(_vao); }
       GLuint vao() const { return _vao; }
       GLuint vbo() const { return _vbo; }
       GLuint ebo() const { return _ebo; }

@@ -27,7 +27,11 @@ int main(int argc, char *argv[])
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
 
       // Create scene objects here
-
+      std::vector<std::string> skybox_paths;
+      for (auto& i : Skybox::default_files) {
+            skybox_paths.push_back(Skybox::default_path + i);
+      }
+      worker->skybox().map.loadImage(skybox_paths);
       // create albedo texture for balls
       Image* off_color = Image::CreateColorImage("grey", R8G8B8(25, 25, 25), false);
       Image* on_color = Image::CreateColorImage("yellow", R8G8B8(113, 206.f, 239.f), false);

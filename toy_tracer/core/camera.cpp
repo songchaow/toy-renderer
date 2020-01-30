@@ -49,7 +49,7 @@ void Camera::setSpinTransform(Float offset, const Point3f& refPoint) {
       while (spinAngle >= 2 * Pi) spinAngle -= 2 * Pi;
 }
 
-Matrix4 LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec = {0.f, 1.f, 0.f}) {
+Matrix4 LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec /*= {0.f, 1.f, 0.f}*/) {
       // First calculate cam2world
       Vector3f localZ = Normalize(-viewDir);
       Vector3f localX = Normalize(Cross(upVec, localZ));

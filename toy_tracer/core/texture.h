@@ -29,9 +29,9 @@ typedef Texture2D<RGBSpectrum> RGBSpectrumTexture2D;
 extern ConstColorTexture<RGBSpectrum> blackConstantTexture;
 extern ConstColorTexture<RGBSpectrum> whiteConstantTexture;
 
-// Point-like class
+// Point-like class (not necessarily)
 class ImageTexture : public RGBSpectrumTexture2D {
-      Image* _image; // owned
+      Image* _image; // temporarily owned
       // shared attributes
       GLuint* _tbo;
       Point2f* resolution;
@@ -96,8 +96,8 @@ public:
                   delete _image;
             _image = new Image(path);
       }
-      Float height() { if (!_image) return 0.f; return _image->resolution().x; }
-      Float width() { if (!_image) return 0.f; return _image->resolution().y; }
+      Float height() { return resolution->x; }
+      Float width() { return resolution->y; }
       bool ready2Load() const { return (bool)_image; }
       bool isLoad() const { return *_tbo > 0; }
       // create a tbo and load the image

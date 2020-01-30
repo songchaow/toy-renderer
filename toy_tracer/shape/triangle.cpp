@@ -103,6 +103,8 @@ void TriangleMesh::load() {
       // glBindTexture(GL_TEXTURE_BUFFER, _normTexture);
       // //glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tmp_buff);
       // glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, norms);
+      if (_vao > 0)
+            return;
       glGenVertexArrays(1, &_vao);
       glBindVertexArray(_vao);
       // vbo

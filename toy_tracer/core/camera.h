@@ -13,6 +13,7 @@ class Camera {
       // Orientation
       Transform _cam2world; // not used in RTR
       Transform _world2cam;
+      AnimatedTransform _world2cam_a;
       Vector3f _viewDir = { 0.f,0.f,-1.f };
       Point3f _pos = { 0.f, 0.f, -10.f };
       // Contrl
@@ -49,8 +50,10 @@ public:
       // Generate OpenGL transform, row major order
       Transform Cam2NDC() const;
       void LookAt();
+      // Getters
       const Transform& world2cam() const { return _world2cam; }
       const Transform& cam2world() const { return _cam2world; }
+      const Transform& rotation() const { return _rotation; }
       bool rotationXTrigger() const { return _rotationXTrigger; }
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }

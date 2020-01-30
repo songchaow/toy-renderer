@@ -9,7 +9,8 @@ static std::map<std::string, Shader> shaderStore;
 std::map<ShaderType, ShaderPath> shaderConfig = {
 //    Type        Vertex                  Geometry    Fragment
       {PBR,       {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"}},
-      {DEPTH_MAP, {"shader/vertex.glsl",  "",         "shader/depth.fs"}}
+      {DEPTH_MAP, {"shader/vertex.glsl",  "",         "shader/depth.fs"}},
+      {SKY_BOX,   {"shader/skybox.vs",    "",         "shader/skybox.fs"}}
 };
 
 Shader::Shader(const ShaderPath & path) {

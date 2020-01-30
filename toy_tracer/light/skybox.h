@@ -1,6 +1,7 @@
 #pragma once
 #include "core/light.h"
 #include "core/texture.h"
+#include "core/cubemap.h"
 #include "shape/triangle.h"
 #include <memory>
 
@@ -18,9 +19,13 @@ public:
 };
 
 // uses a cube map for rt rendering
-class Skybox {
-      
+struct Skybox {
+      CubeMap map;
       static TriangleMesh cube;
-public:
-      Skybox();
+      static const std::vector<std::string> default_files;
+      static const std::string default_path;
+      Skybox(const std::vector<std::string> & paths) : map(paths) {}
+      Skybox() = default;
+      void glLoad();
+      void draw();
 };

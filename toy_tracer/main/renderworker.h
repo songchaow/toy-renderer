@@ -6,6 +6,7 @@
 #include "core/camera.h"
 #include "core/cubemap.h"
 #include "light/point.h"
+#include "light/skybox.h"
 #include "main/TwoThreadQueue.h"
 #include "main/canvas.h"
 
@@ -24,7 +25,8 @@ class RenderWorker : public QObject {
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
-      CubeMap* depthMap;
+      CubeDepthMap* depthMap;
+      Skybox sky;
 
 public:
       Primitive* curr_primitive;
@@ -40,6 +42,7 @@ public:
       void loadPointLight(PointLight* l);
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }
+      Skybox& skybox() { return sky; }
       void setCanvas(Canvas* c) { _canvas = c; }
       void setCamera(Camera* c) { cam = c; }
       Canvas* canvas() { return _canvas; }

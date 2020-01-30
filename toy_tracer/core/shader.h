@@ -12,7 +12,8 @@ struct ShaderPath {
 
 enum ShaderType {
       PBR,
-      DEPTH_MAP
+      DEPTH_MAP,
+      SKY_BOX
 };
 
 class Shader {

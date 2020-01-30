@@ -37,6 +37,9 @@ void RenderWorker::initialize() {
 
       if (cam->lightAssociated())
             loadPointLight(cam->associatedLight());
+      if (sky.map.ready2Load()) {
+            sky.map.glLoad();
+      }
 }
 
 void RenderWorker::renderPassPBR() {
@@ -108,7 +111,7 @@ void RenderWorker::renderLoop() {
       // fbo
       GLuint fbo;
       glGenFramebuffers(1, &fbo);
-      depthMap = new CubeMap();
+      depthMap = new CubeDepthMap();
       for(;;) {
             // resize the camera if needed
             assert(_canvas);
