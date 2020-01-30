@@ -69,5 +69,7 @@ void Skybox::draw()
       s->setUniformF("rotation", &rotation);
       s->setUniformF("cam2ndc", &cam2ndc);
       s->setUniformI("skybox", 0);
+      glDepthMask(GL_FALSE);
       glDrawElements(GL_TRIANGLES, cube.face_count()*3, GL_UNSIGNED_INT, 0);
+      glDepthMask(GL_TRUE);
 }

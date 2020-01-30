@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
       // Create scene objects here
       std::vector<std::string> skybox_paths;
       for (auto& i : Skybox::default_files) {
-            skybox_paths.push_back(Skybox::default_path + i);
+            skybox_paths.push_back(Skybox::default_path + '/' + i);
       }
       worker->skybox().map.loadImage(skybox_paths);
       // create albedo texture for balls

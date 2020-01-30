@@ -33,7 +33,7 @@ void RenderWorker::initialize() {
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
-      glEnable(GL_CULL_FACE);
+      //glEnable(GL_CULL_FACE);
       // Associate light to camera
       if (cam->lightAssociated())
             loadPointLight(cam->associatedLight());
@@ -84,9 +84,7 @@ void RenderWorker::renderPassPBR() {
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       shader->setUniformF("far", depthMap->depthFarPlane);
-      //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-      //glViewport(0, 0, _canvas->width(), _canvas->height());
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      
       //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       for (auto &p : primitives) {
             if (p->getPBRMaterial()->dirty())
@@ -164,6 +162,10 @@ void RenderWorker::renderLoop() {
                         }
                   }
             }
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            Float max999 = 0.9999999;
             // shadow map
             if (_pointLights.size() > 0) {
                   glBindFramebuffer(GL_FRAMEBUFFER, fbo);
