@@ -56,7 +56,7 @@ void Primitive::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             GLenum err = glGetError();
-            glDrawElements(GL_TRIANGLES, 3 * m->face_count()*2, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
             err = glGetError();
       }
 }

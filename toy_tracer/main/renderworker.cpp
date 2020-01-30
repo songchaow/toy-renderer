@@ -34,12 +34,11 @@ void RenderWorker::initialize() {
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_CULL_FACE);
-
+      // Associate light to camera
       if (cam->lightAssociated())
             loadPointLight(cam->associatedLight());
-      if (sky.map.ready2Load()) {
-            sky.map.glLoad();
-      }
+      // Skybox
+      sky.glLoad();
 }
 
 void RenderWorker::renderPassPBR() {
@@ -85,7 +84,7 @@ void RenderWorker::renderPassPBR() {
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       shader->setUniformF("far", depthMap->depthFarPlane);
-      glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+      //glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
       //glViewport(0, 0, _canvas->width(), _canvas->height());
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -135,7 +134,7 @@ void RenderWorker::renderLoop() {
                         curr_primitive->obj2world().update();
                   }
             }
-            // add pending primitives
+            // add/remove pending primitives
             std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {
                   for (auto* d : pendingDelPrimitives) {
@@ -148,7 +147,7 @@ void RenderWorker::renderLoop() {
                         primitives.push_back(o);
                   }
             }
-            // add pending lights
+            // add/remove pending lights
             std::vector<PointLight*> pendingLights, pendingDelLights;
             if (lightQueue.readAll(pendingLights, pendingDelLights)) {
                   for (auto* d : pendingDelLights) {
@@ -175,6 +174,7 @@ void RenderWorker::renderLoop() {
             }
             // rendering
             loopN++;
+            sky.draw();
             renderPassPBR();
             m_context->swapBuffers(_canvas);
       }

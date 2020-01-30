@@ -46,21 +46,28 @@ static Layout skyboxLayout;
 const std::string Skybox::default_path = "texture/skybox";
 const std::vector<std::string> Skybox::default_files = { "right.tga", "left.tga", "up.tga", "down.tga", "back.tga", "front.tga" };
 
-TriangleMesh Skybox::cube = TriangleMesh(indices, std::vector<LayoutItem>(1, DEFAULT_VERTEX_LAYOUT), 
+TriangleMesh Skybox::cube = TriangleMesh(_worldPositions, std::vector<LayoutItem>(1, DEFAULT_VERTEX_LAYOUT),
       DEFAULT_VERTEX_LAYOUT.strip * 8, indices, 12, GL_UNSIGNED_INT, Transform::Identity());
 
 void Skybox::glLoad()
 {
-      map.glLoad();
+      if(map.ready2Load())
+            map.glLoad();
       cube.load();
 }
 
 void Skybox::draw()
 {
+      glActiveTexture(GL_TEXTURE0);
       map.glUse();
       cube.glUse();
       Shader* s = LoadShader(SKY_BOX, true);
       s->use();
-      s->setUniformF("rotation", &RenderWorker::getCamera()->world2cam().m);
-      // set depth to 1
+      Matrix4 rotation = RenderWorker::getCamera()->world2cam().m;
+      Matrix4 cam2ndc = RenderWorker::getCamera()->Cam2NDC().m;
+      rotation[0][3] = rotation[1][3] = rotation[2][3] = 0.f;
+      s->setUniformF("rotation", &rotation);
+      s->setUniformF("cam2ndc", &cam2ndc);
+      s->setUniformI("skybox", 0);
+      glDrawElements(GL_TRIANGLES, cube.face_count()*3, GL_UNSIGNED_INT, 0);
 }

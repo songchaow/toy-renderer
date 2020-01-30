@@ -7,6 +7,6 @@ uniform mat4 cam2ndc;
 out vec3 coord;
 
 void main() {
-      gl_Position = vec4(cam2ndc * rotation * posWorld, 1);
+      gl_Position = cam2ndc * rotation * vec4(posWorld, 1.0);
       coord = posWorld;
 }
