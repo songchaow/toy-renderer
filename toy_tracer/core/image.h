@@ -28,13 +28,13 @@ private:
 public:
       Image() = default;
       Image(const Image& i) = delete;
+      Image& operator=(const Image& i) = delete;
       Image(Image&& i) :_resolution(i._resolution), loaded(i.loaded), flags(i.flags), _data(i._data), 
             numChannel(i.numChannel), _elementType(i._elementType) {
             i._data = nullptr;
       }
       Image(std::string path, Format flags = RGBSpectrum) : flags(flags) { LoadFromFile(path); };
       Image(const ::R8G8B8& color, bool alpha = false, Float val_alpha = 0.f);
-      Image& operator=(const Image& i) = delete;
       static Image* CreateImageFromFile(std::string path);
       static Image* CreateColorImage(std::string path, ::R8G8B8 color, bool alpha = false, Float val_alpha = 0.f);
       ::R8G8B8 R8G8B8Pixel(int i, int j);

@@ -66,7 +66,7 @@ public:
       ImageTexture() : _ref(0), _image(nullptr) {
             _tbo = new GLuint();
             _ref = new unsigned int(1);
-            resolution = new Point2f(_image->resolution());
+            resolution = new Point2f();
       }
       ImageTexture(const ImageTexture& i) :_image(i._image), _tbo(i._tbo), _ref(i._ref), resolution(resolution) {
             ++*_ref;

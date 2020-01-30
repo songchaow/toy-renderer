@@ -72,7 +72,7 @@ bool Image::LoadFromFile(std::string path)
                                                                                        InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 2]));
                         }
                   }
-                  delete tmp;
+                  stbi_image_free(tmp);
             }
             loaded = true;
             return true;
@@ -89,7 +89,12 @@ bool Image::LoadFromFile(std::string path)
 Image::~Image()
 {
       if(_data) {
-            stbi_image_free(_data);
+            if (_elementType == GL_FLOAT) {
+                  ::RGBSpectrum* d = (::RGBSpectrum*)_data;
+                  delete[] d;
+            }
+            else
+                  stbi_image_free(_data);
       }
 }
 

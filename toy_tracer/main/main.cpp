@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
       }
       worker->skybox().map.loadImage(skybox_paths);
       // create albedo texture for balls
-      Image* off_color = Image::CreateColorImage("grey", R8G8B8(25, 25, 25), false);
-      Image* on_color = Image::CreateColorImage("yellow", R8G8B8(113, 206.f, 239.f), false);
-      Image* spec_color = Image::CreateColorImage("black", R8G8B8(0.f, 0.f, 0.f), false);
+      Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
+      Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
+      Image* spec_color = new Image(R8G8B8(0.f, 0.f, 0.f), false, 0.f);
       PBRMaterial m;
       {
             ImageTexture off_texture(on_color);

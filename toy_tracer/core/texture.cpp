@@ -23,6 +23,7 @@ RGBSpectrum ImageTexture::Evaluate(Float u, Float v)
 void ImageTexture::load() {
       if (*_tbo != 0) { // already loaded
             DLOG(INFO) << "Texture already loaded";
+            _image = nullptr;
             return;
       }
       glGenTextures(1, _tbo);
