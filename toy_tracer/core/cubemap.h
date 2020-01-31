@@ -37,6 +37,7 @@ struct CubeMap {
       CubeMap() = default;
       CubeMap(const std::vector<std::string>& paths) { loadImage(paths); }
       void loadImage(const std::vector<std::string>& paths);
+      void loadImage(const std::vector<Image*> images);
       bool ready2Load() {
             for (int i = 0; i < 6; i++)
                   if (_image[i] == nullptr)

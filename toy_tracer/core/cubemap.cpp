@@ -75,7 +75,16 @@ void CubeMap::loadImage(const std::vector<std::string>& paths)
             if(_image[i])
                   delete _image[i];
       for (int i = 0; i < 6; i++)
-            _image[i] = new Image(paths[i]);
+            _image[i] = new Image(paths[i], Image::Format::RGBSpectrum, false);
+      resolution = _image[0]->resolution();
+}
+
+void CubeMap::loadImage(const std::vector<Image*> images) {
+      for (int i = 0; i < 6; i++)
+            if (_image[i])
+                  delete _image[i];
+      for (int i = 0; i < 6; i++)
+            _image[i] = images[i];
       resolution = _image[0]->resolution();
 }
 

@@ -8,6 +8,11 @@ Canvas::Canvas() {
       setSurfaceType(QWindow::OpenGLSurface); create();
 }
 
+Canvas::Canvas(int width, int height) {
+      QWindow::resize(width, height);
+      setSurfaceType(QWindow::OpenGLSurface); create();
+}
+
 void Canvas::mousePressEvent(QMouseEvent *ev) {
       _drag = true;
       _pos0 = ev->pos();

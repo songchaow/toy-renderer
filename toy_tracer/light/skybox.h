@@ -27,5 +27,6 @@ struct Skybox {
       Skybox(const std::vector<std::string> & paths) : map(paths) {}
       Skybox() = default;
       void glLoad();
+      void loadSkybox();
       void draw();
 };

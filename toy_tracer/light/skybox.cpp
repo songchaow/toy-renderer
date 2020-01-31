@@ -45,6 +45,7 @@ static uint32_t indices[] = {
 static Layout skyboxLayout;
 const std::string Skybox::default_path = "texture/skybox";
 const std::vector<std::string> Skybox::default_files = { "right.tga", "left.tga", "up.tga", "down.tga", "back.tga", "front.tga" };
+//const std::vector<std::string> Skybox::default_files = { "left.tga", "right.tga", "up.tga", "down.tga", "front.tga", "back.tga" };
 
 TriangleMesh Skybox::cube = TriangleMesh(_worldPositions, std::vector<LayoutItem>(1, DEFAULT_VERTEX_LAYOUT),
       DEFAULT_VERTEX_LAYOUT.strip * 8, indices, 12, GL_UNSIGNED_INT, Transform::Identity());
@@ -54,6 +55,30 @@ void Skybox::glLoad()
       if(map.ready2Load())
             map.glLoad();
       cube.load();
+}
+
+void Skybox::loadSkybox()
+{
+      std::vector<std::string> skybox_paths;
+      for (auto& i : Skybox::default_files) {
+            skybox_paths.push_back(Skybox::default_path + '/' + i);
+      }
+      std::vector<Image*> images;
+      for (auto& path : skybox_paths) {
+            if (path.substr(path.size() - 6, 6) == "up.tga") {
+                  Image* up = new Image(path, Image::Format::RGBSpectrum, false);
+                  up->RotateCW();
+                  images.push_back(up);
+            }
+            else if (path.substr(path.size() - 8, 8) == "down.tga") {
+                  Image* down = new Image(path, Image::Format::RGBSpectrum, false);
+                  down->RotateCCW();
+                  images.push_back(down);
+            }
+            else
+                  images.push_back(new Image(path, Image::Format::RGBSpectrum, false));
+      }
+      map.loadImage(images);
 }
 
 void Skybox::draw()

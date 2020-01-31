@@ -16,7 +16,7 @@ class Canvas : public QWindow {
       bool camera_obj = true;
 public:
       Canvas();
-
+      Canvas(int width, int height);
       bool resized() const { return _resized; }
       bool keyPressed() const { return _keyPressed; }
       void clearResized() { _resized = false; }

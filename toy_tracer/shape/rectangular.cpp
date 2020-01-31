@@ -6,7 +6,7 @@ std::vector<TriangleMesh*> Rectangular::GenMesh() const {
                               {-width / 2, height / 2, 0}, 
                               {width / 2, -height / 2, 0} , 
                               {width / 2, height / 2, 0} };
-      Point2f tex[4] = { {0.f, 0.f}, {0.f, 1.f}, {1.f, -1.f}, {1.f, 1.f} };
+      Point2f tex[4] = { {0.f, 0.f}, {0.f, 1.f}, {1.f, 0.f}, {1.f, 1.f} };
       Normal3f norm = { 0.f, 0.f, 1.f };
       Layout layout;
       // TODO: data_ptr is not needed anymore. Consider move it out of LayoutItem
@@ -22,7 +22,7 @@ std::vector<TriangleMesh*> Rectangular::GenMesh() const {
             p += 2;
             *(Normal3f*)(p) = norm;
       }
-      uint32_t* index_data = new uint32_t[6]{ 0, 1, 2, 1, 2, 3 };
+      uint32_t* index_data = new uint32_t[6]{ 1, 0, 2, 1, 2, 3 };
       // obj2world!
       TriangleMesh* ret = new TriangleMesh(vertex_data, layout, layout.strip() * 4, index_data, 2, GL_UNSIGNED_INT, Transform::Identity());
       return std::vector<TriangleMesh*>(1, ret);

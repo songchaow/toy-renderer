@@ -6,7 +6,7 @@ class Rectangular : public Shape {
       Float height = 2.f;
 public:
       std::vector<TriangleMesh*> GenMesh() const;
-      Rectangular(Float width, Float height, Transform& r) : width(width), height(height), Shape(r) {}
+      Rectangular(Float width, Float height) : width(width), height(height) {}
       Rectangular() : Shape(Transform::Identity()) {}
       virtual std::string shapeName() const { return "Rectangular"; }
       Float Area() const { return width * height; }
