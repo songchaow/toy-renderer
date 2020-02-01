@@ -138,3 +138,17 @@ const LayoutItem* Layout::getLayoutItem(ArrayType t) const {
                   return &l;
       }
 }
+
+static Float screenVertex[] = {
+      // Position       Tex coord
+      -1.f, -1.f,       0.f, 0.f,
+      -1.f, 1.f,        0.f, 1.f,
+      1.f, -1.f,        1.f, 0.f,
+      1.f, 1.f,         1.f, 1.f
+};
+static uint32_t screenMeshIndices[] = {
+      1, 0, 2, 1, 2, 3
+};
+
+TriangleMesh TriangleMesh::screenMesh = TriangleMesh(screenVertex, std::vector<LayoutItem>{DEFAULT_POINT2F_LAYOUT, DEFAULT_TEXUV_LAYOUT},
+(DEFAULT_POINT2F_LAYOUT.strip + DEFAULT_TEXUV_LAYOUT.strip) * 4, screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());

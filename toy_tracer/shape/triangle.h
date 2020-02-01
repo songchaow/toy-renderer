@@ -36,6 +36,7 @@ struct LayoutItem {
 };
 
 static LayoutItem DEFAULT_VERTEX_LAYOUT = LayoutItem(12, ARRAY_VERTEX, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
+static LayoutItem DEFAULT_POINT2F_LAYOUT = LayoutItem(8, ARRAY_VERTEX, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_TEXUV_LAYOUT = LayoutItem(8, ARRAY_TEX_UV, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_NORMAL_LAYOUT = LayoutItem(12, ARRAY_NORMAL, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
 
@@ -141,6 +142,7 @@ public:
             if (index_data) delete[](char*)index_data;
       }
       const uint32_t* face_triangle(int faceIdx) const { return index_data + faceIdx * 3; }
+      static TriangleMesh screenMesh;
 };
 
 class Triangle : public Shape {

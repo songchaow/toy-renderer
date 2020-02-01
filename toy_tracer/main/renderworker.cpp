@@ -39,6 +39,30 @@ void RenderWorker::initialize() {
             loadPointLight(cam->associatedLight());
       // Skybox
       sky.glLoad();
+      TriangleMesh::screenMesh.load();
+      // Depth fbo
+      glGenFramebuffers(1, &depth_fbo);
+      // Create a float-point color buffer and depth buffer for HDR fbo
+      glGenFramebuffers(1, &hdr_fbo);
+      glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
+      glGenTextures(1, &hdr_color_tex);
+      glBindTexture(GL_TEXTURE_2D, hdr_color_tex);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, NULL);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glGenRenderbuffers(1, &hdr_depth_buf);
+      glBindRenderbuffer(GL_RENDERBUFFER, hdr_depth_buf);
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
+      // attach them to a new fb
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color_tex, 0);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, hdr_depth_buf);
+      glEnable(GL_DEPTH_TEST);
+      GLenum res = glCheckFramebufferStatus(hdr_fbo);
+      if (res == GL_FRAMEBUFFER_COMPLETE)
+            LOG(INFO) << "complete framebuffer";
+      else
+            LOG(INFO) << "incomplete";
+      depthMap = new CubeDepthMap();
 }
 
 void RenderWorker::renderPassPBR() {
@@ -105,10 +129,6 @@ void RenderWorker::renderPassDepth() {
 
 void RenderWorker::renderLoop() {
       int loopN = 0;
-      // fbo
-      GLuint depth_fbo;
-      glGenFramebuffers(1, &depth_fbo);
-      depthMap = new CubeDepthMap();
       for(;;) {
             // resize the camera if needed
             assert(_canvas);
@@ -162,22 +182,34 @@ void RenderWorker::renderLoop() {
                         }
                   }
             }
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            Float max999 = 0.9999999;
+
             // shadow map
             if (_pointLights.size() > 0) {
                   glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
                   depthMap->o = _pointLights[0]->pos();
                   depthMap->GenCubeDepthMap();
-                  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                  //glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
                   glViewport(0, 0, _canvas->width(), _canvas->height());
             }
-            // rendering
+            // render to hdr fb
             loopN++;
+            glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClearDepth(1.0f);
+            glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
             sky.draw();
             renderPassPBR();
+            // render to default fb
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClearDepth(1.0f);
+            glClear(GL_DEPTH_BUFFER_BIT);
+            Shader* hdr = LoadShader(HDR_TONE_MAP, true);
+            hdr->use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, hdr_color_tex);
+            hdr->setUniformI("radiance", 0);
+            TriangleMesh::screenMesh.glUse();
+            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
             m_context->swapBuffers(_canvas);
       }
 }

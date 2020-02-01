@@ -25,8 +25,16 @@ class RenderWorker : public QObject {
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
+      // Depth Map
       CubeDepthMap* depthMap;
+      GLuint depth_fbo = 0;
+      // HDR Framebuffer
+      GLuint hdr_fbo = 0;
+      GLuint hdr_color_tex = 0;
+      GLuint hdr_depth_buf = 0;
+
       Skybox sky;
+
 
 public:
       Primitive* curr_primitive;

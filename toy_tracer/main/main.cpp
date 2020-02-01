@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
       Primitive* ball = new Primitive(new Sphere(1.2f), m, Translate(3.7f, -0.5f, 0.f));
       ball->GenMeshes();
       //Primitive* ball2 = new Primitive(new Sphere(1.f), m, Translate(0.f, 0.f, 3.f));
-      Primitive* ball2 = new Primitive(new Sphere(4.f), m, Translate(0.f, 0.f, -6.f));
+      Primitive* ball2 = new Primitive(new Sphere(4.f), m, Translate(3.5f, 0.f, -6.f));
       ball2->GenMeshes();
       PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, 5.f));
       m.albedo_map = ImageTexture(new Image("texture/skybox/front.tga"));
