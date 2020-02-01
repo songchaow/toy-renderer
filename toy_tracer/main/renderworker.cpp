@@ -106,8 +106,8 @@ void RenderWorker::renderPassDepth() {
 void RenderWorker::renderLoop() {
       int loopN = 0;
       // fbo
-      GLuint fbo;
-      glGenFramebuffers(1, &fbo);
+      GLuint depth_fbo;
+      glGenFramebuffers(1, &depth_fbo);
       depthMap = new CubeDepthMap();
       for(;;) {
             // resize the camera if needed
@@ -168,7 +168,7 @@ void RenderWorker::renderLoop() {
             Float max999 = 0.9999999;
             // shadow map
             if (_pointLights.size() > 0) {
-                  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+                  glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
                   depthMap->o = _pointLights[0]->pos();
                   depthMap->GenCubeDepthMap();
                   glBindFramebuffer(GL_FRAMEBUFFER, 0);
