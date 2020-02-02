@@ -191,7 +191,7 @@ std::vector<TriangleMesh*> Sphere::GenMesh() const {
             *idx_ptr++ = bottomPointIdx;
             *idx_ptr++ = lastLineIdx + (facei + 1) % vSlide;
       }
-      TriangleMesh* m = new TriangleMesh(vertex_data, layout._data, layout.strip()*numVertices, 
+      TriangleMesh* m = new TriangleMesh(vertex_data, layout._data, numVertices, 
             idx_data, faceNum, GL_UNSIGNED_INT, Transform::Identity());
       return std::vector<TriangleMesh*>(1, m);
 }

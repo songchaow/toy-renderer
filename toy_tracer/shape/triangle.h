@@ -92,6 +92,7 @@ struct Layout {
 class TriangleMesh {
       // for generated meshes, those transforms are copied from the Shape object.
       Transform _world2obj, _obj2world;
+      Layout _layout;
       uint32_t vertex_num = 0;
       // size in byte
       uint32_t vbuffer_size = 0;
@@ -102,18 +103,15 @@ class TriangleMesh {
       GLuint _vbo = 0; // vertex buffer object
       GLuint _ebo = 0; // element buffer object
       //  GLuint _normTexture = 0;  // normal buffer texture
-public:
-      //using Layout = std::vector<LayoutItem>;
 private:
-      Layout _layout;
+      
       GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* vbuffer, Layout l, uint32_t vb_size, uint32_t* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
-            : vertex_data(vbuffer), _layout(l), vbuffer_size(vb_size), 
+      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, uint32_t* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
+            : vertex_num(vertex_num), vertex_data(vbuffer), _layout(l), vbuffer_size(vertex_num*l.strip()), 
             index_data(index_data), face_num(faceNum), indexFormat(idxFormat) {
-            vertex_num = vb_size / _layout.strip();
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);

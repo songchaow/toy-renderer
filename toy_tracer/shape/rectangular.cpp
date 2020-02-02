@@ -24,7 +24,7 @@ std::vector<TriangleMesh*> Rectangular::GenMesh() const {
       }
       uint32_t* index_data = new uint32_t[6]{ 1, 0, 2, 1, 2, 3 };
       // obj2world!
-      TriangleMesh* ret = new TriangleMesh(vertex_data, layout, layout.strip() * 4, index_data, 2, GL_UNSIGNED_INT, Transform::Identity());
+      TriangleMesh* ret = new TriangleMesh(vertex_data, layout, 4, index_data, 2, GL_UNSIGNED_INT, Transform::Identity());
       return std::vector<TriangleMesh*>(1, ret);
 }
 

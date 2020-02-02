@@ -73,7 +73,7 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             }
             Transform obj2world(o2w[0][0], o2w[0][1], o2w[0][2], o2w[0][3], o2w[1][0], o2w[1][1], o2w[1][2], o2w[1][3],
                   o2w[2][0], o2w[2][1], o2w[2][2], o2w[2][3], o2w[3][0], o2w[3][1], o2w[3][2], o2w[3][3]);
-            TriangleMesh* tri_mesh = new TriangleMesh(raw_data, layout, curr_strip*vertex_count,
+            TriangleMesh* tri_mesh = new TriangleMesh(raw_data, layout, vertex_count,
                   idx_data, mesh->mNumFaces, GL_UNSIGNED_INT, obj2world);
             meshes.push_back(tri_mesh);
       }
@@ -151,4 +151,4 @@ static uint32_t screenMeshIndices[] = {
 };
 
 TriangleMesh TriangleMesh::screenMesh = TriangleMesh(screenVertex, std::vector<LayoutItem>{DEFAULT_POINT2F_LAYOUT, DEFAULT_TEXUV_LAYOUT},
-(DEFAULT_POINT2F_LAYOUT.strip + DEFAULT_TEXUV_LAYOUT.strip) * 4, screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());
+ 4, screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());
