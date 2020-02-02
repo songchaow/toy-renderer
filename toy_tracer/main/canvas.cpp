@@ -3,14 +3,17 @@
 #include "main/MainWindow.h"
 #include "main/uiwrapper.h"
 
-Canvas::Canvas() {
-      QWindow::resize(800, 800);
-      setSurfaceType(QWindow::OpenGLSurface); create();
-}
 
 Canvas::Canvas(int width, int height) {
       QWindow::resize(width, height);
-      setSurfaceType(QWindow::OpenGLSurface); create();
+      setSurfaceType(QWindow::OpenGLSurface);
+      QSurfaceFormat format;
+      format.setSamples(1);
+      format.setMajorVersion(3);
+      format.setMinorVersion(3);
+      format.setProfile(QSurfaceFormat::CoreProfile);
+      setFormat(format);
+      create();
 }
 
 void Canvas::mousePressEvent(QMouseEvent *ev) {

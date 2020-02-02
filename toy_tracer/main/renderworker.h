@@ -29,9 +29,12 @@ class RenderWorker : public QObject {
       CubeDepthMap* depthMap;
       GLuint depth_fbo = 0;
       // HDR Framebuffer
-      GLuint hdr_fbo = 0;
-      GLuint hdr_color_tex = 0;
-      GLuint hdr_depth_buf = 0;
+      GLuint ms_hdr_fbo = 0;
+      GLuint ms_hdr_color = 0;
+      GLuint ms_hdr_depth = 0;
+      GLuint hdr_fbo;
+      GLuint hdr_color;
+      GLuint hdr_depth; // not used now
 
       Skybox sky;
 

@@ -122,7 +122,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(vertex, 512, &len, infoLog);
                   infoLog[len] = 0;
-                  LOG(ERROR) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED:" << path << "\n" << infoLog << std::endl;
             }
       }
       else {
@@ -138,7 +138,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(geometry, 1024, &len, infoLog);
                   infoLog[len] = 0;
-                  LOG(ERROR) << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED" << path << '\n' << infoLog << std::endl;
             }
       }
       if(fragment_shader_code.size()>0) {
