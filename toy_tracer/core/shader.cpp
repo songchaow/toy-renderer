@@ -4,17 +4,17 @@
 #include <cassert>
 #include <map>
 
-static std::map<std::string, Shader> shaderStore;
-
-std::map<ShaderType, ShaderPath> shaderConfig = {
-//    Type              Vertex                  Geometry    Fragment
-      {PBR,             {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"}},
-      {DEPTH_MAP,       {"shader/vertex.glsl",  "",         "shader/depth.fs"}},
-      {SKY_BOX,         {"shader/skybox.vs",    "",         "shader/skybox.fs"}},
-      {HDR_TONE_MAP,    {"shader/posAndTex.vs", "",         "shader/hdr_tonemap.fs"}}
+//static std::map<std::string, Shader> shaderStore;
+Shader shaderStore[NUM_SHADER_TYPE];
+ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
+//    Vertex                  Geometry    Fragment
+      {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"},           // PBR
+      {"shader/vertex.glsl",  "",         "shader/depth.fs"},                 // DEPTH_MAP
+      {"shader/skybox.vs",    "",         "shader/skybox.fs"},                // SKY_BOX
+      {"shader/posAndTex.vs", "",         "shader/hdr_tonemap.fs"}            // HDR_TONE_MAP
 };
 
-Shader::Shader(const ShaderPath & path) {
+Shader::Shader(const ShaderPath & path) : path(path) {
       _complete = path.complete();
       if (path.vertex.size() > 0) {
             std::ifstream vertex_file;
@@ -75,7 +75,8 @@ Shader::Shader(const std::string & vertex_path, const std::string & fragment_pat
             LOG(ERROR) << "Read shader files failed." << std::endl;
             return;
       }
-      path = vertex_path + fragment_path;
+      path.vertex = vertex_path;
+      path.fragment = fragment_path;
       _complete = true;
 }
 
@@ -92,7 +93,7 @@ Shader::Shader(const std::string & vertex_path) {
             LOG(ERROR) << "Read shader files failed." << std::endl;
             return;
       }
-      path = vertex_path;
+      path.vertex = vertex_path;
       _complete = true;
 }
 
@@ -122,7 +123,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(vertex, 512, &len, infoLog);
                   infoLog[len] = 0;
-                  LOG(ERROR) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED:" << path << "\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::VERTEX::COMPILATION_FAILED:" << path.vertex << "\n" << infoLog << std::endl;
             }
       }
       else {
@@ -138,7 +139,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(geometry, 1024, &len, infoLog);
                   infoLog[len] = 0;
-                  LOG(ERROR) << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED" << path << '\n' << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED" << path.geometry << '\n' << infoLog << std::endl;
             }
       }
       if(fragment_shader_code.size()>0) {
@@ -150,7 +151,7 @@ void Shader::compileAndLink() {
             if (!success) {
                   glGetShaderInfoLog(fragment, 1024, &len, infoLog);
                   infoLog[len] = 0;
-                  LOG(ERROR) << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+                  LOG(ERROR) << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED" << path.fragment << "\n" << infoLog << std::endl;
             }
       }
       
@@ -263,7 +264,7 @@ void Shader::setUniformI(const std::string& name, const int val)
 }
 
 
-
+#if 0
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile) {
       std::string id = vertex_path + fragment_path;
       if (shaderStore.find(id) != shaderStore.end()) {
@@ -283,28 +284,22 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
             else return nullptr;
       }
 }
+#endif
 
 Shader* LoadShader(ShaderType t, bool compile) {
-      assert(shaderConfig.find(t) != shaderConfig.end());
-      std::string id = shaderConfig[t].vertex + shaderConfig[t].fragment;
-      if (shaderStore.find(id) != shaderStore.end()) {
-            return &shaderStore[id];
-      }
+      assert(t < NUM_SHADER_TYPE);
+      if (shaderStore[t].loaded())
+            return &shaderStore[t];
       else {
-            Shader s(shaderConfig[t].vertex, shaderConfig[t].fragment);
-            if (!s.complete())
+            shaderStore[t] = Shader(shaderConfig[t]);
+            if (!shaderStore[t].complete())
                   return nullptr;
             if (compile)
-                  s.compileAndLink();
-            if (s.loaded()) {
-                  shaderStore[id] = s;
-                  return &shaderStore[id];
+                  shaderStore[t].compileAndLink();
+            if (shaderStore[t].loaded()) {
+                  return &shaderStore[t];
             }
-            else return nullptr;
+            else
+                  return nullptr;
       }
-}
-
-Shader* GetDefaultShader() {
-      assert(shaderStore.find(std::string("shader/vertex.glsl") + std::string("shader/pbr_pixel.glsl")) != shaderStore.end());
-      return &shaderStore.at(std::string("shader/vertex.glsl") + std::string("shader/pbr_pixel.glsl"));
 }

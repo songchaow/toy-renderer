@@ -19,7 +19,7 @@ enum ShaderType {
 };
 
 class Shader {
-      std::string path;
+      ShaderPath path;
       std::string vertex_shader_code;
       std::string fragment_shader_code;
       std::string geo_shader_code;

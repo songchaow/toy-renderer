@@ -50,7 +50,6 @@ void RenderWorker::initialize() {
       glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
       glGenTextures(1, &ms_hdr_color);
       glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ms_hdr_color);
-      //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, NULL);
       glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, _canvas->width(), _canvas->height(), GL_TRUE);
       glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
