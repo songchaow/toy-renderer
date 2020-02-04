@@ -11,7 +11,9 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"},           // PBR
       {"shader/vertex.glsl",  "",         "shader/depth.fs"},                 // DEPTH_MAP
       {"shader/skybox.vs",    "",         "shader/skybox.fs"},                // SKY_BOX
-      {"shader/posAndTex.vs", "",         "shader/hdr_tonemap.fs"}            // HDR_TONE_MAP
+      {"shader/posAndTex.vs", "",         "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
+      {"shader/posAndTex.vs", "",         "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
+      {"shader/posAndTex.vs", "",         "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {

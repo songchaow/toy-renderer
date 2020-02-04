@@ -15,7 +15,9 @@ enum ShaderType {
       DEPTH_MAP,
       SKY_BOX,
       HDR_TONE_MAP,
-      NUM_SHADER_TYPE
+      GAUSSIAN_BLUR_H,
+      GAUSSIAN_BLUR_V,
+      NUM_SHADER_TYPE,
 };
 
 class Shader {

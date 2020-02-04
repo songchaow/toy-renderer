@@ -48,19 +48,25 @@ void RenderWorker::initialize() {
       // Multi-sample fbo
       glGenFramebuffers(1, &ms_hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
-      glGenTextures(1, &ms_hdr_color);
-      glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ms_hdr_color);
+      glGenRenderbuffers(1, &ms_hdr_color);
+      glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_color);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_RGBA16F, _canvas->width(), _canvas->height());
       glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, _canvas->width(), _canvas->height(), GL_TRUE);
       glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glGenRenderbuffers(1, &ms_hdr_emissive);
+      glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_emissive);
+      glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_RGBA16F, _canvas->width(), _canvas->height());
       glGenRenderbuffers(1, &ms_hdr_depth);
       
       glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_depth);
-      //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
       glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
       // attach them to a new fb
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, ms_hdr_color, 0);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ms_hdr_color);
+      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, ms_hdr_emissive);
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ms_hdr_depth);
+      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+      glDrawBuffers(2, draw_bufs);
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_MULTISAMPLE);
       GLenum res = glCheckFramebufferStatus(ms_hdr_fbo);
@@ -76,7 +82,15 @@ void RenderWorker::initialize() {
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, nullptr);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
+      glGenTextures(2, hdr_emissive);
+      for (int i = 0; i < 2; i++) {
+            glBindTexture(GL_TEXTURE_2D, hdr_emissive[i]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      }
+      // attachment1 is fixed
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
       // no depth buffer attached
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       depthMap = new CubeDepthMap();
@@ -211,16 +225,41 @@ void RenderWorker::renderLoop() {
             // render to ms frame buffer
             loopN++;
             glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClearDepth(1.0f);
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
             sky.draw();
             renderPassPBR();
             // blit to hdr frame buffer
+            // hdr_color, hdr_emissive[0]
             glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_hdr_fbo);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, hdr_fbo);
+            glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
+            glReadBuffer(GL_COLOR_ATTACHMENT1);
+            glDrawBuffer(GL_COLOR_ATTACHMENT1);
             glBlitFramebuffer(0, 0, _canvas->width(), _canvas->height(), 0, 0, _canvas->width(),
                   _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            glReadBuffer(GL_COLOR_ATTACHMENT0);
+            glDrawBuffer(GL_COLOR_ATTACHMENT0);
+            glBlitFramebuffer(0, 0, _canvas->width(), _canvas->height(), 0, 0, _canvas->width(),
+                  _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+            // Gaussian blur
+            TriangleMesh::screenMesh.glUse();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, hdr_emissive[0]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[1], 0);
+            Shader* blur = LoadShader(GAUSSIAN_BLUR_H, true);
+            blur->use();
+            blur->setUniformI("color", 0);
+            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+            glBindTexture(GL_TEXTURE_2D, hdr_emissive[1]);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[0], 0);
+            blur = LoadShader(GAUSSIAN_BLUR_V, true);
+            blur->use();
+            blur->setUniformI("color", 0);
+            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+
             // render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glClearDepth(1.0f);
@@ -229,9 +268,12 @@ void RenderWorker::renderLoop() {
             hdr->use();
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, hdr_color);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, hdr_emissive[0]);
             hdr->setUniformI("radiance", 0);
+            hdr->setUniformI("bloom", 1);
             hdr->setUniformF("explosure", 1.0);
-            TriangleMesh::screenMesh.glUse();
+            
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
             m_context->swapBuffers(_canvas);
       }

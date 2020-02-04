@@ -25,15 +25,27 @@ class RenderWorker : public QObject {
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
+#if 0
+      enum {
+            DEPTH_MAP,
+            MULTI_SAMPLE_HDR,
+            HDR,
+            NUM_FBO
+      };
+      static const int num_fbo = NUM_FBO;
+      GLuint fbo[NUM_FBO];
+#endif
       // Depth Map
       CubeDepthMap* depthMap;
       GLuint depth_fbo = 0;
       // HDR Framebuffer
       GLuint ms_hdr_fbo = 0;
       GLuint ms_hdr_color = 0;
+      GLuint ms_hdr_emissive = 0;
       GLuint ms_hdr_depth = 0;
       GLuint hdr_fbo;
       GLuint hdr_color;
+      GLuint hdr_emissive[2];
       GLuint hdr_depth; // not used now
 
       Skybox sky;

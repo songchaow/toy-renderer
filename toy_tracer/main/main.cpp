@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
             m.albedo_map = off_texture;
             m.metallic_map = specular;
             m.rough_map = roughness;
+            m.globalEmission() = RGBSpectrum(0.1,0.2,0.5);
       }
       Primitive* ball = new Primitive(new Sphere(1.2f), m, Translate(3.7f, -0.5f, 0.f));
       ball->GenMeshes();

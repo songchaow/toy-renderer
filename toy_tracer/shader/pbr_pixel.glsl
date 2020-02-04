@@ -1,5 +1,6 @@
 #version 330 core
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 EmitColor;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
@@ -158,10 +159,10 @@ void main()
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.03) * albedo * ao;
 
-    vec3 color = ambient + Lo + Le;
-    
+    vec3 color = ambient + Lo;
+
     FragColor = vec4(color, 1.0);
-    
+    EmitColor = vec4(Le, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
