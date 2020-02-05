@@ -20,8 +20,9 @@ INCLUDE_DIRECTORIES (
   ${CMAKE_CURRENT_SOURCE_DIR}/ext/std_image/include
   ${CMAKE_BINARY_DIR}/toy_tracer/ext/glog
 )
-message(STATUS "Binary dir: " ${CMAKE_BINARY_DIR})
-
+# rapidjson, and include explicitly
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/rapidjson-1.1.0)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/rapidjson-1.1.0/include)
 # image IO
 file(GLOB IMAGE_IO ext/std_image/include/*.h
   ext/std_image/src/*.cpp
