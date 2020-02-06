@@ -48,7 +48,8 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
                   //PBRMaterial_Ui new_Ui = PBRMaterial_Ui(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
                   Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
                   RenderWorker::Instance()->curr_primitive = pUi->m();
-                  pUi->setMaterialUi(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
+                  pUi->setMaterialUi(&static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial()[0]);
+                  // TODO: list all the materials
                   if (pUi->isValid() && pUi->materialUi().isValid()) {
                         pUi->materialUi().addProperties(materialWidget);
                   }

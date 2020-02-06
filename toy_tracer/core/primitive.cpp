@@ -28,29 +28,29 @@ void Primitive::load() {
             mesh->load();
       }
       // TODO: consider other types of RTMaterial
-      rt_m.load();
+      for (auto& m : rt_m)
+            m.load();
 }
 
 void Primitive::draw(Shader* shader) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
-
-      shader->setUniformF("globalEmission", rt_m.globalEmission()[0], rt_m.globalEmission()[1], rt_m.globalEmission()[2]);
-      
-      if (rt_m.albedo_map.isLoad()) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, rt_m.albedo_map.tbo());
-      }
-      if (rt_m.metallic_map.isLoad()) {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, rt_m.metallic_map.tbo());
-      }
-      if (rt_m.rough_map.isLoad()) {
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, rt_m.rough_map.tbo());
-      }
-      
-      for (auto& m : _meshes) {
+      for (int i = 0; i < _meshes.size(); i++) {
+            PBRMaterial& mtl = rt_m[i];
+            shader->setUniformF("globalEmission", mtl.globalEmission()[0], mtl.globalEmission()[1], mtl.globalEmission()[2]);
+            if (mtl.albedo_map.isLoad()) {
+                  glActiveTexture(GL_TEXTURE0);
+                  glBindTexture(GL_TEXTURE_2D, mtl.albedo_map.tbo());
+            }
+            if (mtl.metallic_map.isLoad()) {
+                  glActiveTexture(GL_TEXTURE1);
+                  glBindTexture(GL_TEXTURE_2D, mtl.metallic_map.tbo());
+            }
+            if (mtl.rough_map.isLoad()) {
+                  glActiveTexture(GL_TEXTURE2);
+                  glBindTexture(GL_TEXTURE_2D, mtl.rough_map.tbo());
+            }
+            auto& m = _meshes[i];
             glBindVertexArray(m->vao());
             shader->setUniformF("obj2world", _obj2world.getRowMajorData());
             // no need to bind the ebo again
@@ -59,4 +59,5 @@ void Primitive::draw(Shader* shader) {
             glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
             err = glGetError();
       }
+      
 }

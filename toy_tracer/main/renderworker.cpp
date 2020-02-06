@@ -142,8 +142,9 @@ void RenderWorker::renderPassPBR() {
       
       //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       for (auto &p : primitives) {
-            if (p->getPBRMaterial()->dirty())
-                  p->getPBRMaterial()->update();
+            for (auto& m : p->getPBRMaterial())
+                  if (m.dirty())
+                        m.update();
             p->draw(shader);
       }
 }

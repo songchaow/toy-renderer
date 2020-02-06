@@ -76,15 +76,24 @@ public:
       virtual Spectrum f(const Interaction& i) override;
       virtual bool isFlat() override { return surface->isFlatSurface(); }
 };
+enum AlphaMode {
+      OPACITY,
+      MASK,
+      BLEND
+};
 
 class PBRMaterial {
 public:
       ImageTexture albedo_map;
-      //ImageTexture* normal_map = nullptr; // use vertex's normal instead if nullptr
-      //ImageTexture* specular_map = nullptr; // replaced by metallic
       ImageTexture metallic_map;
       ImageTexture rough_map;
-
+      ImageTexture emissive_map;
+      ImageTexture normal_map;
+      RGBSpectrum albedoFactor = 1.f;
+      RGBSpectrum emissiveFactor = 1.f;
+      Float metallicFactor = 1.f;
+      Float roughFactor = 1.f;
+      AlphaMode alphaMode = OPACITY;
 protected:
       // TODO: seems _shader can be shared among multiple PBRMaterials
       volatile bool _dirty; // need to update some of those `tbo`s.

@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
                         ledUnit->obj2world() = SRT::fromTranslation(startPoint.x + i*BALL_DISTANCE, startPoint.y + j*BALL_DISTANCE, startPoint.z + k*BALL_DISTANCE);
                         RenderWorker::Instance()->loadObject(ledUnit);
                         if (i + j + k == 15)
-                              ledUnit->getPBRMaterial()->globalEmission() = RGBSpectrum(0.2f, 0.25f, 0.01f);
+                              ledUnit->getPBRMaterial()[0].globalEmission() = RGBSpectrum(0.2f, 0.25f, 0.01f);
                   }
             }
       }

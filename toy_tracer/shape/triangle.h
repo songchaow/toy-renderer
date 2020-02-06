@@ -99,6 +99,7 @@ class TriangleMesh {
       void* vertex_data = nullptr;
       uint32_t face_num = 0;
       uint32_t* index_data = nullptr;
+      GLuint primitiveMode = GL_TRIANGLES;
       GLuint _vao = 0; // vertex array object
       GLuint _vbo = 0; // vertex buffer object
       GLuint _ebo = 0; // element buffer object
