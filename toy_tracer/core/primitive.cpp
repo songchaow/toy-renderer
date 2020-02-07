@@ -42,13 +42,9 @@ void Primitive::draw(Shader* shader) {
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, mtl.albedo_map.tbo());
             }
-            if (mtl.metallic_map.isLoad()) {
+            if (mtl.metallicRoughnessMap.isLoad()) {
                   glActiveTexture(GL_TEXTURE1);
-                  glBindTexture(GL_TEXTURE_2D, mtl.metallic_map.tbo());
-            }
-            if (mtl.rough_map.isLoad()) {
-                  glActiveTexture(GL_TEXTURE2);
-                  glBindTexture(GL_TEXTURE_2D, mtl.rough_map.tbo());
+                  glBindTexture(GL_TEXTURE_2D, mtl.metallicRoughnessMap.tbo());
             }
             auto& m = _meshes[i];
             glBindVertexArray(m->vao());
@@ -56,7 +52,7 @@ void Primitive::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             GLenum err = glGetError();
-            glDrawElements(GL_TRIANGLES, 3 * m->face_count(), GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, 3 * m->face_count(), m->indexElementT(), 0);
             err = glGetError();
       }
       

@@ -10,9 +10,7 @@ void PBRMaterial_Ui::updateProperties() {
       if (!albedo_text->text().isEmpty())
             _m->albedo_map.resetImage(albedo_text->text().toStdString());
       if (!metallic_text->text().isEmpty())
-            _m->metallic_map.resetImage(metallic_text->text().toStdString());
-      if (!rough_text->text().isEmpty())
-            _m->rough_map.resetImage(rough_text->text().toStdString());
+            _m->metallicRoughnessMap.resetImage(metallic_text->text().toStdString());
       _m->setDirty();
 }
 

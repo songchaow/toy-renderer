@@ -9,8 +9,7 @@ in float depth[POINT_LIGHT_NUM];
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
-uniform sampler2D metallicSampler; // float
-uniform sampler2D roughnessSampler; // float
+uniform sampler2D mrSampler; // g: roughness value | b: metalness
 uniform sampler2D emissionSampler; // vec3
 uniform sampler2D aoSampler;
 uniform samplerCube depthSampler;
@@ -143,8 +142,8 @@ void main()
 
     
     vec3 albedo = vec3(texture(albedoSampler, TexCoord));
-    float metallic = texture(metallicSampler, TexCoord).r;
-    float roughness = texture(roughnessSampler, TexCoord).r;
+    float metallic = texture(mrSampler, TexCoord).b;
+    float roughness = texture(mrSampler, TexCoord).g;
     float ao = texture(aoSampler, TexCoord).r;
     // ao is invalid now, so use 1 instead
     ao = 1;
@@ -160,7 +159,7 @@ void main()
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = ambient + Lo;
-
+    color = albedo;
     FragColor = vec4(color, 1.0);
     EmitColor = vec4(Le, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);

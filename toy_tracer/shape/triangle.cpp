@@ -74,7 +74,7 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             Transform obj2world(o2w[0][0], o2w[0][1], o2w[0][2], o2w[0][3], o2w[1][0], o2w[1][1], o2w[1][2], o2w[1][3],
                   o2w[2][0], o2w[2][1], o2w[2][2], o2w[2][3], o2w[3][0], o2w[3][1], o2w[3][2], o2w[3][3]);
             TriangleMesh* tri_mesh = new TriangleMesh(raw_data, layout, vertex_count,
-                  idx_data, mesh->mNumFaces, GL_UNSIGNED_INT, obj2world);
+                  (char*)idx_data, mesh->mNumFaces, GL_UNSIGNED_INT, obj2world);
             meshes.push_back(tri_mesh);
       }
       for (int i = 0; i < node->mNumChildren; i++) {
@@ -114,8 +114,8 @@ void TriangleMesh::load() {
       // ebo
       glGenBuffers(1, &_ebo);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-      // each int32_t contains 4 bytes
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3 * face_num, index_data, GL_STATIC_DRAW);
+      uint32_t res = indexElementSize * 3 * face_num;
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexElementSize * 3 * face_num, index_data, GL_STATIC_DRAW);
       // configure vertex pointers (stored in vao)
       for (int i = 0; i < _layout.size(); i++) {
             auto& l = _layout[i];
@@ -151,4 +151,4 @@ static uint32_t screenMeshIndices[] = {
 };
 
 TriangleMesh TriangleMesh::screenMesh = TriangleMesh(screenVertex, std::vector<LayoutItem>{DEFAULT_POINT2F_LAYOUT, DEFAULT_TEXUV_LAYOUT},
- 4, screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());
+ 4, (char*)screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());

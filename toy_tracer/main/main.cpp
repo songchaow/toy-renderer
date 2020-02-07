@@ -5,6 +5,7 @@
 #include "shape/rectangular.h"
 #include "main/renderworker.h"
 #include "main/ResourceManager.h"
+#include "core/glTFLoader.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -28,14 +29,8 @@ int main(int argc, char *argv[])
       worker->moveToThread(&workerThread);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
-
-      // Create scene objects here
-      /*std::vector<std::string> skybox_paths;
-      for (auto& i : Skybox::default_files) {
-            skybox_paths.push_back(Skybox::default_path + '/' + i);
-      }
-      worker->skybox().map.loadImage(skybox_paths);*/
       worker->skybox().loadSkybox();
+#if 0
       // create albedo texture for balls
       Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
       Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
@@ -50,7 +45,7 @@ int main(int argc, char *argv[])
             m.albedo_map = off_texture;
             m.metallic_map = specular;
             m.rough_map = roughness;
-            m.globalEmission() = RGBSpectrum(0.1,0.2,0.5);
+            m.globalEmission() = RGBSpectrum(0.1, 0.2, 0.5);
       }
       Primitive* ball = new Primitive(new Sphere(1.2f), m, Translate(3.7f, -0.5f, 0.f));
       ball->GenMeshes();
@@ -65,8 +60,12 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadObject(ball2);
       RenderWorker::Instance()->loadObject(rect);
       RenderWorker::Instance()->loadPointLight(l);
-
-
+#endif
+      std::vector<Primitive*> glTFPrimitives;
+      glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
+      //glTFPrimitives[0]->getPBRMaterial()[0].albedo_map = ImageTexture(on_color);
+      RenderWorker::Instance()->loadObject(glTFPrimitives[0]);
       workerThread.start();
       a.exec();
 	return 0;

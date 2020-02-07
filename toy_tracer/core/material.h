@@ -85,8 +85,7 @@ enum AlphaMode {
 class PBRMaterial {
 public:
       ImageTexture albedo_map;
-      ImageTexture metallic_map;
-      ImageTexture rough_map;
+      ImageTexture metallicRoughnessMap;
       ImageTexture emissive_map;
       ImageTexture normal_map;
       RGBSpectrum albedoFactor = 1.f;

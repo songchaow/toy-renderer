@@ -93,35 +93,47 @@ class TriangleMesh {
       // for generated meshes, those transforms are copied from the Shape object.
       Transform _world2obj, _obj2world;
       Layout _layout;
+      LayoutItem _indexLayout;
       uint32_t vertex_num = 0;
       // size in byte
       uint32_t vbuffer_size = 0;
       void* vertex_data = nullptr;
       uint32_t face_num = 0;
-      uint32_t* index_data = nullptr;
+      char* index_data = nullptr;
       GLuint primitiveMode = GL_TRIANGLES;
       GLuint _vao = 0; // vertex array object
       GLuint _vbo = 0; // vertex buffer object
       GLuint _ebo = 0; // element buffer object
       //  GLuint _normTexture = 0;  // normal buffer texture
 private:
-      
+      uint8_t indexElementSize = 0;
       GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, uint32_t* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
+      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
             : vertex_num(vertex_num), vertex_data(vbuffer), _layout(l), vbuffer_size(vertex_num*l.strip()), 
             index_data(index_data), face_num(faceNum), indexFormat(idxFormat) {
+            switch (indexFormat) {
+            case GL_INT:
+            case GL_UNSIGNED_INT:
+                  indexElementSize = 4; break;
+            case GL_SHORT:
+            case GL_UNSIGNED_SHORT:
+                  indexElementSize = 2; break;
+            case GL_UNSIGNED_BYTE:
+            case GL_BYTE:
+                  indexElementSize = 1; break;
+            }
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);
       }
       TriangleMesh(const TriangleMesh& t) : _world2obj(t._world2obj), _obj2world(t._obj2world), vertex_num(t.vertex_num),
-      vbuffer_size(t.vbuffer_size), face_num(t.face_num), _layout(t._layout), indexFormat(t.indexFormat) {
+      vbuffer_size(t.vbuffer_size), face_num(t.face_num), _layout(t._layout), indexFormat(t.indexFormat), primitiveMode(t.primitiveMode) {
             vertex_data = new char[vbuffer_size];
             std::memcpy(vertex_data, t.vertex_data, vbuffer_size);
-            index_data = new uint32_t[3 * face_num];
+            index_data = new char[3 * face_num * indexElementSize];
             std::memcpy(index_data, t.index_data, 3 * sizeof(uint32_t) * face_num);
       }
       void load();
@@ -136,11 +148,13 @@ public:
       const Transform& obj2world() const { return _obj2world; }
       const Transform& world2obj() const { return _world2obj; }
       const Layout& layout() const { return _layout; }
+      uint8_t sizeofIndexElement() const { return indexElementSize; }
+      GLenum indexElementT() const { return indexFormat; }
       ~TriangleMesh() { 
             if (vertex_data) delete[](char*)vertex_data; 
             if (index_data) delete[](char*)index_data;
       }
-      const uint32_t* face_triangle(int faceIdx) const { return index_data + faceIdx * 3; }
+      const char* face_triangle(int faceIdx) const { return index_data + faceIdx * 3 * indexElementSize; }
       static TriangleMesh screenMesh;
 };
 

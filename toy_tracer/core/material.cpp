@@ -213,18 +213,14 @@ void PBRMaterial::load() {
       // TODO: use a const texture as the fallback if there're null pointers
       if(albedo_map.ready2Load())
             albedo_map.load();
-      if (metallic_map.ready2Load())
-            metallic_map.load();
-      if (rough_map.ready2Load())
-            rough_map.load();
+      if (metallicRoughnessMap.ready2Load())
+            metallicRoughnessMap.load();
 }
 
 void PBRMaterial::update() {
       if (albedo_map.ready2Load())
             albedo_map.update();
-      if (metallic_map.ready2Load())
-            metallic_map.update();
-      if (rough_map.ready2Load())
-            rough_map.update();
+      if (metallicRoughnessMap.ready2Load())
+            metallicRoughnessMap.update();
       _dirty = false;
 }

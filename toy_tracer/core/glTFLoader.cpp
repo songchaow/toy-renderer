@@ -16,9 +16,16 @@ using namespace rapidjson;
 void layoutFromAccessor(LayoutItem& l, const Value& accessor, const Value& bufferViews, std::vector<char*>& buffers) {
       l.offset = 0;
       const Value& bufferView = bufferViews[accessor["bufferView"].GetUint()];
-      uint32_t offset = accessor["byteOffset"].GetUint() + bufferView["byteOffset"].GetUint();
+      uint32_t bufferVOffset = 0, accessorOffset = 0;
+      auto it = bufferView.FindMember("byteOffset");
+      if (it != bufferView.MemberEnd())
+            bufferVOffset = it->value.GetUint();
+      it = accessor.FindMember("byteOffset");
+      if (it != accessor.MemberEnd())
+            accessorOffset = it->value.GetUint();
+      uint32_t offset = bufferVOffset + accessorOffset;
       l.data_ptr = buffers[bufferView["buffer"].GetUint()] + offset;
-      auto it = accessor.FindMember("normalized");
+      it = accessor.FindMember("normalized");
       if (it != accessor.MemberEnd())
             l.normalized = it->value.GetBool() ? GL_TRUE : GL_FALSE;
       uint32_t eType = accessor["componentType"].GetUint();
@@ -42,6 +49,8 @@ void layoutFromAccessor(LayoutItem& l, const Value& accessor, const Value& buffe
       case ElementType::UNSIGNED_SHORT:
             l.e_size = 2;
             l.e_format = GL_UNSIGNED_SHORT; break;
+      default:
+            break;
       }
             
 
@@ -108,7 +117,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       std::string dir;
       int dirStart = path.find_last_of('/');
       if (dirStart != std::string::npos && dirStart < path.size() - 1)
-            dir = path.substr(dirStart + 1);
+            //dir = path.substr(dirStart + 1);
+      dir = path.substr(0, dirStart);
       std::string gltfFileStr;
       std::stringstream gltfFileStream;
       std::ifstream gltfFile(path);
@@ -121,7 +131,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       const Value& buffers_json = d["buffers"];
       std::vector<char*> buffer_array(buffers_json.Size());
       for (int i = 0; i < buffers_json.Size(); i++) {
-            std::ifstream fbuffer(buffers_json[i]["uri"].GetString(), std::ios_base::binary);
+            std::ifstream fbuffer(dir + '/' + buffers_json[i]["uri"].GetString(), std::ios_base::binary);
+            bool ok = fbuffer.is_open();
             uint32_t byteLength = buffers_json[i]["byteLength"].GetUint();
             char* bin_data = new char[byteLength];
             fbuffer.read(bin_data, byteLength);
@@ -138,7 +149,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   int img_idx = texture_json[i]["source"].GetUint();
                   std::string img_path(d["images"][img_idx]["uri"].GetString());
                   img_path = dir + '/' + img_path;
-                  textures.emplace_back(img_path);
+                  Image* img = new Image(img_path, Image::RGBSpectrum, false);
+                  textures.emplace_back(img);
                   // TODO: read texture.sampler
             }
       }
@@ -147,8 +159,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       {
             const Value& materials_json = d["materials"];
             assert(materials_json.IsArray());
-            PBRMaterial m;
             for (int i = 0; i < materials_json.Size(); i++) {
+                  PBRMaterial m;
                   const Value& material_js = materials_json[i];
                   if (material_js.FindMember("pbrMetallicRoughness") == material_js.MemberEnd())
                         continue;
@@ -163,7 +175,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   if (it != pbr_js.MemberEnd()) {
                         m.metallicFactor = it->value.GetFloat();
                   }
-                  it = pbr_js.FindMember("baseColorFactor");
+                  it = pbr_js.FindMember("roughnessFactor");
                   if (it != pbr_js.MemberEnd()) {
                         m.roughFactor = it->value.GetFloat();
                   }
@@ -179,8 +191,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   }
                   it = pbr_js.FindMember("metallicRoughnessTexture");
                   if (it != pbr_js.MemberEnd()) {
-                        m.metallic_map = textures[it->value["index"].GetUint()];
-                        m.rough_map = m.metallic_map;
+                        m.metallicRoughnessMap = textures[it->value["index"].GetUint()];
                   }
                   it = pbr_js.FindMember("emissiveTexture");
                   if (it != pbr_js.MemberEnd()) {
@@ -199,10 +210,12 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                         else if (std::string("BLEND") == it->value.GetString())
                               m.alphaMode = BLEND;
                   }
+                  materials.push_back(m);
             }
       }
       // nodes
-      const Value& nodes_array = d["scenes"]["nodes"];
+      // only the first scene is parsed
+      const Value& nodes_array = d["scenes"][0]["nodes"];
       const Value& nodes = d["nodes"];
       const Value& glTFmeshes = d["meshes"];
       const Value& accessors = d["accessors"];
@@ -218,21 +231,25 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
             for (int j = 0; j < p_meshes.Size(); j++) {
                   const Value& mesh = p_meshes[j];
                   rtms.push_back(materials[mesh["material"].GetUint()]);
-                  GLint primitive_mode = mesh["mode"].GetUint();
+                  auto it = mesh.FindMember("mode");
+                  GLenum primitive_mode = GL_TRIANGLES;
+                  if(it != mesh.MemberEnd())
+                        primitive_mode = mesh["mode"].GetUint();
                   // index
                   const Value& index_accessor = accessors[mesh["indices"].GetUint()];
                   uint32_t indexNum = index_accessor["count"].GetUint();
-                  const Value& index_bufferView = bufferViews[index_accessor["bufferView"]];
-                  char* index_data = buffer_array[index_bufferView["buffer"].GetUint()]
-                        + index_bufferView["byteOffset"].GetUint()
-                        + index_accessor["byteOffset"].GetUint();
-                  GLint indexElementT = index_accessor["componentType"].GetUint();
+                  const Value& index_bufferView = bufferViews[index_accessor["bufferView"].GetUint()];
+                  LayoutItem indexLayout;
+                  layoutFromAccessor(indexLayout, index_accessor, bufferViews, buffer_array);
+                  char* index_data = new char[indexLayout.e_size*indexLayout.e_count*indexNum];
+                  // here we assume the index data is compact
+                  std::memcpy(index_data, indexLayout.data_ptr, indexLayout.e_size*indexLayout.e_count*indexNum);
+                  GLenum indexElementT = index_accessor["componentType"].GetUint();
                   // construct vertex buffer layout
                   Layout vbLayout;
                   uint32_t vertexNum;
                   char* vertex_data = collectVertexAttributes(mesh["attributes"], accessors, bufferViews, buffer_array, vbLayout, vertexNum);
-                  // here we assume the index data is compact
-                  meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, (uint32_t*)index_data, indexNum / 3, indexElementT, Transform::Identity()));
+                  meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform::Identity()));
             }
             Primitive* p = new Primitive(rtms, meshes);
             primitives.push_back(p);

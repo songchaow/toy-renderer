@@ -1,7 +1,9 @@
 #pragma once
 #include "glad/glad.h"
+#include "core/primitive.h"
 #include <string>
 #include <cctype>
+#include <vector>
 
 // buffer
 struct glTFBufferFile {
@@ -47,4 +49,6 @@ struct glTFSampler {
 struct glTFMaterial {
 
 };
+
+std::vector<Primitive*> LoadGLTF(std::string path);
 

@@ -7,7 +7,7 @@
 void GenFaceNormal(const TriangleMesh& mesh) {
       std::vector<Normal3f> normals;
       for (int facei = 0; facei < mesh.face_count(); facei++) {
-            const uint32_t* idx_array = mesh.face_triangle(facei);
+            const char* idx_array = mesh.face_triangle(facei);
 
             Vector3f v1;
       }
