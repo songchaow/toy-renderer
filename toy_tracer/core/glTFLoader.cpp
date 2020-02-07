@@ -179,11 +179,6 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   if (it != pbr_js.MemberEnd()) {
                         m.roughFactor = it->value.GetFloat();
                   }
-                  it = pbr_js.FindMember("emissiveFactor");
-                  if (it != pbr_js.MemberEnd()) {
-                        for (int j = 0; j < 3; j++)
-                              m.emissiveFactor.rgb[j] = it->value[j].GetFloat();
-                  }
                   // textures
                   it = pbr_js.FindMember("baseColorTexture");
                   if (it != pbr_js.MemberEnd()) {
@@ -193,9 +188,14 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   if (it != pbr_js.MemberEnd()) {
                         m.metallicRoughnessMap = textures[it->value["index"].GetUint()];
                   }
-                  it = pbr_js.FindMember("emissiveTexture");
-                  if (it != pbr_js.MemberEnd()) {
+                  it = material_js.FindMember("emissiveTexture");
+                  if (it != material_js.MemberEnd()) {
                         m.emissive_map = textures[it->value["index"].GetUint()];
+                  }
+                  it = material_js.FindMember("emissiveFactor");
+                  if (it != material_js.MemberEnd()) {
+                        for (int j = 0; j < 3; j++)
+                              m.emissiveFactor.rgb[j] = it->value[j].GetFloat();
                   }
                   it = material_js.FindMember("normalTexture");
                   if (it != material_js.MemberEnd()) {

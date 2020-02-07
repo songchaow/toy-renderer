@@ -46,6 +46,14 @@ void Primitive::draw(Shader* shader) {
                   glActiveTexture(GL_TEXTURE1);
                   glBindTexture(GL_TEXTURE_2D, mtl.metallicRoughnessMap.tbo());
             }
+            if (mtl.normal_map.isLoad()) {
+                  glActiveTexture(GL_TEXTURE2);
+                  glBindTexture(GL_TEXTURE_2D, mtl.normal_map.tbo());
+            }
+            if (mtl.emissive_map.isLoad()) {
+                  glActiveTexture(GL_TEXTURE3);
+                  glBindTexture(GL_TEXTURE_2D, mtl.emissive_map.tbo());
+            }
             auto& m = _meshes[i];
             glBindVertexArray(m->vao());
             shader->setUniformF("obj2world", _obj2world.getRowMajorData());

@@ -11,6 +11,7 @@ in float depth[POINT_LIGHT_NUM];
 uniform sampler2D albedoSampler; // vec3
 uniform sampler2D mrSampler; // g: roughness value | b: metalness
 uniform sampler2D emissionSampler; // vec3
+uniform sampler2D normalSampler; // initially 0-1
 uniform sampler2D aoSampler;
 uniform samplerCube depthSampler;
 uniform float far;
@@ -137,7 +138,8 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
 
 void main()
 {		
-    vec3 N = normalize(normalWorld);
+    vec3 N = vec3(texture(normalSampler, TexCoord));
+    N = normalize(2*N+vec3(-1.0));
     vec3 V = normalize(camPos - posWorld);
 
     
@@ -158,8 +160,7 @@ void main()
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.03) * albedo * ao;
 
-    vec3 color = ambient + Lo;
-    color = albedo;
+    vec3 color = ambient + Lo + Le;
     FragColor = vec4(color, 1.0);
     EmitColor = vec4(Le, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);

@@ -215,6 +215,10 @@ void PBRMaterial::load() {
             albedo_map.load();
       if (metallicRoughnessMap.ready2Load())
             metallicRoughnessMap.load();
+      if (normal_map.ready2Load())
+            normal_map.load();
+      if (emissive_map.ready2Load())
+            emissive_map.load();
 }
 
 void PBRMaterial::update() {
@@ -222,5 +226,9 @@ void PBRMaterial::update() {
             albedo_map.update();
       if (metallicRoughnessMap.ready2Load())
             metallicRoughnessMap.update();
+      if (normal_map.ready2Load())
+            normal_map.load();
+      if (emissive_map.ready2Load())
+            emissive_map.load();
       _dirty = false;
 }

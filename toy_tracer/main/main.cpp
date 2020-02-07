@@ -64,8 +64,11 @@ int main(int argc, char *argv[])
       std::vector<Primitive*> glTFPrimitives;
       glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
-      //glTFPrimitives[0]->getPBRMaterial()[0].albedo_map = ImageTexture(on_color);
+      PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, 5.f));
+      PointLight* l2 = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, -5.f));
       RenderWorker::Instance()->loadObject(glTFPrimitives[0]);
+      RenderWorker::Instance()->loadPointLight(l);
+      RenderWorker::Instance()->loadPointLight(l2);
       workerThread.start();
       a.exec();
 	return 0;

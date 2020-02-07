@@ -125,13 +125,14 @@ void RenderWorker::renderPassPBR() {
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->HalfAngle());
       // point shadow
-      glActiveTexture(GL_TEXTURE4);
+      glActiveTexture(GL_TEXTURE5);
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap->cubeMapObj);
       shader->setUniformI("albedoSampler", 0);
       shader->setUniformI("mrSampler", 1);
-      shader->setUniformI("emissionSampler", 2);
-      shader->setUniformI("aoSampler", 3);
-      shader->setUniformI("depthSampler", 4);
+      shader->setUniformI("normalSampler", 2);
+      shader->setUniformI("emissionSampler", 3);
+      shader->setUniformI("aoSampler", 4);
+      shader->setUniformI("depthSampler", 5);
       // set camera
       
       shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
