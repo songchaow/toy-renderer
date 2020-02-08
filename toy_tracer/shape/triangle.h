@@ -100,7 +100,7 @@ class TriangleMesh {
       void* vertex_data = nullptr;
       uint32_t face_num = 0;
       char* index_data = nullptr;
-      GLuint primitiveMode = GL_TRIANGLES;
+      GLuint _primitiveMode = GL_TRIANGLES;
       GLuint _vao = 0; // vertex array object
       GLuint _vbo = 0; // vertex buffer object
       GLuint _ebo = 0; // element buffer object
@@ -111,9 +111,9 @@ private:
 public:
 
       TriangleMesh() = default;
-      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
-            : vertex_num(vertex_num), vertex_data(vbuffer), _layout(l), vbuffer_size(vertex_num*l.strip()), 
-            index_data(index_data), face_num(faceNum), indexFormat(idxFormat) {
+      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world, GLenum primMode)
+            : vertex_num(vertex_num), vertex_data(vbuffer), _layout(l), vbuffer_size(vertex_num*l.strip()),
+            index_data(index_data), face_num(faceNum), indexFormat(idxFormat), _primitiveMode(primMode) {
             switch (indexFormat) {
             case GL_INT:
             case GL_UNSIGNED_INT:
@@ -129,8 +129,10 @@ public:
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);
       }
+      TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
+            : TriangleMesh(vbuffer, l, vertex_num, index_data, faceNum, idxFormat, obj2world, GL_TRIANGLES) {}
       TriangleMesh(const TriangleMesh& t) : _world2obj(t._world2obj), _obj2world(t._obj2world), vertex_num(t.vertex_num),
-      vbuffer_size(t.vbuffer_size), face_num(t.face_num), _layout(t._layout), indexFormat(t.indexFormat), primitiveMode(t.primitiveMode) {
+      vbuffer_size(t.vbuffer_size), face_num(t.face_num), _layout(t._layout), indexFormat(t.indexFormat), _primitiveMode(t._primitiveMode) {
             vertex_data = new char[vbuffer_size];
             std::memcpy(vertex_data, t.vertex_data, vbuffer_size);
             index_data = new char[3 * face_num * indexElementSize];
@@ -150,6 +152,7 @@ public:
       const Layout& layout() const { return _layout; }
       uint8_t sizeofIndexElement() const { return indexElementSize; }
       GLenum indexElementT() const { return indexFormat; }
+      GLenum primitiveMode() const { return _primitiveMode; }
       ~TriangleMesh() { 
             if (vertex_data) delete[](char*)vertex_data; 
             if (index_data) delete[](char*)index_data;

@@ -62,12 +62,13 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadPointLight(l);
 #endif
       std::vector<Primitive*> glTFPrimitives;
-      glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
       Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
-      PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, 5.f));
-      PointLight* l2 = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, -5.f));
+      //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
+      PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
       RenderWorker::Instance()->loadObject(glTFPrimitives[0]);
-      RenderWorker::Instance()->loadPointLight(l);
+      //RenderWorker::Instance()->loadPointLight(l);
       RenderWorker::Instance()->loadPointLight(l2);
       workerThread.start();
       a.exec();

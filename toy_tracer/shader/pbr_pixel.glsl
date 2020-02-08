@@ -86,14 +86,14 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
-    for(int i = 0; i < 1; i++)
+    for(int i = 0; i < POINT_LIGHT_NUM; i++)
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L = normalize(Lraw);
         float distance = depth[i];
         float maxDepth = texture(depthSampler, -Lraw).r;
         maxDepth *= far;
-        if(maxDepth < distance - 0.15) {
+        if(i==0 && maxDepth < distance - 0.15) {
             // occluded
             // debug
             //Lo += vec3(maxDepth/far);
@@ -140,6 +140,7 @@ void main()
 {		
     vec3 N = vec3(texture(normalSampler, TexCoord));
     N = normalize(2*N+vec3(-1.0));
+    N = normalize(normalWorld);
     vec3 V = normalize(camPos - posWorld);
 
     

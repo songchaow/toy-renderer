@@ -38,5 +38,6 @@ void main()
       TexCoord = texCoord;
       ver_color = pColor;
       normalWorld = vec3(transpose(inverse(obj2world)) * vec4(normalLocal,0));
-      depth[0] = length(pointLights[0].pos - posWorld);
+      for(int i=0;i<POINT_LIGHT_NUM;i++)
+        depth[i] = length(pointLights[i].pos - posWorld);
 }

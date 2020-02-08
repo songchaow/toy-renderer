@@ -249,7 +249,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   Layout vbLayout;
                   uint32_t vertexNum;
                   char* vertex_data = collectVertexAttributes(mesh["attributes"], accessors, bufferViews, buffer_array, vbLayout, vertexNum);
-                  meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform::Identity()));
+                  meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform::Identity(), primitive_mode));
             }
             Primitive* p = new Primitive(rtms, meshes);
             primitives.push_back(p);
