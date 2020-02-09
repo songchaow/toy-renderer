@@ -90,7 +90,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L = normalize(Lraw);
-        float distance = depth[i];
+        float distance = length(pointLights[i].pos - posWorld);
         float maxDepth = texture(depthSampler, -Lraw).r;
         maxDepth *= far;
         if(i==0 && maxDepth < distance - 0.15) {

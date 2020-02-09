@@ -26,7 +26,6 @@ out vec3 ver_color; // deprecated
 out vec2 TexCoord;
 out vec3 posWorld;
 out vec3 normalWorld;
-out float depth[POINT_LIGHT_NUM];
 
 
 
@@ -38,6 +37,4 @@ void main()
       TexCoord = texCoord;
       ver_color = pColor;
       normalWorld = vec3(transpose(inverse(obj2world)) * vec4(normalLocal,0));
-      for(int i=0;i<POINT_LIGHT_NUM;i++)
-        depth[i] = length(pointLights[i].pos - posWorld);
 }

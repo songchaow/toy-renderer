@@ -12,6 +12,7 @@ class Point3f_Ui : public QObject {
       mutable QLineEdit* posY;
       mutable QLineEdit* posZ;
 public:
+      Point3f_Ui(Point3f* m) : _m(m) {}
       void addProperties(QWidget* parent) const;
       void reset(Point3f* _mIn) { _m = _mIn; }
 public slots:
@@ -105,9 +106,12 @@ class PointLight_Ui : public RendererObject {
       PointLight* _m = nullptr;
       // Child UI
       mutable Point3f_Ui _pos;
+      mutable RGB_Spectrum_Ui _rgb;
 public:
       void addProperties(QWidget * parent) const override;
-      PointLight_Ui(PointLight* l) : _m(l), RendererObject(TypeID::Light) {}
+      PointLight_Ui(PointLight* l) : _m(l), _pos(&l->rpos()), _rgb(&l->rradiance()), RendererObject(TypeID::Light) {}
       void reset(PointLight* _mIn) { _m = _mIn; }
       PointLight* m() const { return _m; }
 };
+
+void addDefaultProperties(QWidget* parent);

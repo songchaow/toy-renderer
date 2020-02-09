@@ -109,23 +109,6 @@ void RendererObject::addNumberi(QString desc, int* value_ptr, QWidget* target) {
 }
 
 void RendererObject::addProperties(QWidget* parent) const {
-      // set global layout
-      QVBoxLayout* globalLayout = new QVBoxLayout;
-      if (parent->layout()) {
-            // Delete all existing widgets, if any.
-            if (parent->layout() != NULL)
-            {
-                  QLayoutItem* item;
-                  while ((item = parent->layout()->takeAt(0)) != NULL)
-                  {
-                        delete item->widget();
-                        delete item;
-                  }
-                  delete parent->layout();
-            }
-            delete parent->layout();
-      }
-      parent->setLayout(globalLayout);
       QGroupBox* roGroup = new QGroupBox("Object");
       // set current widget's layout
       QVBoxLayout* currentLayout = new QVBoxLayout;

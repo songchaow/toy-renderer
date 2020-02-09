@@ -1,10 +1,12 @@
 #include "main/uiwrapper.h"
-
+#include "main/renderworker.h"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QGroupBox>
 #include <QDebug>
 #include <QLabel>
+#include <QCheckBox>
+#include <QRadioButton>
 
 void PBRMaterial_Ui::updateProperties() {
       if (!albedo_text->text().isEmpty())
@@ -17,7 +19,6 @@ void PBRMaterial_Ui::updateProperties() {
 void PBRMaterial_Ui::addProperties(QWidget* parent) const {
       //RendererObject::addProperties(parent);
       // TODO: add existing values
-      qDebug() << "PBRMaterial thread affinity:" << thread();
       QVBoxLayout* globalLayout = new QVBoxLayout;
       if (parent->layout()) {
             // Delete all existing widgets, if any.
@@ -53,7 +54,7 @@ void Primitive_Ui::addProperties(QWidget* parent) const {
       addConstText("Mesh Faces:", QString::number(_m->meshes().size()), primitive_group);
       // add sub toolbars for child items
       QGroupBox* shapeToolBox = new QGroupBox("Shape");
-      shape.reset(_m->shape());
+      //shape.reset(_m->shape());
       if(shape.isValid()) {
             shape.addProperties(shapeToolBox);
       }
@@ -66,8 +67,8 @@ void PointLight_Ui::addProperties(QWidget * parent) const {
       QGroupBox* pl_group = new QGroupBox("Point Light");
       QVBoxLayout* currentLayout = new QVBoxLayout;
       pl_group->setLayout(currentLayout);
-      _pos.reset(&_m->rpos());
       _pos.addProperties(pl_group);
+      _rgb.addProperties(pl_group);
       parent->layout()->addWidget(pl_group);
 }
 
@@ -185,4 +186,34 @@ void Point3f_Ui::addProperties(QWidget * parent) const
       QObject::connect(posX, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
       QObject::connect(posY, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
       QObject::connect(posZ, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
+}
+
+static void updateCameraSpeed(Float newSpeed) {
+      RenderWorker::getCamera()->rspeed() = newSpeed;
+}
+
+void addHLayout(QWidget* parent, const std::vector<QWidget*>& elements) {
+      QWidget* lineWidget = new QWidget;
+      QHBoxLayout* lineLayout = new QHBoxLayout;
+      lineWidget->setLayout(lineLayout);
+      for (auto* e : elements) {
+            lineLayout->addWidget(e);
+      }
+      parent->layout()->addWidget(lineWidget);
+}
+
+void addDefaultProperties(QWidget* parent) {
+      QLabel* camSpeed_text = new QLabel("Camera speed:");
+      QLineEdit* speed = new QLineEdit(QString::number(RenderWorker::getCamera()->rspeed()));
+      addHLayout(parent, { camSpeed_text, speed });
+      QObject::connect(speed, &QLineEdit::returnPressed, [=]() {
+            Float newspeed = speed->text().toFloat();
+            RenderWorker::getCamera()->rspeed() = newspeed;
+      });
+      QCheckBox* renderLight = new QCheckBox("Render point lights");
+      renderLight->setCheckable(RenderWorker::Instance()->renderPointLight);
+      parent->layout()->addWidget(renderLight);
+      QObject::connect(renderLight, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->renderPointLight = state == Qt::Checked;
+      });
 }

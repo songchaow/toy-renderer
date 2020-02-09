@@ -4,6 +4,7 @@
 #include "main/uiwrapper.h"
 #include <QFileDialog>
 #include <QMenu>
+#include <QScrollArea>
 
 MainWindow* _mainWindow;
 void addCreateShapeMenu(QMenu* shapeMenu);
@@ -12,6 +13,11 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       _mainWindow = this;
       setupUi(this);
       resourceWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+      property_container = new QWidget;
+      properties->setFrameShape(QFrame::NoFrame);
+      properties->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+      properties->setWidgetResizable(true);
+      properties->setWidget(property_container);
       // add menu for the Add button
       QMenu *menu = new QMenu(this);
       QAction* primitiveAdd = menu->addAction("Primitive...");
@@ -39,16 +45,37 @@ void MainWindow::viewToggled(bool checked) {
       }
 }
 
+void deleteContentCascaded(QWidget* parent) {
+      if (parent->layout()) {
+            // Delete all existing widgets, if any.
+            if (parent->layout() != NULL)
+            {
+                  QLayoutItem* item;
+                  while ((item = parent->layout()->takeAt(0)) != NULL)
+                  {
+                        delete item->widget();
+                        delete item;
+                  }
+                  delete parent->layout();
+            }
+            delete parent->layout();
+      }
+      QVBoxLayout* globalLayout = new QVBoxLayout;
+      parent->setLayout(globalLayout);
+}
+
 void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
       RendererObject* robj = static_cast<RendererObject*>(obj->data(Qt::UserRole).value<void*>());
       _currobj = robj;
+      deleteContentCascaded(property_container);
       if (robj) {
-            robj->addProperties(properties);
+            robj->addProperties(property_container);
             if (robj->typeID() == RendererObject::TypeID::Primitive) {
-                  //PBRMaterial_Ui new_Ui = PBRMaterial_Ui(static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial());
+                  // add to material panel
                   Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
                   RenderWorker::Instance()->curr_primitive = pUi->m();
-                  pUi->setMaterialUi(&static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial()[0]);
+                  if (static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial().size() > 0)
+                        pUi->setMaterialUi(&static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial()[0]);
                   // TODO: list all the materials
                   if (pUi->isValid() && pUi->materialUi().isValid()) {
                         pUi->materialUi().addProperties(materialWidget);
@@ -59,6 +86,9 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
                   
 
             }
+      }
+      else {
+            addDefaultProperties(property_container);
       }
 }
 
@@ -71,12 +101,13 @@ void MainWindow::importObj() {
 }
 
 void MainWindow::addPointLight() {
-      PointLight* pl = new PointLight();
+      addPointLight(new PointLight());
+}
+
+void MainWindow::addPointLight(PointLight* pl) {
       PointLight_Ui* pl_ui = new PointLight_Ui(pl);
       ResourceManager::getInstance()->getResourceList().push_back(pl_ui);
       refreshResource();
-      // TODO: Consider directly load the light
-
 }
 
 void MainWindow::objLoadToggled(QTableWidgetItem* i)

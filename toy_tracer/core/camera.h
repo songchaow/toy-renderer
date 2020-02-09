@@ -31,7 +31,7 @@ class Camera {
       Float fov_Vertical;
       // Config Used in RTR
       Float _near = 0.1f;
-      Float _far = 1000.f;
+      Float _far = 3000.f;
       // Associated light
       bool light_associated = false;
       PointLight light;
@@ -62,7 +62,7 @@ public:
       bool lightAssociated() const { return light_associated; }
       PointLight* associatedLight() { return &light; }
       void setAssociatedLight(PointLight l);
-
+      Float& rspeed() { return _speed; }
       void disociateLight();
       void setOrientationTransform(Float offsetX, Float offsetY);
       void setSpinTransform(Float offset, const Point3f& refPoint);

@@ -4,16 +4,16 @@
 #include <fstream>
 #include <cassert>
 
-const Float CubeDepthMap::depthFarPlane = 32.f;
+const Float CubeDepthMap::depthFarPlane = 1500.f;
 const Float CubeDepthMap::depthNearPlane = 1.f;
 /*static*/ const Transform CubeDepthMap::camtoNDC { toNDCPerspective(depthNearPlane, CubeDepthMap::depthFarPlane, 1.f, 90.f/ 180.f * Pi) };
 /*static*/ const Transform CubeDepthMap::o2cam[6] = { 
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                            // X+
       LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(-1.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f)),                           // X-
-      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 1.f, 0.f), Vector3f(0.f, 0.f ,1.f)),  // Y+
-      LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f), Vector3f(0.f, 0.f, -1.f)),  // Y-
-      LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f), Vector3f(0.f, -1.f, 0.f)),   // Z+
-      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f)),    // Z-
+      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 1.f, 0.f), Vector3f(0.f, 0.f ,1.f)),                             // Y+
+      LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, -1.f, 0.f), Vector3f(0.f, 0.f, -1.f)),                           // Y-
+      LookAt(Point3f(0.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f), Vector3f(0.f, -1.f, 0.f)),                            // Z+
+      LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f)),                           // Z-
 };
 
 CubeDepthMap::CubeDepthMap(const Point3f& o) : o(o) {

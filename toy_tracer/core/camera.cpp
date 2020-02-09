@@ -123,7 +123,7 @@ void Camera::setAssociatedLight(PointLight l) {
 }
 
 void Camera::applyTranslation(volatile bool* keyStatuses, Float deltaT) {
-      static Float offset = deltaT * _speed;
+      Float offset = deltaT * _speed;
       if (keyStatuses[0] && keyStatuses[1])
             ; // Skiped
       else if (keyStatuses[0])
