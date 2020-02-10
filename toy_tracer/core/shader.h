@@ -17,6 +17,7 @@ enum ShaderType {
       HDR_TONE_MAP,
       GAUSSIAN_BLUR_H,
       GAUSSIAN_BLUR_V,
+      TANGENE_TEST,
       NUM_SHADER_TYPE,
 };
 

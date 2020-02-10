@@ -97,11 +97,17 @@ char* collectVertexAttributes(const Value& attributes, const Value& accessors, c
             layouts.push_back(l);
       }
       vbLayout = Layout(layouts);
+      if (!vbLayout.Find(ARRAY_TANGENT)) {
+            vbLayout.emplace_back(ARRAY_TANGENT, GL_FLOAT, 4, 4, true);
+            vbLayout.Find(ARRAY_TANGENT)->valid = false;
+      }
       uint32_t compatStrip = vbLayout.strip();
       // copy from bin buffer
       char* vertexBuffer = new char[vbLayout.strip()*vertexNum];
       for (int i = 0; i < layouts.size(); i++) {
             auto& l = layouts[i];
+            if (l.data_ptr == nullptr)
+                  continue;
             uint32_t offset = vbLayout[i].offset;
             for (int j = 0; j < vertexNum; j++) {
                   // here l.strip is the one from the original buffer, NOT the vertex buffer
@@ -149,7 +155,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   int img_idx = texture_json[i]["source"].GetUint();
                   std::string img_path(d["images"][img_idx]["uri"].GetString());
                   img_path = dir + '/' + img_path;
-                  Image* img = new Image(img_path, Image::RGBASpectrum, false);
+                  // do not load at first!
+                  Image* img = new Image(img_path, Image::RGBASpectrum, false, false);
                   textures.emplace_back(img);
                   // TODO: read texture.sampler
             }
@@ -186,7 +193,9 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   }
                   it = pbr_js.FindMember("metallicRoughnessTexture");
                   if (it != pbr_js.MemberEnd()) {
-                        m.metallicRoughnessMap = textures[it->value["index"].GetUint()];
+                        auto& t = textures[it->value["index"].GetUint()];
+                        t.image()->setConvertFromsRGB(false);
+                        m.metallicRoughnessMap = t;
                   }
                   it = material_js.FindMember("emissiveTexture");
                   if (it != material_js.MemberEnd()) {
@@ -199,7 +208,9 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   }
                   it = material_js.FindMember("normalTexture");
                   if (it != material_js.MemberEnd()) {
-                        m.normal_map = textures[it->value["index"].GetUint()];
+                        auto& t = textures[it->value["index"].GetUint()];
+                        t.image()->setConvertFromsRGB(false);
+                        m.normal_map = t;
                   }
                   it = material_js.FindMember("alphaMode");
                   if (it != material_js.MemberEnd()) {
@@ -212,6 +223,9 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   }
                   materials.push_back(m);
             }
+      }
+      for (auto& t : textures) {
+            t.image()->Load();
       }
       // nodes
       // only the first scene is parsed

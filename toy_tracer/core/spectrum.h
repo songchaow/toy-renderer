@@ -171,21 +171,21 @@ struct R8G8B8A8 {
 };
 
 // From Radiance 0-1 -> sRGB 0-256
-static Float GammaCorrection(Float stimus) {
+static Float radiance2sRGBFloat(Float stimus) {
       return 255.99f * Clamp(GammaTransform(stimus), 0, 1);
 }
-static R8G8B8 GammaCorrection(RGBSpectrum stimus) {
-      return R8G8B8(GammaCorrection(stimus[0]),
-                    GammaCorrection(stimus[1]),
-                    GammaCorrection(stimus[2]));
+static R8G8B8 radiance2sRGBChar(RGBSpectrum stimus) {
+      return R8G8B8(radiance2sRGBFloat(stimus[0]),
+                    radiance2sRGBFloat(stimus[1]),
+                    radiance2sRGBFloat(stimus[2]));
 }
 
 // sRGB 0-256 -> Radiance 0-1
-static Float InverseGammaCorrection(unsigned char image_value) {
+static Float sRGB2RadianceFloat(unsigned char image_value) {
       return GammaInvTransform(Clamp((Float)image_value/256, 0.f, 1.f));
 }
-static RGBSpectrum InverseGammaCorrection(R8G8B8 image_value) {
-      return RGBSpectrum(InverseGammaCorrection(image_value[0]),
-                         InverseGammaCorrection(image_value[1]),
-                         InverseGammaCorrection(image_value[2]));
+static RGBSpectrum sRGB2RadianceFloat(R8G8B8 image_value) {
+      return RGBSpectrum(sRGB2RadianceFloat(image_value[0]),
+                         sRGB2RadianceFloat(image_value[1]),
+                         sRGB2RadianceFloat(image_value[2]));
 }

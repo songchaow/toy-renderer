@@ -4,6 +4,7 @@ layout (location = 1) out vec4 EmitColor;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
+in vec4 tangentWorld;
 #define POINT_LIGHT_NUM 4
 in float depth[POINT_LIGHT_NUM];
 
@@ -138,9 +139,11 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
 
 void main()
 {		
-    vec3 N = vec3(texture(normalSampler, TexCoord));
-    N = normalize(2*N+vec3(-1.0));
-    N = normalize(normalWorld);
+    vec3 Nt = vec3(texture(normalSampler, TexCoord));
+    Nt = normalize(2*Nt+vec3(-1.0));
+    vec3 bitangent = cross(normalWorld, tangentWorld.xyz);
+    vec3 N = normalize( Nt.x * tangentWorld.xyz + Nt.y * bitangent + Nt.z * normalWorld);
+    //N = normalize(normalWorld);
     vec3 V = normalize(camPos - posWorld);
 
     

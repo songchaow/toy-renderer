@@ -32,7 +32,7 @@ Image::Image(const ::R8G8B8& color, bool alpha, Float val_alpha) {
       _data = new Float[numChannel];
       _elementType = GL_FLOAT;
       for (int i = 0; i < 3; i++)
-            static_cast<Float*>(_data)[i] = InverseGammaCorrection(color[i]);
+            static_cast<Float*>(_data)[i] = sRGB2RadianceFloat(color[i]);
       if (alpha)
             static_cast<Float*>(_data)[3] = GammaInvTransform(val_alpha);
       loaded = true;
@@ -65,22 +65,39 @@ bool Image::LoadFromFile(std::string path, bool flip_y/*=true*/)
                   if(flags==RGBSpectrum) {
                         _data = new ::RGBSpectrum[width*height];
                         constexpr uint16_t sizeRGBSpectrum = sizeof(::RGBSpectrum);
-                        // apply InverseGammaCorrection
-                        for(int i = 0; i < width*height ; i++) {
-                                    static_cast<::RGBSpectrum*>(_data)[i] = ::RGBSpectrum(InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 0]),
-                                                                                       InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 1]),
-                                                                                       InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 2]));
+                        // apply sRGB2RadianceFloat
+                        if(convertfromsRGB)
+                              for(int i = 0; i < width*height ; i++) {
+                                          static_cast<::RGBSpectrum*>(_data)[i] = ::RGBSpectrum(sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 0]),
+                                                                                             sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 1]),
+                                                                                             sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 2]));
+                              }
+                        else {
+                              Float* p = (Float*)_data;
+                              for (int i = 0; i < width*height; i++) {
+                                    for (int k = 0; k < 3; k++)
+                                          p[i * 3 + k] = Float(static_cast<unsigned char*>(tmp)[numChannel * i + k]) / 256;
+                              }
                         }
                   }
                   else if(flags==RGBASpectrum) {
                         _data = new ::RGBASpectrum[width*height];
                         constexpr uint16_t sizeRGBASpectrum = sizeof(::RGBSpectrum);
-                        for (int i = 0; i < width*height; i++) {
-                              static_cast<::RGBASpectrum*>(_data)[i] = ::RGBASpectrum(InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 0]),
-                                    InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 1]),
-                                    InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 2]),
-                                    InverseGammaCorrection(static_cast<unsigned char*>(tmp)[numChannel * i + 3]));
+                        if(convertfromsRGB)
+                              for (int i = 0; i < width*height; i++) {
+                                    static_cast<::RGBASpectrum*>(_data)[i] = ::RGBASpectrum(sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 0]),
+                                          sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 1]),
+                                          sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 2]),
+                                          sRGB2RadianceFloat(static_cast<unsigned char*>(tmp)[numChannel * i + 3]));
+                              }
+                        else {
+                              Float* p = (Float*)_data;
+                              for (int i = 0; i < width*height; i++) {
+                                    for (int k = 0; k < 4; k++)
+                                          p[i * 4 + k] = Float(static_cast<unsigned char*>(tmp)[numChannel * i + k]) / 256;
+                              }
                         }
+                              
                   }
                   stbi_image_free(tmp);
             }

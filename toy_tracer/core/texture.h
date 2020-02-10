@@ -96,6 +96,7 @@ public:
                   delete _image;
             _image = new Image(path);
       }
+      Image* image() { return _image; }
       Float height() { return resolution->x; }
       Float width() { return resolution->y; }
       bool ready2Load() const { return (bool)_image; }

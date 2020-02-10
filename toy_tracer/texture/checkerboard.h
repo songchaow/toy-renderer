@@ -13,8 +13,8 @@ public:
       // As inputs, colorA, colorB are in sRGB
       CheckerBoard(R8G8B8 colorA, R8G8B8 colorB, Float stripSize, bool sRGB = true) : stripSize(stripSize) {
             if(sRGB) {
-                  _colorASpectrum = InverseGammaCorrection(colorA);
-                  _colorBSpectrum = InverseGammaCorrection(colorB);
+                  _colorASpectrum = sRGB2RadianceFloat(colorA);
+                  _colorBSpectrum = sRGB2RadianceFloat(colorB);
             }
             else {
                   _colorASpectrum = colorA.toRGBSpectrum();

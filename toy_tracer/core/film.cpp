@@ -32,9 +32,9 @@ void Film::writePNG(const std::string& path) const {
       for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
                   int image_row = height - 1 - i;
-                  img[(image_row*width + j) * 3] = GammaCorrection(ContribSum({ i,j })[0]);
-                  img[(image_row*width + j) * 3 + 1] = GammaCorrection(ContribSum({ i,j })[1]);
-                  img[(image_row*width + j) * 3 + 2] = GammaCorrection(ContribSum({ i,j })[2]);
+                  img[(image_row*width + j) * 3] = radiance2sRGBFloat(ContribSum({ i,j })[0]);
+                  img[(image_row*width + j) * 3 + 1] = radiance2sRGBFloat(ContribSum({ i,j })[1]);
+                  img[(image_row*width + j) * 3 + 2] = radiance2sRGBFloat(ContribSum({ i,j })[2]);
                   /*if (img[(i*width + j) * 3] == 0)
                         LOG(WARNING) << "R:" << img[(i*width + j) * 3] << " G:" << img[(i*width + j) * 3 + 1] << " B:" << img[(i*width + j) * 3 + 2];*/
             }

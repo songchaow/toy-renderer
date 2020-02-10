@@ -7,13 +7,14 @@
 //static std::map<std::string, Shader> shaderStore;
 Shader shaderStore[NUM_SHADER_TYPE];
 ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
-//    Vertex                  Geometry    Fragment
-      {"shader/vertex.glsl",  "",         "shader/pbr_pixel.glsl"},           // PBR
-      {"shader/vertex.glsl",  "",         "shader/depth.fs"},                 // DEPTH_MAP
-      {"shader/skybox.vs",    "",         "shader/skybox.fs"},                // SKY_BOX
-      {"shader/posAndTex.vs", "",         "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
-      {"shader/posAndTex.vs", "",         "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
-      {"shader/posAndTex.vs", "",         "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
+//    Vertex                  Geometry                Fragment
+      {"shader/vertex.glsl",  "",                     "shader/pbr_pixel.glsl"},           // PBR
+      {"shader/vertex.glsl",  "",                     "shader/depth.fs"},                 // DEPTH_MAP
+      {"shader/skybox.vs",    "",                     "shader/skybox.fs"},                // SKY_BOX
+      {"shader/posAndTex.vs", "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
+      {"shader/posAndTex.vs", "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
+      {"shader/posAndTex.vs", "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
+      {"shader/vertex.glsl", "shader/gentangene.gs",  "shader/gentangene.fs"}             // TANGENE_TEST
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -103,6 +104,7 @@ Shader& Shader::operator=(const Shader& i) {
       path = i.path;
       vertex_shader_code = i.vertex_shader_code;
       fragment_shader_code = i.fragment_shader_code;
+      geo_shader_code = i.geo_shader_code;
       _complete = i._complete;
       _loaded = i._loaded;
       program_id = i.program_id;

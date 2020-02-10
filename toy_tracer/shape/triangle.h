@@ -29,6 +29,7 @@ struct LayoutItem {
       GLenum normalized = GL_FALSE;
       GLint offset;     // offset in the strip
       void* data_ptr;
+      bool valid = true;
       LayoutItem(uint16_t strip, ArrayType type, GLenum e_format, GLint e_size,
             uint16_t e_count, bool normalized, GLint offset, void* data_ptr) : strip(strip), type(type),
             e_format(e_format), e_size(e_size), e_count(e_count), normalized(normalized), offset(offset), data_ptr(data_ptr) {}
@@ -86,6 +87,12 @@ struct Layout {
       uint16_t strip() const { return _data.front().strip; }
       size_t size() const { return _data.size(); }
       LayoutItem& operator[](unsigned int idx) { return _data[idx]; }
+      LayoutItem* Find(ArrayType t) {
+            for (auto it = _data.begin(); it < _data.end(); it++)
+                  if (it->type == t)
+                        return &*it;
+            return nullptr;
+      }
       const LayoutItem* getLayoutItem(ArrayType t) const;
 };
 
@@ -128,6 +135,12 @@ public:
             obj2world.Inverse(&_world2obj);
             obj2world.setInverse(&_world2obj);
             _world2obj.setInverse(&obj2world);
+            // calculate tangent vectors if none
+            LayoutItem* tangentL = _layout.Find(ARRAY_TANGENT);
+            if (tangentL && tangentL->valid==false) {
+                  fillTangent();
+                  tangentL->valid = true;
+            }
       }
       TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world)
             : TriangleMesh(vbuffer, l, vertex_num, index_data, faceNum, idxFormat, obj2world, GL_TRIANGLES) {}
@@ -153,6 +166,7 @@ public:
       uint8_t sizeofIndexElement() const { return indexElementSize; }
       GLenum indexElementT() const { return indexFormat; }
       GLenum primitiveMode() const { return _primitiveMode; }
+      void fillTangent();
       ~TriangleMesh() { 
             if (vertex_data) delete[](char*)vertex_data; 
             if (index_data) delete[](char*)index_data;

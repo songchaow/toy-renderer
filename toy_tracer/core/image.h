@@ -20,10 +20,13 @@ public:
 private:
       Point2i _resolution;
       bool loaded = false;
+      bool convertfromsRGB = true;
       Format flags = UNSPECIFIED;
       void* _data = nullptr;
       size_t numChannel;
       GLuint _elementType;
+      std::string _path;
+      bool _flipY;
 
 public:
       Image() = default;
@@ -33,7 +36,12 @@ public:
             numChannel(i.numChannel), _elementType(i._elementType) {
             i._data = nullptr;
       }
-      Image(std::string path, Format flags = RGBASpectrum, bool flip_y = true) : flags(flags) { LoadFromFile(path, flip_y); };
+      Image(std::string path, Format flags = RGBASpectrum, bool flip_y = true, bool load = true) : flags(flags),
+            _flipY(flip_y), _path(path)
+      {
+            if(load)
+                  LoadFromFile(path, flip_y); 
+      }
       Image(const ::R8G8B8& color, bool alpha = false, Float val_alpha = 0.f);
       static Image* CreateImageFromFile(std::string path);
       static Image* CreateColorImage(std::string path, ::R8G8B8 color, bool alpha = false, Float val_alpha = 0.f);
@@ -41,6 +49,7 @@ public:
       ::RGBSpectrum SpectrumPixel(int i, int j);
       bool LoadFromFile(std::string path, bool flip_y = true);
       void setFormat(Format f) { flags = f; }
+      void Load() { LoadFromFile(_path, _flipY); }
       Format format() const { return flags; }
       GLenum glPixelFormat() const {
             if (format() == Image::Format::R8G8B8 || format() == Image::Format::RGBSpectrum)
@@ -53,5 +62,6 @@ public:
       GLuint elementFormat() const { return _elementType; }
       void RotateCW();
       void RotateCCW();
+      void setConvertFromsRGB(bool b) { convertfromsRGB = b;}
       ~Image();
 };
