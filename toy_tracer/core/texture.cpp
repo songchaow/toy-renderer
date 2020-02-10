@@ -34,13 +34,8 @@ void ImageTexture::load() {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // level: 0
-      GLuint image_format;
-      if (_image->format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
-            image_format = GL_RGB;
-      else if (_image->format() == Image::Format::R8G8B8A8)
-            image_format = GL_RGBA;
       //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, GL_UNSIGNED_BYTE, _image->data());
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().x, _image->resolution().y, 0, image_format, _image->elementFormat(), _image->data());
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().x, _image->resolution().y, 0, _image->glPixelFormat(), _image->elementFormat(), _image->data());
       glBindTexture(GL_TEXTURE_2D, 0);
       delete _image;
       _image = nullptr;
@@ -53,12 +48,7 @@ void ImageTexture::update() {
             return;
       }
       glBindTexture(GL_TEXTURE_2D, *_tbo);
-      GLuint image_format;
-      if (_image->format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
-            image_format = GL_RGB;
-      else if (_image->format() == Image::Format::R8G8B8A8)
-            image_format = GL_RGBA;
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, image_format, _image->elementFormat(), _image->data());
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _image->resolution().y, _image->resolution().x, 0, _image->glPixelFormat(), _image->elementFormat(), _image->data());
       glBindTexture(GL_TEXTURE_2D, 0);
       delete _image;
       _image = nullptr;

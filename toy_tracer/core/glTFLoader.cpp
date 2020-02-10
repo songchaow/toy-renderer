@@ -149,7 +149,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   int img_idx = texture_json[i]["source"].GetUint();
                   std::string img_path(d["images"][img_idx]["uri"].GetString());
                   img_path = dir + '/' + img_path;
-                  Image* img = new Image(img_path, Image::RGBSpectrum, false);
+                  Image* img = new Image(img_path, Image::RGBASpectrum, false);
                   textures.emplace_back(img);
                   // TODO: read texture.sampler
             }

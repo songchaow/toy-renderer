@@ -5,7 +5,7 @@
 
 static ResourceManager _resourceManager;
 
-const QStringList ResourceManager::filters = { "Model Files (*.obj)" };
+const QStringList ResourceManager::filters = { "Model Files (*.obj, *.gltf)" };
 
 ResourceManager* ResourceManager::getInstance() {
       return &_resourceManager;

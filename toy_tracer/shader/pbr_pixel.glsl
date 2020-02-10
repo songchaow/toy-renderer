@@ -144,7 +144,10 @@ void main()
     vec3 V = normalize(camPos - posWorld);
 
     
-    vec3 albedo = vec3(texture(albedoSampler, TexCoord));
+    vec4 albedoA = texture(albedoSampler, TexCoord).rgba;
+    vec3 albedo = vec3(albedoA);
+    if(albedoA.a < 0.1)
+        discard;
     float metallic = texture(mrSampler, TexCoord).b;
     float roughness = texture(mrSampler, TexCoord).g;
     float ao = texture(aoSampler, TexCoord).r;

@@ -33,7 +33,7 @@ public:
             numChannel(i.numChannel), _elementType(i._elementType) {
             i._data = nullptr;
       }
-      Image(std::string path, Format flags = RGBSpectrum, bool flip_y = true) : flags(flags) { LoadFromFile(path, flip_y); };
+      Image(std::string path, Format flags = RGBASpectrum, bool flip_y = true) : flags(flags) { LoadFromFile(path, flip_y); };
       Image(const ::R8G8B8& color, bool alpha = false, Float val_alpha = 0.f);
       static Image* CreateImageFromFile(std::string path);
       static Image* CreateColorImage(std::string path, ::R8G8B8 color, bool alpha = false, Float val_alpha = 0.f);
@@ -43,9 +43,9 @@ public:
       void setFormat(Format f) { flags = f; }
       Format format() const { return flags; }
       GLenum glPixelFormat() const {
-            if (format() == Image::Format::R8G8B8 || Image::Format::RGBSpectrum)
+            if (format() == Image::Format::R8G8B8 || format() == Image::Format::RGBSpectrum)
                   return GL_RGB;
-            else if (format() == Image::Format::R8G8B8A8)
+            else if (format() == Image::Format::R8G8B8A8 || format() == Image::Format::RGBASpectrum)
                   return GL_RGBA;
       }
       const Point2i resolution() const {return _resolution;}

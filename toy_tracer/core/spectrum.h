@@ -120,6 +120,20 @@ struct RGBSpectrum {
       const Float& operator[](int idx) const { return rgb[idx]; }
 };
 
+struct RGBASpectrum {
+      Float r = 0.f;
+      Float g = 0.f;
+      Float b = 0.f;
+      Float a = 0.f;
+      RGBASpectrum() = default;
+      RGBASpectrum(Float val) { r = g = b = a = val; }
+      RGBASpectrum(Float r, Float g, Float b) : r(r), g(g), b(b), a(1.f) {}
+      RGBASpectrum(Float r, Float g, Float b, Float a) : r(r), g(g), b(b), a(a) {}
+      RGBASpectrum& operator/=(const RGBASpectrum& rhs) { r/=rhs.r;g/=rhs.g;b/=rhs.b;a/=rhs.a; return *this; }
+      RGBASpectrum& operator+=(const RGBASpectrum& rhs) { r+=rhs.r;g+=rhs.g;b+=rhs.b;a+=rhs.a; return *this; }
+      RGBASpectrum& operator*=(const RGBASpectrum& rhs) { r*=rhs.r;g*=rhs.g;b*=rhs.b;a*=rhs.a; return *this; }
+};
+
 typedef RGBSpectrum Spectrum;
 
 RGBSpectrum operator+(const RGBSpectrum& lhs, const RGBSpectrum& rhs);
