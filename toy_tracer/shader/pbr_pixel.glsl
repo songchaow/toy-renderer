@@ -18,7 +18,7 @@ uniform samplerCube depthSampler;
 uniform float far;
 
 uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
-
+float bloomThreashold = 1.0;
 // lights
 struct PointLight {
     vec3 pos;
@@ -163,11 +163,15 @@ void main()
         Le = vec3(texture(emissionSampler, TexCoord));
     else
         Le = globalEmission;
+    
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = ambient + Lo + Le;
+    float brightness =  dot(color, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > bloomThreashold)
+        Le += color;
     FragColor = vec4(color, 1.0);
     EmitColor = vec4(Le, 1.0);
     //FragColor = vec4(pointLights[0].irradiance, 0);
