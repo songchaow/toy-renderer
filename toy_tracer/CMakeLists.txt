@@ -23,6 +23,16 @@ INCLUDE_DIRECTORIES (
 # rapidjson, and include explicitly
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/rapidjson-1.1.0)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/rapidjson-1.1.0/include)
+# # zlib
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/zlib-1.2.11)
+# set(ZLIB_LIBRARY zlibstatic)
+# # libpng
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/libpng-1.6.35)
+# # harfbuzz
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/harfbuzz-2.6.4)
+# freetype
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype-2.10.1)
+
 # image IO
 file(GLOB IMAGE_IO ext/std_image/include/*.h
   ext/std_image/src/*.cpp
@@ -58,6 +68,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
 add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO} ${GLAD})
 target_link_libraries(tracer_lib glog Qt5::Widgets)
+target_link_libraries(tracer_lib freetype)
 if (MSVC)
   target_link_libraries(tracer_lib ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp.lib)
 endif (MSVC)
@@ -88,10 +99,14 @@ message(STATUS "CMAKE CURRENT BINARY DIR: " ${CMAKE_CURRENT_BINARY_DIR})
 add_executable (toytracer ${TRACER_EXE} ${ui_headers})
 target_link_libraries(toytracer tracer_lib)
 
-# copy shader files to the binary directory
+# copy resources
 add_custom_command(TARGET toytracer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                        ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
+add_custom_command(TARGET toytracer POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_CURRENT_SOURCE_DIR}/share/fonts ${PROJECT_BINARY_DIR}/toy_tracer/fonts)
+# runtime dependencies
 if(MSVC)
   target_compile_options(toytracer PRIVATE "/MP")
   add_custom_command(TARGET toytracer POST_BUILD
