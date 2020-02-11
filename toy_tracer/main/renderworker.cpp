@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QOpenGLContext>
+#include <chrono>
 
 RenderWorker _worker;
 
@@ -165,6 +166,7 @@ void RenderWorker::renderLoop() {
       int loopN = 0;
       for(;;) {
             // resize the camera if needed
+            auto startTime = std::chrono::system_clock::now();
             assert(_canvas);
             m_context->makeCurrent(_canvas);
             if (_canvas->resized()) {
@@ -279,7 +281,11 @@ void RenderWorker::renderLoop() {
             
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
             // Frame rate
+            auto endTime = std::chrono::system_clock::now();
             std::string text_str("Total frame: ");
+            std::chrono::duration<double> elapsed_seconds = endTime - startTime;
+            std::string duration_str = std::to_string(elapsed_seconds.count() * 1000);
+            text_str += duration_str += " ms";
             renderTextAtTopLeft(text_str, 1.0);
             m_context->swapBuffers(_canvas);
       }

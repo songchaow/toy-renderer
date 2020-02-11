@@ -125,12 +125,12 @@ void renderText(const std::string& txt, Point2f startPos, Float scale) {
                   x + w, y + h,   1.0, 0.0 
             };
             glBindVertexArray(vao);
-            //glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertexBuffer), vertexBuffer);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             currPosx += (ch.Advance >> 6) * scale;
       }
-      
+      //glBindBuffer(GL_ARRAY_BUFFER, 0);
       glBindVertexArray(0);
       glEnable(GL_DEPTH_TEST);
 }

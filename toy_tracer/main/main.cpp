@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
       std::vector<Primitive*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
-      ResourceManager::getInstance()->loadFile("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
       PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
       
