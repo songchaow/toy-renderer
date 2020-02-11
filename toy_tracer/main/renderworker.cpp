@@ -2,6 +2,7 @@
 #include "main/uiwrapper.h"
 #include "main/MainWindow.h"
 #include "core/cubemap.h"
+#include "core/rendertext.h"
 #include <glad/glad.h>
 #include <QWindow>
 #include <QThread>
@@ -33,6 +34,7 @@ void RenderWorker::initialize() {
       if(!cam)
             cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
       //initializeOpenGLFunctions();
+      _resolution = Point2i(_canvas->width(), _canvas->height());
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
@@ -276,6 +278,9 @@ void RenderWorker::renderLoop() {
             hdr->setUniformF("explosure", 1.0);
             
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
+            // Frame rate
+            std::string text_str("Total frame: ");
+            renderTextAtTopLeft(text_str, 1.0);
             m_context->swapBuffers(_canvas);
       }
 }

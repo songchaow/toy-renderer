@@ -18,6 +18,7 @@ enum ShaderType {
       GAUSSIAN_BLUR_H,
       GAUSSIAN_BLUR_V,
       TANGENE_TEST,
+      TEXT,
       NUM_SHADER_TYPE,
 };
 
@@ -62,6 +63,7 @@ public:
       void setUniformBool(unsigned int loc, bool val);
       void setUniformI(const std::string& name, const int val);
       void setUniformI(unsigned int loc, const int val);
+      void setUniformI(const std::string& name, const int val1, const int val2);
       unsigned int getUniformLocation(const std::string& name) { return glGetUniformLocation(program_id, name.c_str()); }
 
 };

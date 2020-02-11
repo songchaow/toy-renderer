@@ -25,6 +25,7 @@ class RenderWorker : public QObject {
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
+      Point2i _resolution;
 #if 0
       enum {
             DEPTH_MAP,
@@ -65,6 +66,7 @@ public:
       void loadPointLight(PointLight* l);
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }
+      const Point2i& resolution() const { return _resolution; }
       Skybox& skybox() { return sky; }
       void setCanvas(Canvas* c) { _canvas = c; }
       void setCamera(Camera* c) { cam = c; }

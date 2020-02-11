@@ -7,14 +7,15 @@
 //static std::map<std::string, Shader> shaderStore;
 Shader shaderStore[NUM_SHADER_TYPE];
 ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
-//    Vertex                  Geometry                Fragment
-      {"shader/vertex.glsl",  "",                     "shader/pbr_pixel.glsl"},           // PBR
-      {"shader/vertex.glsl",  "",                     "shader/depth.fs"},                 // DEPTH_MAP
-      {"shader/skybox.vs",    "",                     "shader/skybox.fs"},                // SKY_BOX
-      {"shader/posAndTex.vs", "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
-      {"shader/posAndTex.vs", "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
-      {"shader/posAndTex.vs", "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
-      {"shader/vertex.glsl", "shader/gentangene.gs",  "shader/gentangene.fs"}             // TANGENE_TEST
+//    Vertex                        Geometry                Fragment
+      {"shader/vertex.glsl",        "",                     "shader/pbr_pixel.glsl"},           // PBR
+      {"shader/vertex.glsl",        "",                     "shader/depth.fs"},                 // DEPTH_MAP
+      {"shader/skybox.vs",          "",                     "shader/skybox.fs"},                // SKY_BOX
+      {"shader/posAndTex.vs",       "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
+      {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
+      {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
+      {"shader/vertex.glsl",        "shader/gentangene.gs",  "shader/gentangene.fs"},           // TANGENE_TEST
+      {"shader/screenTransform.vs", "",                     "shader/text.fs"}                   // TEXT
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -262,9 +263,12 @@ void Shader::setUniformF(unsigned int loc, const float val, const float val2, co
 
 void Shader::setUniformI(const std::string& name, const int val)
 {
-      const char* test = name.c_str();
       int loc = glGetUniformLocation(program_id, name.c_str());
       glUniform1i(loc, val);
+}
+void Shader::setUniformI(const std::string& name, const int val1, const int val2) {
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform2i(loc, val1, val2);
 }
 
 
