@@ -190,3 +190,4 @@ public:
 };
 
 std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene);
+extern std::map<ArrayType, uint16_t> ShaderLocMap;

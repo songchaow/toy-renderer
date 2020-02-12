@@ -15,7 +15,9 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
       {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
       {"shader/vertex.glsl",        "shader/gentangene.gs",  "shader/gentangene.fs"},           // TANGENE_TEST
-      {"shader/screenTransform.vs", "",                     "shader/text.fs"}                   // TEXT
+      {"shader/screenTransform.vs", "",                     "shader/text.fs"},                  // TEXT
+      {"shader/vertexInstance.vs",  "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
+      {"shader/vertexInstance.vs",  "",                     "shader/depth.fs"},                 // DEPTH_MAP_INSTANCED
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {

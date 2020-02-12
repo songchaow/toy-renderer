@@ -46,13 +46,10 @@ int main(int argc, char *argv[])
             //m.globalEmission() = RGBSpectrum(0.1, 0.2, 0.1);
       }
       Primitive* cube = new Primitive(new FlatCube(), defaultMaterial, Transform::Identity());
-      cube->GenMeshes();
-      PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, 5.f));
-      m.albedo_map = ImageTexture(new Image("texture/skybox/front.tga"));
-      Primitive* rect = new Primitive(new Rectangular(3, 2), defaultMaterial, Translate(0, 0, 0.f));
-      rect->GenMeshes();
-      RenderWorker::Instance()->loadObject(cube);
-      //RenderWorker::Instance()->loadObject(rect);
+      std::vector<Matrix4> obj2worlds = { TranslateM(-10, -10, 0), TranslateM(-10, 10, 0), TranslateM(10, -10, 0), TranslateM(10, 10, 0) };
+      InstancedPrimitive* cubes = new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
+      cubes->GenMeshes();
+      RenderWorker::Instance()->loadObject(cubes);
       //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;

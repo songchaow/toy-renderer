@@ -90,7 +90,7 @@ std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene) {
       return meshes;
 }
 
-static std::map<ArrayType, uint16_t> ShaderLocMap = {
+std::map<ArrayType, uint16_t> ShaderLocMap = {
       {ArrayType::ARRAY_VERTEX, 0},
       {ArrayType::ARRAY_TEX_UV, 1},
       {ArrayType::ARRAY_NORMAL, 2},

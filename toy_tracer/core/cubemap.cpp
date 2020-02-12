@@ -46,6 +46,12 @@ void CubeDepthMap::GenCubeDepthMap() {
             depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
             depthMapShader->setUniformF("camPos", o.x, o.y, o.z);
             depthMapShader->setUniformF("far", depthFarPlane);
+            Shader* depthInstanceShader = LoadShader(ShaderType::DEPTH_MAP_INSTANCED, true);
+            depthInstanceShader->use();
+            depthInstanceShader->setUniformF("world2cam", &world2light.m);
+            depthInstanceShader->setUniformF("cam2ndc", &camtoNDC.m);
+            depthInstanceShader->setUniformF("camPos", o.x, o.y, o.z);
+            depthInstanceShader->setUniformF("far", depthFarPlane);
             RenderWorker::Instance()->renderPassDepth();
       }
       //// print to file

@@ -114,6 +114,15 @@ SRT Matrix4::toSRT() const {
       return ret;
 }
 
+void Matrix4::transpose()
+{
+      for (int i = 0; i < 4; i++) {
+            for (int j = i + 1; j < 4; j++) {
+                  std::swap(m_matrix[i][j], m_matrix[j][i]);
+            }
+      }
+}
+
 Point3f Transform::operator() (const Point3f& o) const {
       Point3f ret;
       ret.x = m[0][0] * o[0] + m[0][1] * o[1] + m[0][2] * o[2] + m[0][3];

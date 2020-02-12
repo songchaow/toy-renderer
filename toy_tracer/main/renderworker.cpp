@@ -99,9 +99,7 @@ void RenderWorker::initialize() {
       depthMap = new CubeDepthMap();
 }
 
-void RenderWorker::renderPassPBR() {
-      Shader* shader = LoadShader(PBR, true);
-      shader->use();
+void RenderWorker::configPBRShader(Shader* shader) {
       // set lights
       uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
       uint16_t pos = startPos;
@@ -137,29 +135,51 @@ void RenderWorker::renderPassPBR() {
       shader->setUniformI("aoSampler", 4);
       shader->setUniformI("depthSampler", 5);
       // set camera
-      
+
       shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       shader->setUniformF("far", depthMap->depthFarPlane);
-      
-      //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      for (auto &p : primitives) {
-            for (auto& m : p->getPBRMaterial())
-                  if (m.dirty())
-                        m.update();
-            p->draw(shader);
+}
+
+void RenderWorker::renderPassPBR() {
+      Shader* monoShader = LoadShader(PBR, true);
+      Shader* instanceShader = LoadShader(PBR_INSTANCED, true);
+      if (primitives.size() > 0) {
+            monoShader->use();
+            configPBRShader(monoShader);
+            for (auto &p : primitives) {
+                  for (auto& m : p->getPBRMaterial())
+                        if (m.dirty())
+                              m.update();
+                  p->draw(monoShader);
+            }
+      }
+      if (instancedPrimitives.size() > 0) {
+            instanceShader->use();
+            configPBRShader(instanceShader);
+            for (auto &p : instancedPrimitives) {
+                  for (auto& m : p->getPBRMaterial())
+                        if (m.dirty())
+                              m.update();
+                  p->draw(instanceShader);
+            }
       }
 }
 
 void RenderWorker::renderPassDepth() {
       Shader* shader = LoadShader(DEPTH_MAP, true);
+      Shader* shaderInstance = LoadShader(DEPTH_MAP_INSTANCED, true);
       //shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
+      shader->use();
       for (auto &p : primitives) {
             p->draw(shader);
       }
+      shaderInstance->use();
+      for (auto &p : instancedPrimitives)
+            p->draw(shaderInstance);
 }
 
 void RenderWorker::renderLoop() {
@@ -198,7 +218,12 @@ void RenderWorker::renderLoop() {
                   for (auto* o : pendingAddPrimitives) {
                         // o is primitive now
                         o->load();
-                        primitives.push_back(o);
+                        if(!o->isInstanced())
+                              primitives.push_back(o);
+                        else {
+                              static_cast<InstancedPrimitive*>(o)->GenInstancedArray();
+                              instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(o));
+                        }
                   }
             }
             // add/remove pending lights

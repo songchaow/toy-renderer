@@ -21,6 +21,7 @@ class RenderWorker : public QObject {
       TwoThreadQueue<Primitive*> primitiveQueue;
       TwoThreadQueue<PointLight*> lightQueue;
       std::vector<Primitive*> primitives;
+      std::vector<InstancedPrimitive*> instancedPrimitives;
       std::vector<PointLight*> _pointLights;
       // TODO: define an update info structure
       static Camera* cam;
@@ -58,6 +59,8 @@ public:
 public slots:
       void initialize();
       void renderLoop();
+private:
+      void configPBRShader(Shader* shader);
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }

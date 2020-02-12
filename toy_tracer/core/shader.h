@@ -19,6 +19,8 @@ enum ShaderType {
       GAUSSIAN_BLUR_V,
       TANGENE_TEST,
       TEXT,
+      PBR_INSTANCED,
+      DEPTH_MAP_INSTANCED,
       NUM_SHADER_TYPE,
 };
 

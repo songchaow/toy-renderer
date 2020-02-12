@@ -3,8 +3,10 @@ layout (location = 0) in vec3 posLocal;
 layout (location = 1) in vec2 texCoord;
 layout (location = 2) in vec3 normalLocal;
 layout (location = 3) in vec4 tangentLocal;
+// instanced attribute
+layout (location = 4) in mat4 obj2world;
 
-uniform mat4 obj2world;
+//uniform mat4 obj2world;
 uniform mat4 world2cam;
 uniform mat4 cam2ndc;
 
