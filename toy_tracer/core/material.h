@@ -103,7 +103,11 @@ public:
       bool dirty() const { return _dirty; }
       void setDirty() { _dirty = true; }
       RGBSpectrum& globalEmission() { return _globalEmission; }
+      PBRMaterial() = default;
+      PBRMaterial(ImageTexture albedo, ImageTexture metalRough, ImageTexture normal) :
+            albedo_map(albedo), metallicRoughnessMap(metalRough), normal_map(normal) {}
 };
+extern PBRMaterial defaultMaterial;
 
 class GlossSurface;
 class FlatSurface : public Surface

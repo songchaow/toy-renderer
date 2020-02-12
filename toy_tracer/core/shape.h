@@ -18,11 +18,13 @@ protected:
       Transform world2obj, obj2world;
 public:
       Shape() = default;
+      // deprecated
       Shape(Transform& obj2worldIn) :obj2world(obj2worldIn) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
             world2obj.setInverse(&obj2world);
       }
+      // deprecated
       Shape(Transform&& obj2worldIn) :obj2world(obj2worldIn) {
             obj2world.Inverse(&world2obj);
             obj2world.setInverse(&world2obj);
@@ -48,8 +50,9 @@ class Sphere : public Shape {
       unsigned int vSlide = 50;
 public:
       Sphere(Float r) : Shape(), radius(r) {}
+      // deprecated
       Sphere(Float r, Transform& obj2world) : Shape(obj2world), radius(r) {}
-      Sphere() : Sphere(1.f, Transform::Identity()) {}
+      Sphere() : Sphere(1.f) {}
       virtual std::string shapeName() const { return "Sphere"; }
       virtual Float Area() const override { return 4 * Pi*radius*radius; }
       virtual bool Intercept(const Ray& r, Interaction& i) const override;

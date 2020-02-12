@@ -36,7 +36,7 @@ struct LayoutItem {
       LayoutItem() = default;
 };
 
-static LayoutItem DEFAULT_VERTEX_LAYOUT = LayoutItem(12, ARRAY_VERTEX, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
+static LayoutItem DEFAULT_POINT3F_LAYOUT = LayoutItem(12, ARRAY_VERTEX, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_POINT2F_LAYOUT = LayoutItem(8, ARRAY_VERTEX, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_TEXUV_LAYOUT = LayoutItem(8, ARRAY_TEX_UV, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_NORMAL_LAYOUT = LayoutItem(12, ARRAY_NORMAL, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
@@ -54,6 +54,7 @@ struct Layout {
             for(auto i = _data.begin();i<_data.end();i++)
                   i->strip = curr_offset;
       }
+      Layout(const std::initializer_list<LayoutItem> item_list) : Layout(std::vector<LayoutItem>(item_list)) {}
       // TODO
       void emplace_back(const ArrayType& type) {}
       void emplace_back(ArrayType type, GLenum e_format, GLint e_size,

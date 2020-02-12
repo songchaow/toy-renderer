@@ -3,6 +3,7 @@
 #include "main/MainWindow.h"
 #include "main/canvas.h"
 #include "shape/rectangular.h"
+#include "shape/flatcube.h"
 #include "main/renderworker.h"
 #include "main/ResourceManager.h"
 #include "core/glTFLoader.h"
@@ -30,35 +31,29 @@ int main(int argc, char *argv[])
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
       worker->skybox().loadSkybox();
-#if 0
+#if 1
       // create albedo texture for balls
       Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
       Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
-      Image* spec_color = new Image(R8G8B8(0.5f, 0.5f, 0.5f), false, 0.f);
+      Image* spec_color = new Image(R8G8B8(0.7f, 0.4f, 0.5f), false, 0.f);
       PBRMaterial m;
       {
             ImageTexture off_texture(on_color);
-            ImageTexture specular(spec_color);
-            ImageTexture roughness(off_color);
-            //ImageTexture on_texture(on_color);
+            ImageTexture specularRough(spec_color);
 
             m.albedo_map = off_texture;
-            m.metallicRoughnessMap = specular;
+            m.metallicRoughnessMap = specularRough;
             //m.globalEmission() = RGBSpectrum(0.1, 0.2, 0.1);
       }
-      Primitive* ball = new Primitive(new Sphere(1.2f), m, Translate(3.7f, -0.5f, 0.f));
-      ball->GenMeshes();
-      //Primitive* ball2 = new Primitive(new Sphere(1.f), m, Translate(0.f, 0.f, 3.f));
-      Primitive* ball2 = new Primitive(new Sphere(4.f), m, Translate(3.5f, 0.f, -6.f));
-      ball2->GenMeshes();
+      Primitive* cube = new Primitive(new FlatCube(), defaultMaterial, Transform::Identity());
+      cube->GenMeshes();
       PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 0.f, 5.f));
       m.albedo_map = ImageTexture(new Image("texture/skybox/front.tga"));
-      Primitive* rect = new Primitive(new Rectangular(3, 2), m, Translate(0, 0, 0.f));
+      Primitive* rect = new Primitive(new Rectangular(3, 2), defaultMaterial, Translate(0, 0, 0.f));
       rect->GenMeshes();
-      RenderWorker::Instance()->loadObject(ball);
-      RenderWorker::Instance()->loadObject(ball2);
-      RenderWorker::Instance()->loadObject(rect);
-      RenderWorker::Instance()->loadPointLight(l);
+      RenderWorker::Instance()->loadObject(cube);
+      //RenderWorker::Instance()->loadObject(rect);
+      //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");

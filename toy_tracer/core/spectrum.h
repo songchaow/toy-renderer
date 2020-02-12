@@ -154,8 +154,8 @@ static inline Float GammaInvTransform(Float img_value) {
 struct R8G8B8 {
       unsigned char rgb[3];
       R8G8B8() = default;
-      explicit R8G8B8(char val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
-      R8G8B8(char r, char g, char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b; }
+      explicit R8G8B8(unsigned char val) { for (int i = 0; i < 3; i++) rgb[i] = val; }
+      R8G8B8(unsigned char r, unsigned char g, unsigned char b) { rgb[0] = r; rgb[1] = g; rgb[2] = b; }
       unsigned char& operator [](int idx) { assert(idx >= 0 && idx < 3); return rgb[idx]; }
       const unsigned char& operator [](int idx) const { assert(idx >= 0 && idx < 3); return rgb[idx]; }
       R8G8B8 operator/(Float div) { R8G8B8 ret(rgb[0] / div, rgb[1] / div, rgb[2] / div); return ret; }

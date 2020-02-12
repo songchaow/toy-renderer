@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "core/common.h"
 #include "core/sampler.h"
+#include "core/texture.h"
 #include <QPushButton>
 
 #include <QLayout>
@@ -232,3 +233,11 @@ void PBRMaterial::update() {
             emissive_map.load();
       _dirty = false;
 }
+
+static Image* default_color = new Image(R8G8B8(100, 100, 100), false, 0.f);
+static Image* default_normal_color = new Image(R8G8B8(128, 128, 255), false, 0.f, false);
+static Image* default_metalRough = new Image(R8G8B8(128, 128, 0), false, 0.f, false);
+ImageTexture default_texture = ImageTexture(default_color);
+ImageTexture default_normal = ImageTexture(default_normal_color);
+
+PBRMaterial defaultMaterial(default_color, default_metalRough, default_normal_color);

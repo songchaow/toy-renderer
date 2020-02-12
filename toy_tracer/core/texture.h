@@ -110,6 +110,8 @@ public:
 
 };
 
+extern ImageTexture default_texture;
+
 template <typename Element>
 struct Texture1D {
       virtual Element Evaluate(Float u) = 0;

@@ -42,7 +42,7 @@ public:
             if(load)
                   LoadFromFile(path, flip_y); 
       }
-      Image(const ::R8G8B8& color, bool alpha = false, Float val_alpha = 0.f);
+      Image(const ::R8G8B8& color, bool alpha = false, Float val_alpha = 0.f, bool fromsRGB = true);
       static Image* CreateImageFromFile(std::string path);
       static Image* CreateColorImage(std::string path, ::R8G8B8 color, bool alpha = false, Float val_alpha = 0.f);
       ::R8G8B8 R8G8B8Pixel(int i, int j);

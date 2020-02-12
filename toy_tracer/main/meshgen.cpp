@@ -2,6 +2,7 @@
 #include <functional>
 #include "core/shape.h"
 #include "core/primitive.h"
+#include "core/material.h"
 #include "main/ResourceManager.h"
 #include "main/MainWindow.h"
 #include "shape/rectangular.h"
@@ -16,7 +17,7 @@ struct ShapeTableEntry {
 };
 
 static void fromShapeFunc(std::function<Shape*(void)> shapeFunc) {
-      Primitive* p = new Primitive(shapeFunc(), nullptr);
+      Primitive* p = new Primitive(shapeFunc(), defaultMaterial);
       p->GenMeshes();
       ResourceManager::getInstance()->addPrimitive(p);
       MainWindow::getInstance()->refreshResource();

@@ -21,7 +21,7 @@ Image * Image::CreateColorImage(std::string path, ::R8G8B8 color, bool alpha, Fl
 }
 
 // color and val_alpha in sRGB
-Image::Image(const ::R8G8B8& color, bool alpha, Float val_alpha) {
+Image::Image(const ::R8G8B8& color, bool alpha, Float val_alpha, bool fromsRGB) {
       // assume we store float internally
       numChannel = alpha ? 4 : 3;
       if (alpha)
@@ -31,8 +31,12 @@ Image::Image(const ::R8G8B8& color, bool alpha, Float val_alpha) {
       _resolution.x = _resolution.y = 1;
       _data = new Float[numChannel];
       _elementType = GL_FLOAT;
-      for (int i = 0; i < 3; i++)
-            static_cast<Float*>(_data)[i] = sRGB2RadianceFloat(color[i]);
+      if (fromsRGB)
+            for (int i = 0; i < 3; i++)
+                  static_cast<Float*>(_data)[i] = sRGB2RadianceFloat(color[i]);
+      else
+            for (int i = 0; i < 3; i++)
+                  static_cast<Float*>(_data)[i] = Float(color[i]) / 256.f;
       if (alpha)
             static_cast<Float*>(_data)[3] = GammaInvTransform(val_alpha);
       loaded = true;
