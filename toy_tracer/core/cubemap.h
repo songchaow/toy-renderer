@@ -25,6 +25,7 @@ struct CubeDepthMap {
       CubeDepthMap() : CubeDepthMap(nullptr) {}
       ~CubeDepthMap() { glDeleteTextures(1, &cubeMapObj); }
       void GenCubeDepthMap();
+      void clearDepth();
 };
 
 // value-like, no copy

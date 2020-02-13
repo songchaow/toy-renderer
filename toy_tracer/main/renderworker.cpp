@@ -249,12 +249,22 @@ void RenderWorker::renderLoop() {
             }
 
             // shadow map
-            if (_pointLights.size() > 0) {
+            if (enableShadowMap && _pointLights.size() > 0) {
+                  if (alreadyClear)
+                        alreadyClear = false;
                   glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
                   depthMap->l = _pointLights[0];
                   depthMap->GenCubeDepthMap();
                   //glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
                   glViewport(0, 0, _canvas->width(), _canvas->height());
+            }
+            else {
+                  if (!alreadyClear) {
+                        glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
+                        depthMap->clearDepth();
+                        glViewport(0, 0, _canvas->width(), _canvas->height());
+                        alreadyClear = true;
+                  }
             }
             // render to ms frame buffer
             loopN++;

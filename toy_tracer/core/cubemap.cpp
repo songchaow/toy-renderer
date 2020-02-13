@@ -79,6 +79,16 @@ void CubeDepthMap::GenCubeDepthMap() {
       //glViewport
 }
 
+void CubeDepthMap::clearDepth() {
+      glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+      for (int i = 0; i < 6; i++) {
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubeMapObj, 0);
+            glClearDepth(1.0);
+            glClear(GL_DEPTH_BUFFER_BIT);
+      }
+
+}
+
 void CubeMap::loadImage(const std::vector<std::string>& paths)
 {
       assert(paths.size() >= 6);

@@ -211,9 +211,15 @@ void addDefaultProperties(QWidget* parent) {
             RenderWorker::getCamera()->rspeed() = newspeed;
       });
       QCheckBox* renderLight = new QCheckBox("Render point lights");
-      renderLight->setCheckable(RenderWorker::Instance()->renderPointLight);
+      renderLight->setCheckState(RenderWorker::Instance()->renderPointLight ? Qt::Checked : Qt::Unchecked);
       parent->layout()->addWidget(renderLight);
       QObject::connect(renderLight, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->renderPointLight = state == Qt::Checked;
+      });
+      QCheckBox* shadowMap = new QCheckBox("Enable shadow map");
+      shadowMap->setCheckState(RenderWorker::Instance()->enableShadowMap ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(shadowMap);
+      QObject::connect(shadowMap, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->enableShadowMap = state == Qt::Checked;
       });
 }

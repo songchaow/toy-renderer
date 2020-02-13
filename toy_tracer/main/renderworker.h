@@ -39,6 +39,7 @@ class RenderWorker : public QObject {
 #endif
       // Depth Map
       CubeDepthMap* depthMap;
+      bool alreadyClear = false;
       GLuint depth_fbo = 0;
       // HDR Framebuffer
       GLuint ms_hdr_fbo = 0;
@@ -56,6 +57,7 @@ class RenderWorker : public QObject {
 public:
       Primitive* curr_primitive;
       bool renderPointLight = true;
+      bool enableShadowMap = true;
 public slots:
       void initialize();
       void renderLoop();
