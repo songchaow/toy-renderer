@@ -22,10 +22,8 @@ float bloomThreashold = 1.0;
 // lights
 struct PointLight {
     vec3 pos;
-    // vec3 diffuse;
-    // vec3 specular;
-    // vec3 ambient;
     vec3 irradiance;
+    bool spot;
     bool directional;
     vec3 direction;
     float cosAngle;
@@ -90,22 +88,34 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     for(int i = 0; i < POINT_LIGHT_NUM; i++)
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
-        vec3 L = normalize(Lraw);
+        vec3 L;
+        if(pointLights[i].directional)
+            L = -normalize(pointLights[i].direction);
+        else
+            L = normalize(Lraw);
         float distance = length(pointLights[i].pos - posWorld);
         float maxDepth = texture(depthSampler, -Lraw).r;
         maxDepth *= far;
-        if(i==0 && maxDepth < distance - 0.15) {
+        if(i==0 ) {
+            float light_distance;
+            if(pointLights[i].directional)
+                light_distance = length(dot(pointLights[i].direction, -Lraw));
+            else
+                light_distance = distance;
+            if(maxDepth < light_distance - 0.15)
             // occluded
-            // debug
-            //Lo += vec3(maxDepth/far);
-            continue;
+                continue;
         }
         // calculate per-light radiance
         if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
             continue; // skip
         vec3 H = normalize(wi + L);
         
-        float attenuation = 1.0 / (distance * distance);
+        float attenuation;
+        if(pointLights[i].directional)
+            attenuation = 1.0;
+        else
+            attenuation = 1.0 / (distance * distance);
         vec3 radiance = pointLights[i].irradiance * attenuation;
 
         // Cook-Torrance BRDF

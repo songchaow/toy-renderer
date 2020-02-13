@@ -114,15 +114,19 @@ void RenderWorker::configPBRShader(Shader* shader) {
             shader->setUniformF(pos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
       }
       pos += Shader::maxPointLightNum - pointLights.size();
-      // 3: bool directional
+      // 3: bool spot
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformBool(pos++, pointLights[i]->isSpotLight());
+      pos += Shader::maxPointLightNum - pointLights.size();
+      // 4: bool directional
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformBool(pos++, pointLights[i]->isDirectionalLight());
       pos += Shader::maxPointLightNum - pointLights.size();
-      // 4: vec3 direction
+      // 5: vec3 direction
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->direction());
       pos += Shader::maxPointLightNum - pointLights.size();
-      // 5: cosAngle
+      // 6: cosAngle
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->HalfAngle());
       // point shadow
@@ -247,7 +251,7 @@ void RenderWorker::renderLoop() {
             // shadow map
             if (_pointLights.size() > 0) {
                   glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
-                  depthMap->o = _pointLights[0]->pos();
+                  depthMap->l = _pointLights[0];
                   depthMap->GenCubeDepthMap();
                   //glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
                   glViewport(0, 0, _canvas->width(), _canvas->height());

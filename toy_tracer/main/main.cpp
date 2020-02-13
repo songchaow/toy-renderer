@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
             //m.globalEmission() = RGBSpectrum(0.1, 0.2, 0.1);
       }
       Primitive* cube = new Primitive(new FlatCube(), defaultMaterial, Transform::Identity());
-      std::vector<Matrix4> obj2worlds = { TranslateM(-10, -10, 0), TranslateM(-10, 10, 0), TranslateM(10, -10, 0), TranslateM(10, 10, 0) };
+      std::vector<Matrix4> obj2worlds = { TranslateM(-1, -1, 0), TranslateM(-1, 1, 0), TranslateM(1, -1, 0), TranslateM(1, 1, 0) };
       InstancedPrimitive* cubes = new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
       cubes->GenMeshes();
       RenderWorker::Instance()->loadObject(cubes);

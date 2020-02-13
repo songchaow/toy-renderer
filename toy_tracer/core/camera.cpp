@@ -100,7 +100,7 @@ void Camera::LookAt() {
       if (light_associated) {
             //light.rpos() = spinM(_pos); // apply spinM to camera's pos
             light.rpos() = _pos;
-            if(light.isDirectionalLight())
+            if(light.isSpotLight())
                   //light.direction() = spinM(_viewDir); // apply spinM to _viewDir
                   light.direction() = _viewDir; // apply spinM to _viewDir
       }

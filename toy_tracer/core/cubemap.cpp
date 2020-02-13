@@ -16,7 +16,7 @@ const Float CubeDepthMap::depthNearPlane = 1.f;
       LookAt(Point3f(0.f, 0.f ,0.f), Vector3f(0.f, 0.f, -1.f), Vector3f(0.f, -1.f, 0.f)),                           // Z-
 };
 
-CubeDepthMap::CubeDepthMap(const Point3f& o) : o(o) {
+CubeDepthMap::CubeDepthMap(const PointLight* l) : l(l) {
       glGenTextures(1, &cubeMapObj);
       glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapObj);
       for (int i = 0; i < 6; i++)
@@ -41,17 +41,22 @@ void CubeDepthMap::GenCubeDepthMap() {
             // fetch the shader from shader store
             Shader* depthMapShader = LoadShader(ShaderType::DEPTH_MAP, true);
             depthMapShader->use();
-            Transform world2light = o2cam[i] * Translate(-o.x, -o.y, -o.z);
+            
+            Transform world2light = o2cam[i] * Translate(-l->pos().x, -l->pos().y, -l->pos().z);
             depthMapShader->setUniformF("world2cam", &world2light.m);
             depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
-            depthMapShader->setUniformF("camPos", o.x, o.y, o.z);
+            depthMapShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
             depthMapShader->setUniformF("far", depthFarPlane);
+            depthMapShader->setUniformBool("directional", l->isDirectionalLight());
+            depthMapShader->setUniformF("direction", l->direction());
             Shader* depthInstanceShader = LoadShader(ShaderType::DEPTH_MAP_INSTANCED, true);
             depthInstanceShader->use();
             depthInstanceShader->setUniformF("world2cam", &world2light.m);
             depthInstanceShader->setUniformF("cam2ndc", &camtoNDC.m);
-            depthInstanceShader->setUniformF("camPos", o.x, o.y, o.z);
+            depthInstanceShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
             depthInstanceShader->setUniformF("far", depthFarPlane);
+            depthMapShader->setUniformBool("directional", l->isDirectionalLight());
+            depthMapShader->setUniformF("direction", l->direction());
             RenderWorker::Instance()->renderPassDepth();
       }
       //// print to file

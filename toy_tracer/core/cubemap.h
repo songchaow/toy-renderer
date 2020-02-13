@@ -3,6 +3,7 @@
 #include "core/transform.h"
 #include "core/image.h"
 #include "glad/glad.h"
+#include "light/point.h"
 
 Transform toNDCPerspective(Float n, Float f, Float hwRatio, Float fov);
 void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec, Matrix4& world2cam);
@@ -10,7 +11,7 @@ Matrix4 LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVe
 
 // for internal use, so uses gl in ctors
 struct CubeDepthMap {
-      Point3f o;
+      const PointLight* l;
       GLuint cubeMapObj;
       static const unsigned int SHADOW_WIDTH = 1024;
       static const unsigned int SHADOW_HEIGHT = 1024;
@@ -19,9 +20,9 @@ struct CubeDepthMap {
       static const Transform camtoNDC;
       static const Transform o2cam[6];
       //static const Float cam_near = 1.f; 
-      CubeDepthMap(const Point3f& o);
+      CubeDepthMap(const PointLight* l);
       CubeDepthMap(const CubeDepthMap& c) = delete;
-      CubeDepthMap() : CubeDepthMap(Point3f(0.f, 0.f, 0.f)) {}
+      CubeDepthMap() : CubeDepthMap(nullptr) {}
       ~CubeDepthMap() { glDeleteTextures(1, &cubeMapObj); }
       void GenCubeDepthMap();
 };
