@@ -7,6 +7,7 @@
 #include "main/renderworker.h"
 #include "main/ResourceManager.h"
 #include "core/glTFLoader.h"
+#include "core/cubematrix.h"
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -47,9 +48,13 @@ int main(int argc, char *argv[])
       }
       Primitive* cube = new Primitive(new FlatCube(), defaultMaterial, Transform::Identity());
       std::vector<Matrix4> obj2worlds = { TranslateM(-1, -1, 0), TranslateM(-1, 1, 0), TranslateM(1, -1, 0), TranslateM(1, 1, 0) };
-      InstancedPrimitive* cubes = new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
-      cubes->GenMeshes();
-      RenderWorker::Instance()->loadObject(cubes);
+      //InstancedPrimitive* cubes = new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
+      //cubes->GenMeshes();
+      InstancedPrimitive* matrix = createRandomCubeMatrix();
+      matrix->GenMeshes();
+      RenderWorker::Instance()->loadObject(matrix);
+      PointLight* l2 = new PointLight(RGBSpectrum(5000.f, 5000.f, 5000.f), Point3f(-40.f, 32.f, -40.f));
+      MainWindow::getInstance()->addPointLight(l2);
       //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;
