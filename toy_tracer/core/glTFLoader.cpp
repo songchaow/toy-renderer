@@ -13,7 +13,7 @@
 
 using namespace rapidjson;
 
-void layoutFromAccessor(LayoutItem& l, const Value& accessor, const Value& bufferViews, std::vector<char*>& buffers) {
+void layoutFromAccessor(LayoutItem& l, const Value& accessor, const Value& bufferViews, const std::vector<char*>& buffers) {
       l.offset = 0;
       const Value& bufferView = bufferViews[accessor["bufferView"].GetUint()];
       uint32_t bufferVOffset = 0, accessorOffset = 0;
@@ -73,7 +73,7 @@ void layoutFromAccessor(LayoutItem& l, const Value& accessor, const Value& buffe
       l.strip = stride;
 }
 
-char* collectVertexAttributes(const Value& attributes, const Value& accessors, const Value& bufferViews, std::vector<char*>& buffers,
+char* collectVertexAttributes(const Value& attributes, const Value& accessors, const Value& bufferViews, const std::vector<char*>& buffers,
       Layout& vbLayout, uint32_t& vertexNum) {
       std::vector<LayoutItem> layouts;
       vertexNum = 0;
@@ -128,7 +128,8 @@ void Matrix4fromColMajorArray(const Value& node, Matrix4& m) {
       m.transpose();
 }
 
-void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive*>& primitives) {
+void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<char*> &buffer_array, const std::vector<PBRMaterial>& materials,
+      const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive*>& primitives) {
       // transform
       auto it = node.FindMember("matrix");
       if (it != node.MemberEnd()) {
@@ -157,6 +158,41 @@ void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const Value& node_po
             }
       }
       // 
+      uint32_t mesh_idx = node["mesh"].GetUint();
+      const Value& p_meshes = mesh_pool[mesh_idx]["primitives"];
+      std::vector<TriangleMesh*> meshes;
+      std::vector<PBRMaterial> rtms;
+      for (int j = 0; j < p_meshes.Size(); j++) {
+            const Value& mesh = p_meshes[j];
+            rtms.push_back(materials[mesh["material"].GetUint()]);
+            auto it = mesh.FindMember("mode");
+            GLenum primitive_mode = GL_TRIANGLES;
+            if (it != mesh.MemberEnd())
+                  primitive_mode = mesh["mode"].GetUint();
+            // index
+            const Value& index_accessor = accessor_pool[mesh["indices"].GetUint()];
+            uint32_t indexNum = index_accessor["count"].GetUint();
+            const Value& index_bufferView = bufferView_pool[index_accessor["bufferView"].GetUint()];
+            LayoutItem indexLayout;
+            layoutFromAccessor(indexLayout, index_accessor, bufferView_pool, buffer_array);
+            char* index_data = new char[indexLayout.e_size*indexLayout.e_count*indexNum];
+            // here we assume the index data is compact
+            std::memcpy(index_data, indexLayout.data_ptr, indexLayout.e_size*indexLayout.e_count*indexNum);
+            GLenum indexElementT = index_accessor["componentType"].GetUint();
+            // construct vertex buffer layout
+            Layout vbLayout;
+            uint32_t vertexNum;
+            char* vertex_data = collectVertexAttributes(mesh["attributes"], accessor_pool, bufferView_pool, buffer_array, vbLayout, vertexNum);
+            meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform(curr_mesh2obj), primitive_mode));
+      }
+      Primitive* p = new Primitive(rtms, meshes);
+      primitives.push_back(p);
+      // add children
+      const auto& children = node["children"];
+      for (int i = 0; i < children.Size(); i++) {
+            const Value& childNode = node_pool[children[i].GetUint()];
+            AddPrimitive(childNode, curr_mesh2obj, buffer_array, materials, node_pool, mesh_pool, accessor_pool, bufferView_pool, primitives);
+      }
 
 }
 
@@ -272,9 +308,9 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       // only the first scene is parsed
       const Value& nodes_array = d["scenes"][0]["nodes"];
       const Value& nodes_pool = d["nodes"];
-      const Value& glTFmeshes = d["meshes"];
-      const Value& accessors = d["accessors"];
-      const Value& bufferViews = d["bufferViews"];
+      const Value& mesh_pool = d["meshes"];
+      const Value& accessor_pool = d["accessors"];
+      const Value& bufferview_pool = d["bufferViews"];
       std::vector<Primitive*> primitives;
       for (int i = 0; i < nodes_array.Size(); i++) {
             // each node contains multiple meshes, so here treated as a primitive
@@ -282,7 +318,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
             if (!nodes_pool[node_idx].HasMember("mesh"))
                   continue; //skip for now
             uint32_t mesh_idx = nodes_pool[node_idx]["mesh"].GetUint();
-            const Value& p_meshes = glTFmeshes[mesh_idx]["primitives"];
+            const Value& p_meshes = mesh_pool[mesh_idx]["primitives"];
             std::vector<TriangleMesh*> meshes;
             std::vector<PBRMaterial> rtms;
             for (int j = 0; j < p_meshes.Size(); j++) {
@@ -293,11 +329,11 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   if(it != mesh.MemberEnd())
                         primitive_mode = mesh["mode"].GetUint();
                   // index
-                  const Value& index_accessor = accessors[mesh["indices"].GetUint()];
+                  const Value& index_accessor = accessor_pool[mesh["indices"].GetUint()];
                   uint32_t indexNum = index_accessor["count"].GetUint();
-                  const Value& index_bufferView = bufferViews[index_accessor["bufferView"].GetUint()];
+                  const Value& index_bufferView = bufferview_pool[index_accessor["bufferView"].GetUint()];
                   LayoutItem indexLayout;
-                  layoutFromAccessor(indexLayout, index_accessor, bufferViews, buffer_array);
+                  layoutFromAccessor(indexLayout, index_accessor, bufferview_pool, buffer_array);
                   char* index_data = new char[indexLayout.e_size*indexLayout.e_count*indexNum];
                   // here we assume the index data is compact
                   std::memcpy(index_data, indexLayout.data_ptr, indexLayout.e_size*indexLayout.e_count*indexNum);
@@ -305,7 +341,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   // construct vertex buffer layout
                   Layout vbLayout;
                   uint32_t vertexNum;
-                  char* vertex_data = collectVertexAttributes(mesh["attributes"], accessors, bufferViews, buffer_array, vbLayout, vertexNum);
+                  char* vertex_data = collectVertexAttributes(mesh["attributes"], accessor_pool, bufferview_pool, buffer_array, vbLayout, vertexNum);
                   meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform::Identity(), primitive_mode));
             }
             Primitive* p = new Primitive(rtms, meshes);
