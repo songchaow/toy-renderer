@@ -122,3 +122,50 @@ struct AnimatedTransform : public Transform {
       void update() { m = srt.toMatrix4(); mInv = ::Inverse(m); }
       Point3f& translation() { return srt.translation; }
 };
+
+struct Quaternion {
+      // a + bi + cj + dk
+      Float a; // also s
+      Float b;
+      Float c;
+      Float d;
+      Quaternion() = default;
+      Quaternion(Float a, Float b, Float c, Float d)
+            : a(a), b(b), c(c), d(d) {}
+      Quaternion(Vector3f spinAxis, Float theta) {
+            Normalize(spinAxis);
+            a = std::cos(theta);
+            Float sinT = std::sin(theta);
+            b = sinT * spinAxis.x;
+            c = sinT * spinAxis.y;
+            d = sinT * spinAxis.z;
+      }
+      Quaternion operator*(const Quaternion& rhs) {
+            const Float& e = rhs.a;
+            const Float& f = rhs.b;
+            const Float& g = rhs.c;
+            const Float& h = rhs.d;
+            Float newa = a * e - b * f - c * g - d * h;
+            Float newb = a * f + b * e + c * h - d * g;
+            Float newc = a * g - b * h + c * e + d * f;
+            Float newd = a * h + b * g - c * f + d * e;
+            Normalize(newa, newb, newc, newd);
+            return Quaternion(newa, newb, newc, newd);
+      }
+      Quaternion Inverse() {
+            // assume the quaternion normalized?
+            return Quaternion(a, -b, -c, -d);
+      }
+      Matrix4 toMatrix4() {
+            return Matrix4(a*a + b * b - c * c - d * d, 2 * b*c - 2 * a*d, 2 * b*d + 2 * a*c, 0,
+                           2 * b*c + 2 * a*d, a*a - b * b + c * c - d * d, 2 * c*d - 2 * a*b, 0,
+                           2 * b*d - 2 * a*c, 2 * c*d + 2 * a*b, a*a - b * b - c * c + d * d, 0,
+                           0, 0, 0, 1);
+      }
+      Vector3f operator*(const Vector3f& rhs) {
+            Quaternion rhs_q(0, rhs.x, rhs.y, rhs.z);
+            Quaternion res = *this * rhs_q * Inverse();
+            return Vector3f(res.b, res.c, res.d);
+      }
+
+};

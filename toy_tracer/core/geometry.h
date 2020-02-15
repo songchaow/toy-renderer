@@ -772,6 +772,21 @@ inline Vector3<T> Normalize(const Vector3<T> &v) {
     return v / v.Length();
 }
 template <typename T>
+inline void Normalize(T &a, T &b, T &c) {
+      T length = std::sqrt(a*a + b * b + c * c);
+      a /= length;
+      b /= length;
+      c /= length;
+}
+template <typename T>
+inline void Normalize(T &a, T &b, T &c, T &d) {
+    T length = std::sqrt(a*a+b*b+c*c+d*d);
+    a /= length;
+    b /= length;
+    c /= length;
+    d /= length; 
+}
+template <typename T>
 T MinComponent(const Vector3<T> &v) {
     return std::min(v.x, std::min(v.y, v.z));
 }

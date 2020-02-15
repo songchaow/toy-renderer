@@ -119,6 +119,47 @@ char* collectVertexAttributes(const Value& attributes, const Value& accessors, c
       return vertexBuffer;
 }
 
+void Matrix4fromColMajorArray(const Value& node, Matrix4& m) {
+      assert(node.IsArray() && node.Size() >= 16);
+      Float* ptrm = (Float*)m.m_matrix;
+      for (int i = 0; i < node.Size(); i++) {
+            ptrm[i] = node[i].GetFloat();
+      }
+      m.transpose();
+}
+
+void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive*>& primitives) {
+      // transform
+      auto it = node.FindMember("matrix");
+      if (it != node.MemberEnd()) {
+            // use M * vertices
+            Matrix4fromColMajorArray(it->value, curr_mesh2obj);
+      }
+      else {
+            // use TRS * vertices
+            it = node.FindMember("scale");
+            if (it != node.MemberEnd()) {
+                  curr_mesh2obj = ScaleM(it->value[0].GetFloat(),
+                        it->value[1].GetFloat(), it->value[2].GetFloat());
+            }
+            it = node.FindMember("rotation");
+            if (it != node.MemberEnd()) {
+                  Matrix4 r;
+                  Quaternion q(it->value[0].GetFloat(), it->value[1].GetFloat(), it->value[2].GetFloat(), it->value[3].GetFloat());
+                  r = q.toMatrix4();
+                  curr_mesh2obj = r * curr_mesh2obj;
+            }
+            it = node.FindMember("translation");
+            if (it != node.MemberEnd()) {
+                  Matrix4 t = TranslateM(it->value[0].GetFloat(),
+                        it->value[1].GetFloat(), it->value[2].GetFloat());
+                  curr_mesh2obj = t * curr_mesh2obj;
+            }
+      }
+      // 
+
+}
+
 std::vector<Primitive*> LoadGLTF(std::string path) {
       std::string dir;
       int dirStart = path.find_last_of('/');
@@ -230,7 +271,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       // nodes
       // only the first scene is parsed
       const Value& nodes_array = d["scenes"][0]["nodes"];
-      const Value& nodes = d["nodes"];
+      const Value& nodes_pool = d["nodes"];
       const Value& glTFmeshes = d["meshes"];
       const Value& accessors = d["accessors"];
       const Value& bufferViews = d["bufferViews"];
@@ -238,7 +279,9 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       for (int i = 0; i < nodes_array.Size(); i++) {
             // each node contains multiple meshes, so here treated as a primitive
             uint32_t node_idx = nodes_array[i].GetUint();
-            uint32_t mesh_idx = nodes[node_idx]["mesh"].GetUint();
+            if (!nodes_pool[node_idx].HasMember("mesh"))
+                  continue; //skip for now
+            uint32_t mesh_idx = nodes_pool[node_idx]["mesh"].GetUint();
             const Value& p_meshes = glTFmeshes[mesh_idx]["primitives"];
             std::vector<TriangleMesh*> meshes;
             std::vector<PBRMaterial> rtms;
