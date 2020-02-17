@@ -55,12 +55,14 @@ int main(int argc, char *argv[])
       std::vector<Primitive*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
-      ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
+      //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
+      ResourceManager::getInstance()->loadFile("model/untitled.gltf");
+      MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
-      PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
+      //PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
       
       //RenderWorker::Instance()->loadPointLight(l);
-      MainWindow::getInstance()->addPointLight(l2);
+      //MainWindow::getInstance()->addPointLight(l2);
 #endif
       workerThread.start();
       a.exec();

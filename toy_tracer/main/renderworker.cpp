@@ -295,21 +295,23 @@ void RenderWorker::renderLoop() {
             glBlitFramebuffer(0, 0, _canvas->width(), _canvas->height(), 0, 0, _canvas->width(),
                   _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
             profiler.AddTimeStamp();
-            // Gaussian blur
+            // Bloom
             TriangleMesh::screenMesh.glUse();
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, hdr_emissive[0]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[1], 0);
-            Shader* blur = LoadShader(GAUSSIAN_BLUR_H, true);
-            blur->use();
-            blur->setUniformI("color", 0);
-            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
-            glBindTexture(GL_TEXTURE_2D, hdr_emissive[1]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[0], 0);
-            blur = LoadShader(GAUSSIAN_BLUR_V, true);
-            blur->use();
-            blur->setUniformI("color", 0);
-            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+            if (enableBloom) {
+                  glActiveTexture(GL_TEXTURE0);
+                  glBindTexture(GL_TEXTURE_2D, hdr_emissive[0]);
+                  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[1], 0);
+                  Shader* blur = LoadShader(GAUSSIAN_BLUR_H, true);
+                  blur->use();
+                  blur->setUniformI("color", 0);
+                  glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+                  glBindTexture(GL_TEXTURE_2D, hdr_emissive[1]);
+                  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[0], 0);
+                  blur = LoadShader(GAUSSIAN_BLUR_V, true);
+                  blur->use();
+                  blur->setUniformI("color", 0);
+                  glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+            }
             profiler.AddTimeStamp();
             // render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, 0);

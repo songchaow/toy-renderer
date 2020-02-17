@@ -111,6 +111,9 @@ public:
 };
 
 extern ImageTexture default_texture;
+extern ImageTexture white_texture;
+extern ImageTexture default_normal;
+extern ImageTexture black_texture;
 
 template <typename Element>
 struct Texture1D {

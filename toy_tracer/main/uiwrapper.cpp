@@ -222,4 +222,10 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(shadowMap, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->enableShadowMap = state == Qt::Checked;
       });
+      QCheckBox* bloom = new QCheckBox("Enable Bloom");
+      bloom->setCheckState(RenderWorker::Instance()->enableBloom ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(bloom);
+      QObject::connect(bloom, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->enableBloom = state == Qt::Checked;
+      });
 }

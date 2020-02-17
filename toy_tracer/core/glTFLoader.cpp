@@ -225,6 +225,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
 
       // create textures
       std::vector<ImageTexture> textures;
+      if(d.HasMember("textures"))
       {
             const Value& texture_json = d["textures"];
             assert(texture_json.IsArray());
@@ -240,6 +241,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       }
       
       std::vector<PBRMaterial> materials;
+      if (d.HasMember("materials"))
       {
             const Value& materials_json = d["materials"];
             assert(materials_json.IsArray());
@@ -268,16 +270,22 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                   if (it != pbr_js.MemberEnd()) {
                         m.albedo_map = textures[it->value["index"].GetUint()];
                   }
+                  else
+                        m.albedo_map = white_texture;
                   it = pbr_js.FindMember("metallicRoughnessTexture");
                   if (it != pbr_js.MemberEnd()) {
                         auto& t = textures[it->value["index"].GetUint()];
                         t.image()->setConvertFromsRGB(false);
                         m.metallicRoughnessMap = t;
                   }
+                  else
+                        m.metallicRoughnessMap = white_texture;
                   it = material_js.FindMember("emissiveTexture");
                   if (it != material_js.MemberEnd()) {
                         m.emissive_map = textures[it->value["index"].GetUint()];
                   }
+                  else
+                        m.emissive_map = black_texture;
                   it = material_js.FindMember("emissiveFactor");
                   if (it != material_js.MemberEnd()) {
                         for (int j = 0; j < 3; j++)
@@ -289,6 +297,8 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
                         t.image()->setConvertFromsRGB(false);
                         m.normal_map = t;
                   }
+                  else
+                        m.normal_map = default_normal;
                   it = material_js.FindMember("alphaMode");
                   if (it != material_js.MemberEnd()) {
                         if (std::string("OPACITY") == it->value.GetString())

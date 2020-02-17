@@ -235,9 +235,13 @@ void PBRMaterial::update() {
 }
 
 static Image* default_color = new Image(R8G8B8(100, 100, 100), false, 0.f);
+static Image* white_color = new Image(R8G8B8(255, 255, 255), false, 0.f);
+static Image* black_color = new Image(R8G8B8(0, 0, 0), false, 0.f);
 static Image* default_normal_color = new Image(R8G8B8(128, 128, 255), false, 0.f, false);
 static Image* default_metalRough = new Image(R8G8B8(128, 128, 0), false, 0.f, false);
 ImageTexture default_texture = ImageTexture(default_color);
+ImageTexture white_texture = ImageTexture(white_color);
+ImageTexture black_texture = ImageTexture(black_color);
 ImageTexture default_normal = ImageTexture(default_normal_color);
 
 PBRMaterial defaultMaterial(default_color, default_metalRough, default_normal_color);

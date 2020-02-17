@@ -62,6 +62,7 @@ public:
       Primitive* curr_primitive;
       bool renderPointLight = true;
       bool enableShadowMap = true;
+      bool enableBloom = true;
 public slots:
       void initialize();
       void renderLoop();

@@ -16,6 +16,10 @@ uniform sampler2D normalSampler; // initially 0-1
 uniform sampler2D aoSampler;
 uniform samplerCube depthSampler;
 uniform float far;
+uniform vec3 albedoFactor;
+uniform vec3 emissiveFactor;
+uniform float metallicFactor;
+uniform float roughFactor;
 
 uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
 float bloomThreashold = 1.0;
@@ -102,7 +106,9 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
                 light_distance = length(dot(pointLights[i].direction, -Lraw));
             else
                 light_distance = distance;
-            if(maxDepth < light_distance - 0.15)
+            float cos2 = pow(dot(normal, L), 2);
+            float tgn = sqrt((1-cos2)/cos2);
+            if(maxDepth < light_distance - 0.15 * (1 + clamp(tgn, 0, 5)))
             // occluded
                 continue;
         }
@@ -158,11 +164,11 @@ void main()
 
     
     vec4 albedoA = texture(albedoSampler, TexCoord).rgba;
-    vec3 albedo = vec3(albedoA);
+    vec3 albedo = vec3(albedoA.rgb * albedoFactor);
     if(albedoA.a < 0.1)
         discard;
-    float metallic = texture(mrSampler, TexCoord).b;
-    float roughness = texture(mrSampler, TexCoord).g;
+    float metallic = texture(mrSampler, TexCoord).b * metallicFactor;
+    float roughness = texture(mrSampler, TexCoord).g * roughFactor;
     float ao = texture(aoSampler, TexCoord).r;
     // ao is invalid now, so use 1 instead
     ao = 1;
@@ -170,7 +176,7 @@ void main()
     vec3 Lo = addDirectLight(V, N, albedo, roughness, metallic, ao);
     vec3 Le;
     if(globalEmission == vec3(0.0,0.0,0.0))
-        Le = vec3(texture(emissionSampler, TexCoord));
+        Le = vec3(texture(emissionSampler, TexCoord).rgb * emissiveFactor);
     else
         Le = globalEmission;
     

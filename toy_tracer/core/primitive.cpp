@@ -60,6 +60,10 @@ void Primitive::draw(Shader* shader) {
       for (int i = 0; i < _meshes.size(); i++) {
             PBRMaterial& mtl = rt_m[i];
             shader->setUniformF("globalEmission", mtl.globalEmission()[0], mtl.globalEmission()[1], mtl.globalEmission()[2]);
+            shader->setUniformF("albedoFactor", mtl.albedoFactor.rgb[0], mtl.albedoFactor.rgb[1], mtl.albedoFactor.rgb[2]);
+            shader->setUniformF("emissiveFactor", mtl.emissiveFactor.rgb[0], mtl.emissiveFactor.rgb[1], mtl.emissiveFactor.rgb[2]);
+            shader->setUniformF("metallicFactor", mtl.metallicFactor);
+            shader->setUniformF("roughFactor", mtl.roughFactor);
             if (mtl.albedo_map.isLoad()) {
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, mtl.albedo_map.tbo());
