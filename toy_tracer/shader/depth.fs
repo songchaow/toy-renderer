@@ -1,5 +1,5 @@
 #version 330 core
-in vec3 posWorld;
+in vec3 posWorldFs;
 
 uniform mat4 world2cam;
 uniform float far;
@@ -11,9 +11,9 @@ uniform vec3 direction;
 void main() {
       float depth;
       if (directional)
-            depth = length(dot(posWorld - camPos, direction));
+            depth = length(dot(posWorldFs - camPos, direction));
       else
-            depth = length(posWorld-camPos);
+            depth = length(posWorldFs - camPos);
       depth /= far;
       gl_FragDepth = depth;
       //gl_FragDepth = 0.4;

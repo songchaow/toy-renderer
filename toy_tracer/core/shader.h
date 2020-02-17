@@ -62,6 +62,7 @@ public:
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3);
       void setUniformF(unsigned int loc, const Vector3f& vec3);
       void setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4);
+      void setUniformF(unsigned int loc, const Matrix4* data);
       void setUniformBool(unsigned int loc, bool val);
       void setUniformI(const std::string& name, const int val);
       void setUniformI(unsigned int loc, const int val);

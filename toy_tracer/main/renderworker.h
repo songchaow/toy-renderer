@@ -24,6 +24,8 @@ class RenderWorker : public QObject {
       std::vector<Primitive*> primitives;
       std::vector<InstancedPrimitive*> instancedPrimitives;
       std::vector<PointLight*> _pointLights;
+      std::vector<PointLight*> pendingLights, pendingDelLights;
+      std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
       // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;

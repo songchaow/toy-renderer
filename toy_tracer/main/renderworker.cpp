@@ -192,6 +192,7 @@ void RenderWorker::renderPassDepth() {
 void RenderWorker::renderLoop() {
       int loopN = 0;
       for(;;) {
+            m_context->makeCurrent(_canvas);
             profiler.Clear();
             // resize the camera if needed
             profiler.AddTimeStamp();
@@ -214,7 +215,6 @@ void RenderWorker::renderLoop() {
                   }
             }
             // add/remove pending primitives
-            std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
             if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {
                   for (auto* d : pendingDelPrimitives) {
 
@@ -230,9 +230,11 @@ void RenderWorker::renderLoop() {
                               instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(o));
                         }
                   }
+                  pendingAddPrimitives.clear();
+                  pendingDelPrimitives.clear();
             }
             // add/remove pending lights
-            std::vector<PointLight*> pendingLights, pendingDelLights;
+            
             if (lightQueue.readAll(pendingLights, pendingDelLights)) {
                   for (auto* d : pendingDelLights) {
                         auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
@@ -247,6 +249,8 @@ void RenderWorker::renderLoop() {
                               primitives.push_back(l->primitive());
                         }
                   }
+                  pendingLights.clear();
+                  pendingDelLights.clear();
             }
 
             // shadow map

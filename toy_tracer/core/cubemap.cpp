@@ -34,31 +34,49 @@ void CubeDepthMap::GenCubeDepthMap() {
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
       glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+      Shader* depthMapShader = LoadShader(ShaderType::DEPTH_MAP, true);
+      depthMapShader->use();
+      depthMapShader->setUniformF("far", depthFarPlane);
+      depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
+      depthMapShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
+      depthMapShader->setUniformBool("directional", l->isDirectionalLight());
+      depthMapShader->setUniformF("direction", l->direction());
+      uint32_t world2cam_pos = depthMapShader->getUniformLocation("world2cams[0]"); 
+      Matrix4 world2light[6];
+      for (int i = 0; i < 6; i++) {
+            world2light[i] = o2cam[i].m * TranslateM(-l->pos().x, -l->pos().y, -l->pos().z);
+            depthMapShader->setUniformF(world2cam_pos + i, &world2light[i]);
+      }
+      Shader* depthInstanceShader = LoadShader(ShaderType::DEPTH_MAP_INSTANCED, true);
+      depthInstanceShader->use();
+      depthInstanceShader->setUniformF("far", depthFarPlane);
+      depthInstanceShader->setUniformF("cam2ndc", &camtoNDC.m);
+      depthInstanceShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
+      depthInstanceShader->setUniformBool("directional", l->isDirectionalLight());
+      depthInstanceShader->setUniformF("direction", l->direction());
+      world2cam_pos = depthInstanceShader->getUniformLocation("world2cams[0]");
+      for (int i = 0; i < 6; i++) {
+            depthInstanceShader->setUniformF(world2cam_pos + i, &world2light[i]);
+      }
+      glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeMapObj, 0);
+      RenderWorker::Instance()->renderPassDepth();
+#if 0
       for (int i = 0; i < 6; i++) {
             // attach the texture to the current frame buffer
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubeMapObj, 0);
             // set world2cam, cam2ndc, assuming shader is configured
             // fetch the shader from shader store
-            Shader* depthMapShader = LoadShader(ShaderType::DEPTH_MAP, true);
             depthMapShader->use();
-            
             Transform world2light = o2cam[i] * Translate(-l->pos().x, -l->pos().y, -l->pos().z);
             depthMapShader->setUniformF("world2cam", &world2light.m);
-            depthMapShader->setUniformF("cam2ndc", &camtoNDC.m);
-            depthMapShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
-            depthMapShader->setUniformF("far", depthFarPlane);
-            depthMapShader->setUniformBool("directional", l->isDirectionalLight());
-            depthMapShader->setUniformF("direction", l->direction());
-            Shader* depthInstanceShader = LoadShader(ShaderType::DEPTH_MAP_INSTANCED, true);
+            
+
             depthInstanceShader->use();
             depthInstanceShader->setUniformF("world2cam", &world2light.m);
-            depthInstanceShader->setUniformF("cam2ndc", &camtoNDC.m);
-            depthInstanceShader->setUniformF("camPos", l->pos().x, l->pos().y, l->pos().z);
-            depthInstanceShader->setUniformF("far", depthFarPlane);
-            depthMapShader->setUniformBool("directional", l->isDirectionalLight());
-            depthMapShader->setUniformF("direction", l->direction());
+            
             RenderWorker::Instance()->renderPassDepth();
       }
+#endif
       //// print to file
 #if 0
       static int ii= 0;

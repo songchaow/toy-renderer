@@ -55,4 +55,15 @@ public:
             std::atomic_store(&read_pos, currReadPos%ttqueue_pool_size);
             return true;
       }
+      // elements to delete are not treated
+      bool readAll(ElementT*& startIdx, ElementT*& endIdx, ElementT*& startdIdx, ElementT*& enddIdx) {
+            unsigned int currReadPos = std::atomic_load(&read_pos);
+            unsigned int currEndPos = std::atomic_load(&end_pos);
+            if (currEndPos == currReadPos)
+                  // empty
+                  return false;
+            startIdx = &_pool[currReadPos%ttqueue_pool_size];
+            endIdx = &_pool[currEndPos%ttqueue_pool_size];
+            startdIdx = enddIdx = nullptr;
+      }
 };

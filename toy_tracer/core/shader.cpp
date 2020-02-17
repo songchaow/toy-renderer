@@ -8,16 +8,16 @@
 Shader shaderStore[NUM_SHADER_TYPE];
 ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
 //    Vertex                        Geometry                Fragment
-      {"shader/vertex.glsl",        "",                     "shader/pbr_pixel.glsl"},           // PBR
-      {"shader/vertex.glsl",        "",                     "shader/depth.fs"},                 // DEPTH_MAP
-      {"shader/skybox.vs",          "",                     "shader/skybox.fs"},                // SKY_BOX
-      {"shader/posAndTex.vs",       "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
-      {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
-      {"shader/posAndTex.vs",       "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
-      {"shader/vertex.glsl",        "shader/gentangene.gs",  "shader/gentangene.fs"},           // TANGENE_TEST
-      {"shader/screenTransform.vs", "",                     "shader/text.fs"},                  // TEXT
-      {"shader/vertexInstance.vs",  "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
-      {"shader/vertexInstance.vs",  "",                     "shader/depth.fs"},                 // DEPTH_MAP_INSTANCED
+      {"shader/vertex.glsl",              "",                     "shader/pbr_pixel.glsl"},           // PBR
+      {"shader/vertexShadow.glsl",        "shader/shadowmap.gs",  "shader/depth.fs"},                 // DEPTH_MAP
+      {"shader/skybox.vs",                "",                     "shader/skybox.fs"},                // SKY_BOX
+      {"shader/posAndTex.vs",             "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
+      {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
+      {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
+      {"shader/vertex.glsl",              "shader/gentangene.gs",  "shader/gentangene.fs"},           // TANGENE_TEST
+      {"shader/screenTransform.vs",       "",                     "shader/text.fs"},                  // TEXT
+      {"shader/vertexInstance.vs",        "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
+      {"shader/vertexInstanceShadow.vs",  "shader/shadowmap.gs",  "shader/depth.fs"},                 // DEPTH_MAP_INSTANCED
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -184,6 +184,7 @@ void Shader::compileAndLink() {
       if (!success) {
             glGetProgramInfoLog(program_id, 1024, NULL, infoLog);
             LOG(ERROR) << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+            LOG(ERROR) << path.vertex << '\n' << path.geometry << '\n' << path.fragment;
       }
 
       // delete shader objects
@@ -261,6 +262,10 @@ void Shader::setUniformF(unsigned int loc, const Vector3f& vec3) {
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4)
 {
       glUniform4f(loc, val, val2, val3, val4);
+}
+
+void Shader::setUniformF(unsigned int loc, const Matrix4* data) {
+      glUniformMatrix4fv(loc, 1, GL_TRUE, (const GLfloat*)data);
 }
 
 void Shader::setUniformI(const std::string& name, const int val)
