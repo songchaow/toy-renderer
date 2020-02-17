@@ -5,6 +5,7 @@
 #include "core/primitive.h"
 #include "core/camera.h"
 #include "core/cubemap.h"
+#include "core/profiler.h"
 #include "light/point.h"
 #include "light/skybox.h"
 #include "main/TwoThreadQueue.h"
@@ -27,6 +28,7 @@ class RenderWorker : public QObject {
       static Camera* cam;
       Canvas* _canvas = nullptr;
       Point2i _resolution;
+      Profiler profiler;
 #if 0
       enum {
             DEPTH_MAP,

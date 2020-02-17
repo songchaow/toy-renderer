@@ -3,6 +3,7 @@
 #include "main/MainWindow.h"
 #include "core/cubemap.h"
 #include "core/rendertext.h"
+#include "core/profiler.h"
 #include <glad/glad.h>
 #include <QWindow>
 #include <QThread>
@@ -97,6 +98,8 @@ void RenderWorker::initialize() {
       // no depth buffer attached
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       depthMap = new CubeDepthMap();
+      
+      profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
 }
 
 void RenderWorker::configPBRShader(Shader* shader) {
@@ -189,10 +192,10 @@ void RenderWorker::renderPassDepth() {
 void RenderWorker::renderLoop() {
       int loopN = 0;
       for(;;) {
+            profiler.Clear();
             // resize the camera if needed
-            auto startTime = std::chrono::system_clock::now();
+            profiler.AddTimeStamp();
             assert(_canvas);
-            m_context->makeCurrent(_canvas);
             if (_canvas->resized()) {
                   // set glSetViewport
                   // set Camera's size
@@ -202,8 +205,6 @@ void RenderWorker::renderLoop() {
             if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
             }
-            else
-                  cam->LookAt();
             if (_canvas->keyPressed()) {
                   if (_canvas->CameraorObject())
                         cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
@@ -266,6 +267,7 @@ void RenderWorker::renderLoop() {
                         alreadyClear = true;
                   }
             }
+            profiler.AddTimeStamp();
             // render to ms frame buffer
             loopN++;
             glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
@@ -274,6 +276,7 @@ void RenderWorker::renderLoop() {
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
             sky.draw();
             renderPassPBR();
+            profiler.AddTimeStamp();
             // blit to hdr frame buffer
             // hdr_color, hdr_emissive[0]
             glBindFramebuffer(GL_READ_FRAMEBUFFER, ms_hdr_fbo);
@@ -287,7 +290,7 @@ void RenderWorker::renderLoop() {
             glDrawBuffer(GL_COLOR_ATTACHMENT0);
             glBlitFramebuffer(0, 0, _canvas->width(), _canvas->height(), 0, 0, _canvas->width(),
                   _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
+            profiler.AddTimeStamp();
             // Gaussian blur
             TriangleMesh::screenMesh.glUse();
             glActiveTexture(GL_TEXTURE0);
@@ -303,7 +306,7 @@ void RenderWorker::renderLoop() {
             blur->use();
             blur->setUniformI("color", 0);
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
-
+            profiler.AddTimeStamp();
             // render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             glClearDepth(1.0f);
@@ -317,15 +320,10 @@ void RenderWorker::renderLoop() {
             hdr->setUniformI("radiance", 0);
             hdr->setUniformI("bloom", 1);
             hdr->setUniformF("explosure", 1.0);
-            
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
-            // Frame rate
-            auto endTime = std::chrono::system_clock::now();
-            std::string text_str("Total frame: ");
-            std::chrono::duration<double> elapsed_seconds = endTime - startTime;
-            std::string duration_str = std::to_string(elapsed_seconds.count() * 1000);
-            text_str += duration_str += " ms";
-            renderTextAtTopLeft(text_str, 1.0);
+            // Profiling
+            profiler.AddTimeStamp();
+            profiler.PrintProfile();
             m_context->swapBuffers(_canvas);
       }
 }

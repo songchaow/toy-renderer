@@ -113,7 +113,7 @@ void renderText(const std::string& txt, Point2f startPos, Float scale) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, ch.TextureID);
             Float&& x = currPosx + ch.Bearing.x * scale;
-            Float&& y = startPos.y - (ch.Size.y - ch.Bearing.y) * scale;
+            Float&& y = currPosy - (ch.Size.y - ch.Bearing.y) * scale;
             Float&& w = ch.Size.x * scale;
             Float&& h = ch.Size.y * scale;
             Float vertexBuffer[] = {

@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
       worker->skybox().loadSkybox();
-#if 1
+#if 0
       // create albedo texture for balls
       Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
       Image* on_color = new Image(R8G8B8(113, 206.f, 239.f), false, 0.f);
