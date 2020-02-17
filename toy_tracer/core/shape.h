@@ -80,7 +80,8 @@ protected:
       AnimatedTransform _obj2world;
 public:
       Shapeable(Shape* shape, ShapeID s_id, Transform t) : _shape(shape), s_id(s_id), _obj2world(t) {};
-      Shapeable(const std::vector<TriangleMesh*>& meshes) : _meshes(meshes), _shape(nullptr), _obj2world(Transform::Identity()) {}
+      Shapeable(const std::vector<TriangleMesh*>& meshes, const Transform& t) : _meshes(meshes), _shape(nullptr), _obj2world(t) {}
+      Shapeable(const std::vector<TriangleMesh*>& meshes) : Shapeable(meshes, Transform::Identity()) {}
       Shapeable(Shape* shape, ShapeID s_id) : Shapeable(shape, s_id, Transform::Identity()) {}
       Float Area() const { return _shape->Area(); }
       std::string getShapeName() const { return _shape->shapeName(); }

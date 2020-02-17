@@ -20,6 +20,7 @@ public:
       Primitive(Shape* shape, PBRMaterial m) : Shapeable(shape, ShapeID::Primitive), rt_m(1, m), material(nullptr) {}
       Primitive(PBRMaterial m, Transform t) : Primitive(nullptr, m, t) {}
       Primitive(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), Shapeable(meshes) {}
+      Primitive(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), Shapeable(meshes, t) {}
       Material* getMaterial() const { return material; }
       std::vector<PBRMaterial>& getPBRMaterial() { return rt_m; }
       //void setPBRMaterial(PBRMaterial m) { rt_m = m; }
