@@ -6,6 +6,7 @@
 #include "core/transform.h"
 #include "core/renderoption.h"
 #include "core/tracer.h"
+#include "core/frustum.h"
 #include "light/point.h"
 #include <cmath>
 
@@ -25,25 +26,22 @@ class Camera {
       Float _speed = 2.f;
       Float spinAngle = 0.f;
       Point3f spinRefPoint;
-      // Config
-      Float film_distance = 1.f;
-      Film film;
-      Float fov_Vertical;
-      // Config Used in RTR
-      Float _near = 0.1f;
-      Float _far = 3000.f;
+      // Frustum
+      Frustum frustum;
       // Associated light
       bool light_associated = false;
       PointLight light;
       // Off-line
+      Float film_distance = 1.f;
+      Film film;
       Scene* s;
       PathTracer tracer;
       Ray GenerateRay(const Point2f& pFilm);
 
 public:
-      Camera(Scene* s, Transform cam2world, const Point2i& film_size, Float fov_Vertical = 160.f * Pi / 180) : fov_Vertical(fov_Vertical), s(s), tracer(s), _cam2world(cam2world),
+      Camera(Scene* s, Transform cam2world, const Point2i& film_size, Float fov_Horizontal = 160.f * Pi / 180) : frustum((film_size.x/(Float)film_size.y)), s(s), tracer(s), _cam2world(cam2world),
             _pos(cam2world.m[0][3], cam2world.m[1][3], cam2world.m[2][3]),
-            _world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Vertical / 2)) {}
+            _world2cam(cam2world.Inverse()), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Horizontal / 2)) {}
       void Render(RenderOption& options);
       const Film& getFilm() const { return film; }
       // Generate XMMATRIX using XMMatrixPerspectiveFovLH
@@ -57,8 +55,8 @@ public:
       bool rotationXTrigger() const { return _rotationXTrigger; }
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
-      Float nearPlane() const { return _near; }
-      Float farPlane() const { return _far; }
+      Float nearPlane() const { return frustum.near; }
+      Float farPlane() const { return frustum.far; }
       bool lightAssociated() const { return light_associated; }
       PointLight* associatedLight() { return &light; }
       void setAssociatedLight(PointLight l);

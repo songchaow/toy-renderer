@@ -13,6 +13,7 @@ struct ShaderPath {
 enum ShaderType {
       PBR,
       DEPTH_MAP,
+      DEPTH_CUBE_MAP,
       SKY_BOX,
       HDR_TONE_MAP,
       GAUSSIAN_BLUR_H,
@@ -20,7 +21,7 @@ enum ShaderType {
       TANGENE_TEST,
       TEXT,
       PBR_INSTANCED,
-      DEPTH_MAP_INSTANCED,
+      DEPTH_CUBE_MAP_INSTANCED,
       NUM_SHADER_TYPE,
 };
 

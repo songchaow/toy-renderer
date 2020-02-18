@@ -1,5 +1,6 @@
 #pragma once
 #include "core/light.h"
+#include "core/frustum.h"
 
 class PointLight : public Light {
       Spectrum irradiance = 1.f;
@@ -30,6 +31,8 @@ public:
       Float& HalfAngle() { return _angle; }
       const Transform& obj2world() const { return Translate(_posWorld.x, _posWorld.y, _posWorld.z); }
       Transform world2obj() const { return Translate(-_posWorld.x, -_posWorld.y, -_posWorld.z); }
+      void drawDepthMap_Point(const View& v) const;
+      void CreateDepthMap_Direction(const View& v) const;
 };
 
 class DirectionalLight {

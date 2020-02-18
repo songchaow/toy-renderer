@@ -4,8 +4,8 @@
 #include <mutex>
 #include "core/primitive.h"
 #include "core/camera.h"
-#include "core/cubemap.h"
 #include "core/profiler.h"
+#include "core/depthmap.h"
 #include "light/point.h"
 #include "light/skybox.h"
 #include "main/TwoThreadQueue.h"
@@ -84,6 +84,6 @@ public:
       static inline RenderWorker* Instance() { return &_worker; }
       const std::vector<PointLight*>& pointLights() const { return _pointLights; }
       void renderPassPBR();
-      void renderPassDepth();
+      void renderPassCubeMapDepth();
 };
 

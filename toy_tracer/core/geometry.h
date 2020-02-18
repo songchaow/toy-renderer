@@ -695,6 +695,33 @@ class Vector3 {
     T x, y, z;
 };
 
+// Axis aligned bounding box
+struct AABB {
+      Point3f pMax;
+      Point3f pMin;
+      AABB() {
+            Float max = std::numeric_limits<Float>::max();
+            Float min = std::numeric_limits<Float>::lowest();
+            pMax = { max, max, max };
+            pMin = { min,min,min };
+      }
+      AABB(const Point3f& initPoint) : pMax(initPoint), pMin(initPoint) {}
+      void Add(const Point3f& p) {
+            if (p.x > pMax.x)
+                  pMax.x = p.x;
+            if (p.y > pMax.y)
+                  pMax.y = p.y;
+            if (p.z > pMax.z)
+                  pMax.z = p.z;
+            if (p.x < pMin.x)
+                  pMin.x = p.x;
+            if (p.y < pMin.y)
+                  pMin.y = p.y;
+            if (p.z < pMin.z)
+                  pMin.z = p.z;
+      }
+};
+
 template <typename T>
 inline std::ostream &operator<<(std::ostream &os, const Vector3<T> &v) {
     os << "[ " << v.x << ", " << v.y << ", " << v.z << " ]";

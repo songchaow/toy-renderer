@@ -8,10 +8,11 @@ Ray Camera::GenerateRay(const Point2f& pFilm)
       return _cam2world(localRay);
 }
 
-Transform toNDCPerspective(Float n, Float f, Float hwRatio, Float fov_Horizontal) {
-      Float tanHalfFov = std::tan(fov_Horizontal / 2);
-      Matrix4 persp(1.f / tanHalfFov, 0, 0, 0,
-            0, 1.f / tanHalfFov / hwRatio, 0, 0,
+Transform toNDCPerspective(Float n, Float f, Float aspectRatio, Float fov_Horizontal) {
+      Float tanHalfFov_H = std::tan(fov_Horizontal / 2);
+      Float tanHalfFov_V = tanHalfFov_H / aspectRatio;
+      Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0,
+            0, tanHalfFov_V, 0, 0,
             0, 0, -f / (f - n), -f * n / (f - n),
             0, 0, -1, 0);
       return Transform(persp);
@@ -30,8 +31,8 @@ Transform Camera::Cam2NDC() const
       Transform s = Scale(1 / width_original, 1 / height_original, 1);
       return s * t * Transform(persp);
 #endif
-      return toNDCPerspective(_near, _far, film.getHeight() / (Float)film.getWidth(), fov_Vertical);
-      
+      //return toNDCPerspective(_near, _far, film.getHeight() / (Float)film.getWidth(), fov_Horizontal);
+      return Transform(frustum.cam2ndc_Perspective());
 }
 
 void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
@@ -176,4 +177,25 @@ void Camera::Render(RenderOption & options)
       }
       // Normalize
       film.Normalize();
+}
+
+Matrix4 Frustum::cam2ndc_Perspective() const
+{
+      Float tanHalfFov_H = std::tan(fov_Horizontal / 2);
+      Float tanHalfFov_V = tanHalfFov_H / aspectRatio;
+      Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0,
+            0, 1.f / tanHalfFov_V, 0, 0,
+            0, 0, -far / (far - near), -far * near / (far - near),
+            0, 0, -1, 0);
+      return persp;
+}
+
+Matrix4 Frustum::cam2ndc_Orthogonal() const
+{
+      // x: [-width/2, width/2] | y: [-height/2, height/2]
+      Matrix4 orthogonal(2 / width, 0, 0, 0,
+            0, 2 / height, 0, 0,
+            0, 0, -width/2/(far-near), -width/2*near/(far-near),
+            0, 0, 0, 1);
+      return orthogonal;
 }

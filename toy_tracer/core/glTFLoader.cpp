@@ -256,8 +256,10 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
             for (int i = 0; i < materials_json.Size(); i++) {
                   PBRMaterial m;
                   const Value& material_js = materials_json[i];
-                  if (material_js.FindMember("pbrMetallicRoughness") == material_js.MemberEnd())
+                  if (material_js.FindMember("pbrMetallicRoughness") == material_js.MemberEnd()) {
+                        materials.push_back(m);
                         continue;
+                  }
                   const Value& pbr_js = material_js["pbrMetallicRoughness"];
                   // factors
                   Value::ConstMemberIterator it = pbr_js.FindMember("baseColorFactor");

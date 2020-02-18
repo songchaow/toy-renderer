@@ -174,9 +174,9 @@ void RenderWorker::renderPassPBR() {
       }
 }
 
-void RenderWorker::renderPassDepth() {
-      Shader* shader = LoadShader(DEPTH_MAP, true);
-      Shader* shaderInstance = LoadShader(DEPTH_MAP_INSTANCED, true);
+void RenderWorker::renderPassCubeMapDepth() {
+      Shader* shader = LoadShader(DEPTH_CUBE_MAP, true);
+      Shader* shaderInstance = LoadShader(DEPTH_CUBE_MAP_INSTANCED, true);
       //shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
