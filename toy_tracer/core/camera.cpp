@@ -32,7 +32,7 @@ Transform Camera::Cam2NDC() const
       return s * t * Transform(persp);
 #endif
       //return toNDCPerspective(_near, _far, film.getHeight() / (Float)film.getWidth(), fov_Horizontal);
-      return Transform(frustum.cam2ndc_Perspective());
+      return Transform(_view.f.cam2ndc_Perspective());
 }
 
 void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
@@ -78,7 +78,7 @@ void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec, 
 
 void Camera::LookAt() {
       // newZ = _viewDir;
-      ::LookAt(_pos, _viewDir, Vector3f(0.f, 1.f, 0.f), _world2cam.m);
+      ::LookAt(_pos, _viewDir, Vector3f(0.f, 1.f, 0.f), _view.world2view);
       localX = Normalize(Cross(Vector3f(0.f, 1.f, 0.f), -_viewDir));
 #if 0
       localX = Normalize(Cross(_viewDir, Vector3f(0.f, 1.f, 0.f)));
@@ -192,10 +192,10 @@ Matrix4 Frustum::cam2ndc_Perspective() const
 
 Matrix4 Frustum::cam2ndc_Orthogonal() const
 {
-      // x: [-width/2, width/2] | y: [-height/2, height/2]
+      // x: [-width/2, width/2] | y: [-height/2, height/2] z:[0, 1]
       Matrix4 orthogonal(2 / width, 0, 0, 0,
             0, 2 / height, 0, 0,
-            0, 0, -width/2/(far-near), -width/2*near/(far-near),
+            0, 0, -1.f/(far-near), -near/(far-near),
             0, 0, 0, 1);
       return orthogonal;
 }

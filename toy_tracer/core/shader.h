@@ -22,6 +22,7 @@ enum ShaderType {
       TEXT,
       PBR_INSTANCED,
       DEPTH_CUBE_MAP_INSTANCED,
+      CASCADED_DEPTH_MAP,
       NUM_SHADER_TYPE,
 };
 

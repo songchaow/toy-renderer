@@ -26,6 +26,8 @@ public:
       //void setPBRMaterial(PBRMaterial m) { rt_m = m; }
       void load();
       void draw(Shader* shader);
+      // Do not bind textures and material properties
+      void drawSimple(Shader* shader);
       // switch context to the first material
       void drawPrepare(Shader* shader, int meshIndex);
       virtual bool isInstanced() const { return false; }

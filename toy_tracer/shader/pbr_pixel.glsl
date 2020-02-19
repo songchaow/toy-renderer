@@ -5,8 +5,9 @@ in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
 in vec4 tangentWorld;
+in float zValuePos;
 #define POINT_LIGHT_NUM 4
-in float depth[POINT_LIGHT_NUM];
+#define NUM_CASCADE_SHADOW 4
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
@@ -14,7 +15,7 @@ uniform sampler2D mrSampler; // g: roughness value | b: metalness
 uniform sampler2D emissionSampler; // vec3
 uniform sampler2D normalSampler; // initially 0-1
 uniform sampler2D aoSampler;
-uniform samplerCube depthSampler;
+uniform sampler2DArray depthSampler;
 uniform float far;
 uniform vec3 albedoFactor;
 uniform vec3 emissiveFactor;
@@ -34,7 +35,9 @@ struct PointLight {
 
 };
 uniform PointLight pointLights[POINT_LIGHT_NUM];
-
+// z ranges of CSM blocks
+uniform float zpartition[NUM_CASCADE_SHADOW-1];
+uniform mat4 world2lightndc[NUM_CASCADE_SHADOW];
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
@@ -82,6 +85,29 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 }
 // ----------------------------------------------------------------------------
 
+float calcShadow(int i, float distance) {
+    // determine which shadow
+    int k = 0;
+    for(k=0;k<NUM_CASCADE_SHADOW-1;k++) {
+        if(zValuePos < zpartition[k])
+            break;
+    }
+    float kFloat = (k + 0.5) / NUM_CASCADE_SHADOW;
+    
+    vec3 ndcPos = vec3(world2lightndc[k] * vec4(posWorld, 1.0));
+    float closetDepth = texture(depthSampler, ndcPos).r;
+    float currentDepth;
+    if(pointLights[i].directional)
+        currentDepth = ndcPos.z;
+    else
+        // for point lights, use distance
+        currentDepth = distance;
+    if(closetDepth < currentDepth - 0.0015)
+        return 0.0;
+    else
+        return 1.0;
+}
+
 vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float metallic, float ao)
 {
     // add point lights
@@ -98,20 +124,12 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
         else
             L = normalize(Lraw);
         float distance = length(pointLights[i].pos - posWorld);
-        float maxDepth = texture(depthSampler, -Lraw).r;
-        maxDepth *= far;
-        if(i==0 ) {
-            float light_distance;
-            if(pointLights[i].directional)
-                light_distance = length(dot(pointLights[i].direction, -Lraw));
-            else
-                light_distance = distance;
-            float cos2 = pow(dot(normal, L), 2);
-            float tgn = sqrt((1-cos2)/cos2);
-            if(maxDepth < light_distance - 0.15 * (1 + clamp(tgn, 0, 5)))
-            // occluded
+        if(i==0) {
+            float shadow = calcShadow(i, distance);
+            if(shadow==0)
                 continue;
         }
+            
         // calculate per-light radiance
         if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
             continue; // skip

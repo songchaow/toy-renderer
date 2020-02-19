@@ -6,7 +6,6 @@ struct Frustum {
             Projective, Orthogonal
       };
       FrustumType type;
-      Vector3f dir;
       Float near;
       Float far;
       // Orthogonal
@@ -16,7 +15,7 @@ struct Frustum {
       Float aspectRatio;
       Float fov_Horizontal;
       // default Prospective ctor
-      Frustum(Float aspectRatio) : dir({ 0.0, 0.0, -1.0 }), near(0.1f), far(1500.f), aspectRatio(aspectRatio),
+      Frustum(Float aspectRatio) : near(0.1f), far(1500.f), aspectRatio(aspectRatio),
             fov_Horizontal(90.f * Pi / 180), type(Projective) {}
       Frustum() : Frustum(1.6f) {}
       Frustum(Float width, Float height, Float length) : width(width), height(height), near(0.f),
@@ -28,5 +27,7 @@ struct Frustum {
 struct View {
       Frustum f;
       Matrix4 world2view;
+      Matrix4 world2ndc;
+      View() = default;
       View(const Frustum& f, const Matrix4& m) : f(f), world2view(m) {}
 };

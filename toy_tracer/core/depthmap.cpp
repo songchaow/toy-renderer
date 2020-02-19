@@ -119,7 +119,7 @@ AABB FindAABB(const Point3f* pBegin, const Point3f* pEnd) {
       return ret;
 }
 
-void CascadedDepthMap::GenLightFrustums(const Vector3f& dir)
+void CascadedDepthMap::GenLightViews(const Vector3f& dir)
 {
       // transform to light space, with the origin set to (0,0,0) (arbitrarily)
       Matrix4 world2light = LookAt({ 0,0,0 }, dir);
@@ -129,7 +129,6 @@ void CascadedDepthMap::GenLightFrustums(const Vector3f& dir)
       for (int i = 0; i < numFrustumPoints; i++) {
             frustumPoints[i] = view2light(subFrustumPoints[i]);
       }
-      std::vector<View> lightViews;
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
             const Point3f* pbegin = frustumPoints + 4 * i;
             const Point3f* pEnd = frustumPoints + 4 * i + 8;
@@ -137,10 +136,8 @@ void CascadedDepthMap::GenLightFrustums(const Vector3f& dir)
             Float centerX = (bbox.pMax.x + bbox.pMin.x) / 2;
             Float centerY = (bbox.pMax.y + bbox.pMin.y) / 2;
             // light dir is to the -Z direction, so the pMax.z is the starting
-            Point3f posInLightSpace(centerX, centerY, bbox.pMax.z);
-            Point3f pos = light2world(posInLightSpace);
-            Frustum lightFrustum(bbox.pMax.x - bbox.pMin.x, bbox.pMax.y - bbox.pMin.y, bbox.pMax.z - bbox.pMin.z);
-            lightViews.emplace_back(lightFrustum, TranslateM(pos.x, pos.y, pos.z));
+            lightViews[i].f = Frustum(bbox.pMax.x - bbox.pMin.x, bbox.pMax.y - bbox.pMin.y, bbox.pMax.z - bbox.pMin.z);
+            lightViews[i].world2view = world2light;
       }
       // determine length(far-near), x, y, and position in view space first
       // iterate through 4 points: 

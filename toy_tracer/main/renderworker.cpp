@@ -49,6 +49,9 @@ void RenderWorker::initialize() {
       TriangleMesh::screenMesh.load();
       // Depth fbo
       glGenFramebuffers(1, &depth_fbo);
+      glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
       // Multi-sample fbo
       glGenFramebuffers(1, &ms_hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
@@ -97,8 +100,15 @@ void RenderWorker::initialize() {
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
       // no depth buffer attached
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      depthMap = new CubeDepthMap();
-      
+      // Shadow map
+      csm.initTexture();
+      csm.setCameraView(cam->cameraView());
+      Shader* pbr = LoadShader(PBR, true);
+      pbr->use();
+      uint32_t uniform_loc = pbr->getUniformLocation("zpartition");
+      for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
+            pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
+      }
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
 }
 
@@ -134,7 +144,12 @@ void RenderWorker::configPBRShader(Shader* shader) {
             shader->setUniformF(pos++, pointLights[i]->HalfAngle());
       // point shadow
       glActiveTexture(GL_TEXTURE5);
-      glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap->cubeMapObj);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, csm.tbo());
+      pos = shader->getUniformLocation("world2lightndc[0]");
+      for (int i = 0; i < NUM_CASCADED_SHADOW; i++)
+            shader->setUniformF(pos + i, &csm.lightView()[i].world2ndc);
+      // textures
+      // TODO: move these to `initialize`
       shader->setUniformI("albedoSampler", 0);
       shader->setUniformI("mrSampler", 1);
       shader->setUniformI("normalSampler", 2);
@@ -146,7 +161,28 @@ void RenderWorker::configPBRShader(Shader* shader) {
       shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
       shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
-      shader->setUniformF("far", depthMap->depthFarPlane);
+      //shader->setUniformF("far", depthMap->depthFarPlane);
+}
+
+void RenderWorker::GenCSM()
+{
+      csm.GenLightViews(_pointLights[0]->direction());
+      glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
+      glFramebufferTexture(depth_fbo, GL_DEPTH_ATTACHMENT, csm.tbo(), 0);
+      glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+      Shader* csmShader = LoadShader(CASCADED_DEPTH_MAP, true);
+      csmShader->use();
+      uint32_t u_pos = csmShader->getUniformLocation("world2ndcs[0]");
+      for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
+            csm.lightView()[i].world2ndc = csm.lightView()[i].world2view * csm.lightView()[i].f.cam2ndc_Orthogonal();
+            csmShader->setUniformF(u_pos + i, &csm.lightView()[i].world2ndc);
+      }
+      glClearDepth(1.f);
+      glClear(GL_DEPTH_BUFFER_BIT);
+      for (auto &p : primitives) {
+            p->drawSimple(csmShader);
+      }
+      glViewport(0, 0, _canvas->width(), _canvas->height());
 }
 
 void RenderWorker::renderPassPBR() {
@@ -257,16 +293,12 @@ void RenderWorker::renderLoop() {
             if (enableShadowMap && _pointLights.size() > 0) {
                   if (alreadyClear)
                         alreadyClear = false;
-                  glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
-                  depthMap->l = _pointLights[0];
-                  depthMap->GenCubeDepthMap();
-                  //glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
-                  glViewport(0, 0, _canvas->width(), _canvas->height());
+                  //GenCSM();
             }
             else {
                   if (!alreadyClear) {
                         glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
-                        depthMap->clearDepth();
+                        // TODO: csm clear
                         glViewport(0, 0, _canvas->width(), _canvas->height());
                         alreadyClear = true;
                   }

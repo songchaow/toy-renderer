@@ -10,15 +10,16 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
 //    Vertex                        Geometry                Fragment
       {"shader/vertex.glsl",              "",                     "shader/pbr_pixel.glsl"},           // PBR
       {"shader/vertex.glsl",              "",                     "shader/depth.fs"},                 // DEPTH_MAP
-      {"shader/vertex2World.glsl",        "shader/shadowmap.gs",  "shader/depthfromGS.fs"},           // DEPTH_CUBE_MAP
+      {"shader/vertex2World.glsl",        "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP
       {"shader/skybox.vs",                "",                     "shader/skybox.fs"},                // SKY_BOX
       {"shader/posAndTex.vs",             "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
       {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
       {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V
-      {"shader/vertex.glsl",              "shader/gentangene.gs",  "shader/gentangene.fs"},           // TANGENE_TEST
+      {"shader/vertex.glsl",              "shader/gentangene.gs", "shader/gentangene.fs"},            // TANGENE_TEST
       {"shader/screenTransform.vs",       "",                     "shader/text.fs"},                  // TEXT
       {"shader/vertexInstance.vs",        "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
-      {"shader/vertexInstanceShadow.vs",  "shader/shadowmap.gs",  "shader/depthfromGS.fs"},           // DEPTH_CUBE_MAP_INSTANCED
+      {"shader/vertexInstanceShadow.vs",  "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP_INSTANCED
+      {"shader/vertex2World.glsl",        "shader/csm.gs",        "shader/depthGS.fs"},               // CASCADED_DEPTH_MAP
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {

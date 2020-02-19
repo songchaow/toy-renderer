@@ -92,6 +92,16 @@ void Primitive::draw(Shader* shader) {
       glBindVertexArray(0);
 }
 
+void Primitive::drawSimple(Shader* shader) {
+      for (int i = 0; i < _meshes.size(); i++) {
+            auto& m = _meshes[i];
+            glBindVertexArray(m->vao());
+            shader->setUniformF("obj2world", _obj2world.getRowMajorData());
+            glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
+      }
+      glBindVertexArray(0);
+}
+
 void InstancedPrimitive::GenInstancedArray() {
       glGenBuffers(1, &iabo);
       glBindBuffer(GL_ARRAY_BUFFER, iabo);

@@ -36,49 +36,61 @@ struct FrustumTrapezoid {
       Float x_long;
 };
 class CascadedDepthMap {
-      GLuint textures[NUM_CASCADED_SHADOW];
-      View* cameraView;
+      GLuint texArray;
+      const View* cameraView;
       Matrix4 view2world;
       // stored in view space
       // order : top-left, top-right, down-left, down-right, and the next layer...
       static const uint32_t numFrustumPoints = (NUM_CASCADED_SHADOW + 1) * 2 * 2;
       Point3f subFrustumPoints[numFrustumPoints];
+      View lightViews[NUM_CASCADED_SHADOW];
+      Float _zPartition[NUM_CASCADED_SHADOW]; // the last one is redundant
 public:
       void initTexture() {
-            glGenTextures(NUM_CASCADED_SHADOW, textures);
-            for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
-                  glBindTexture(GL_TEXTURE_2D, textures[i]);
-                  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)0);
-                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            }
+            glGenTextures(1, &texArray);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, texArray);
+            // use floating point!
+            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, NUM_CASCADED_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)0);
+            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            // set border color to black!
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
       }
-
-      CascadedDepthMap() : cameraView(nullptr) {}
-      CascadedDepthMap(View* cameraView) : cameraView(cameraView) {
-            assert(cameraView);
-            view2world = Inverse(cameraView->world2view);
-            Float ratio = cameraView->f.far / cameraView->f.near;
-            Float ratioPerScale = std::pow(ratio, 1.f / NUM_CASCADED_SHADOW );
-            Float currNear = cameraView->f.near;
-            Float& far = cameraView->f.far;
-            Float oneDivaspectRatio = 1.f / cameraView->f.aspectRatio;
-            Float widthSlope = std::tan(cameraView->f.fov_Horizontal / 2);
+      void setCameraView(const View* cameraViewIn) {
+            cameraView = cameraViewIn;
+            view2world = Inverse(cameraViewIn->world2view);
+            Float ratio = cameraViewIn->f.far / cameraViewIn->f.near;
+            Float ratioPerScale = std::pow(ratio, 1.f / NUM_CASCADED_SHADOW);
+            Float currNear = cameraViewIn->f.near;
+            const Float& far = cameraViewIn->f.far;
+            Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
+            Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
             for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
                   subFrustumPoints[4 * i + 0] = { -widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };;
                   subFrustumPoints[4 * i + 1] = { widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };
                   subFrustumPoints[4 * i + 2] = { -widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
                   subFrustumPoints[4 * i + 3] = { widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
                   currNear *= ratioPerScale;
+                  _zPartition[i] = currNear;
             }
             subFrustumPoints[4 * NUM_CASCADED_SHADOW + 0] = { -widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
             subFrustumPoints[4 * NUM_CASCADED_SHADOW + 1] = { widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
             subFrustumPoints[4 * NUM_CASCADED_SHADOW + 2] = { -widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
             subFrustumPoints[4 * NUM_CASCADED_SHADOW + 3] = { widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
-
       }
-      void GenLightFrustums(const Vector3f& dir);
+      CascadedDepthMap() : cameraView(nullptr) {}
+      CascadedDepthMap(View* cameraView) : cameraView(cameraView) {
+            assert(cameraView);
+            setCameraView(cameraView);
+      }
+      void GenLightViews(const Vector3f& dir);
       ~CascadedDepthMap() {
-            glDeleteTextures(NUM_CASCADED_SHADOW, textures);
+            glDeleteTextures(1, &texArray);
       }
+      View* lightView() { return lightViews; }
+      const Float* zPartition() const { return _zPartition; }
+      const GLuint tbo() const { return texArray; }
 };

@@ -42,7 +42,8 @@ class RenderWorker : public QObject {
       GLuint fbo[NUM_FBO];
 #endif
       // Depth Map
-      CubeDepthMap* depthMap;
+      //CubeDepthMap* depthMap;
+      CascadedDepthMap csm;
       bool alreadyClear = false;
       GLuint depth_fbo = 0;
       // HDR Framebuffer
@@ -68,6 +69,7 @@ public slots:
       void renderLoop();
 private:
       void configPBRShader(Shader* shader);
+      void GenCSM();
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }
