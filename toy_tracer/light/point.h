@@ -26,7 +26,7 @@ public:
       Point3f& rpos() { return _posWorld; }
       bool isSpotLight() const { return _spot; }
       bool isDirectionalLight() const { return _directional;}
-      Vector3f& direction() { return _direction; }
+      Vector3f& rdirection() { return _direction; }
       const Vector3f& direction() const { return _direction; }
       Float& HalfAngle() { return _angle; }
       const Transform& obj2world() const { return Translate(_posWorld.x, _posWorld.y, _posWorld.z); }

@@ -88,8 +88,8 @@ void Skybox::draw()
       cube.glUse();
       Shader* s = LoadShader(SKY_BOX, true);
       s->use();
-      Matrix4 rotation = RenderWorker::getCamera()->world2cam().m;
-      Matrix4 cam2ndc = RenderWorker::getCamera()->Cam2NDC().m;
+      Matrix4 rotation = RenderWorker::getCamera()->world2cam();
+      const Matrix4& cam2ndc = RenderWorker::getCamera()->Cam2NDC();
       rotation[0][3] = rotation[1][3] = rotation[2][3] = 0.f;
       s->setUniformF("rotation", &rotation);
       s->setUniformF("cam2ndc", &cam2ndc);

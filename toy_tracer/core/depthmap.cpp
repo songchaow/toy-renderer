@@ -124,7 +124,7 @@ void CascadedDepthMap::GenLightViews(const Vector3f& dir)
       // transform to light space, with the origin set to (0,0,0) (arbitrarily)
       Matrix4 world2light = LookAt({ 0,0,0 }, dir);
       Matrix4 light2world = Inverse(world2light);
-      Matrix4 view2light = Inverse(cameraView->world2view) * world2light;
+      Matrix4 view2light = world2light * Inverse(cameraView->world2view);
       Point3f frustumPoints[numFrustumPoints];
       for (int i = 0; i < numFrustumPoints; i++) {
             frustumPoints[i] = view2light(subFrustumPoints[i]);
@@ -137,9 +137,23 @@ void CascadedDepthMap::GenLightViews(const Vector3f& dir)
             Float centerY = (bbox.pMax.y + bbox.pMin.y) / 2;
             // light dir is to the -Z direction, so the pMax.z is the starting
             lightViews[i].f = Frustum(bbox.pMax.x - bbox.pMin.x, bbox.pMax.y - bbox.pMin.y, bbox.pMax.z - bbox.pMin.z);
-            lightViews[i].world2view = world2light;
+            lightViews[i].world2view = TranslateM(-centerX, -centerY, -bbox.pMax.z) * world2light;
       }
       // determine length(far-near), x, y, and position in view space first
       // iterate through 4 points: 
       Point2f trazepoid[4];
+}
+
+void CascadedDepthMap::initTexture() {
+      glGenTextures(1, &texArray);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, texArray);
+      // use floating point!
+      glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, NUM_CASCADED_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // set border color to black!
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+      float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+      glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 }

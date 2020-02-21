@@ -19,6 +19,20 @@ public slots:
       void updateProperties();
 };
 
+class Vector3f_Ui : public QObject {
+      Vector3f* _m;
+      // UI widgets
+      mutable QLineEdit* posX;
+      mutable QLineEdit* posY;
+      mutable QLineEdit* posZ;
+public:
+      Vector3f_Ui(Vector3f* m) : _m(m) {}
+      void addProperties(QWidget* parent) const;
+      void reset(Vector3f* _mIn) { _m = _mIn; }
+public slots:
+      void updateProperties();
+};
+
 class Transform_Ui : public QObject {
       Transform* _m = nullptr;
       // SRT data
@@ -106,10 +120,11 @@ class PointLight_Ui : public RendererObject {
       PointLight* _m = nullptr;
       // Child UI
       mutable Point3f_Ui _pos;
+      mutable Vector3f_Ui _dir;
       mutable RGB_Spectrum_Ui _rgb;
 public:
       void addProperties(QWidget * parent) const override;
-      PointLight_Ui(PointLight* l) : _m(l), _pos(&l->rpos()), _rgb(&l->rradiance()), RendererObject(TypeID::Light) {}
+      PointLight_Ui(PointLight* l) : _m(l), _pos(&l->rpos()), _dir(&l->rdirection()), _rgb(&l->rradiance()), RendererObject(TypeID::Light) {}
       void reset(PointLight* _mIn) { _m = _mIn; }
       PointLight* m() const { return _m; }
 };

@@ -8,5 +8,6 @@ class PathTracer {
       int maxSegment = 10;
 public:
       PathTracer(Scene* scene) :scene(scene) {}
+      PathTracer() = default;
       Spectrum Li(Ray& wo);
 };

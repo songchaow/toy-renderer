@@ -13,12 +13,12 @@ Transform toNDCPerspective(Float n, Float f, Float aspectRatio, Float fov_Horizo
       Float tanHalfFov_V = tanHalfFov_H / aspectRatio;
       Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0,
             0, tanHalfFov_V, 0, 0,
-            0, 0, -f / (f - n), -f * n / (f - n),
+            0, 0, -(f + n) / (f - n), -2 * f * n / (f - n),
             0, 0, -1, 0);
       return Transform(persp);
 }
 
-Transform Camera::Cam2NDC() const
+const Matrix4& Camera::Cam2NDC() const
 {
 #if 0
       Matrix4 persp(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, clip_far / (clip_far - clip_near), -clip_far * clip_near / (clip_far - clip_near),
@@ -32,7 +32,11 @@ Transform Camera::Cam2NDC() const
       return s * t * Transform(persp);
 #endif
       //return toNDCPerspective(_near, _far, film.getHeight() / (Float)film.getWidth(), fov_Horizontal);
-      return Transform(_view.f.cam2ndc_Perspective());
+      if(ndc_transform_dirty) {
+            cam2ndc_cache = _view.f.cam2ndc_Perspective();
+            ndc_transform_dirty = false;
+      }
+      return cam2ndc_cache;
 }
 
 void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
@@ -103,7 +107,7 @@ void Camera::LookAt() {
             light.rpos() = _pos;
             if(light.isSpotLight())
                   //light.direction() = spinM(_viewDir); // apply spinM to _viewDir
-                  light.direction() = _viewDir; // apply spinM to _viewDir
+                  light.rdirection() = _viewDir; // apply spinM to _viewDir
       }
 }
 
@@ -185,17 +189,17 @@ Matrix4 Frustum::cam2ndc_Perspective() const
       Float tanHalfFov_V = tanHalfFov_H / aspectRatio;
       Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0,
             0, 1.f / tanHalfFov_V, 0, 0,
-            0, 0, -far / (far - near), -far * near / (far - near),
+            0, 0, -(far + near) / (far - near), -2 * far * near / (far - near),
             0, 0, -1, 0);
       return persp;
 }
 
 Matrix4 Frustum::cam2ndc_Orthogonal() const
 {
-      // x: [-width/2, width/2] | y: [-height/2, height/2] z:[0, 1]
+      // x: [-width/2, width/2] | y: [-height/2, height/2] z:[-1, 1]
       Matrix4 orthogonal(2 / width, 0, 0, 0,
             0, 2 / height, 0, 0,
-            0, 0, -1.f/(far-near), -near/(far-near),
+            0, 0, -2.f/(far-near), -(far + near)/(far-near),
             0, 0, 0, 1);
       return orthogonal;
 }

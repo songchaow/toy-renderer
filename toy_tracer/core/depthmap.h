@@ -46,19 +46,7 @@ class CascadedDepthMap {
       View lightViews[NUM_CASCADED_SHADOW];
       Float _zPartition[NUM_CASCADED_SHADOW]; // the last one is redundant
 public:
-      void initTexture() {
-            glGenTextures(1, &texArray);
-            glBindTexture(GL_TEXTURE_2D_ARRAY, texArray);
-            // use floating point!
-            glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, NUM_CASCADED_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (void*)0);
-            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            // set border color to black!
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-            float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-            glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-      }
+      void initTexture();
       void setCameraView(const View* cameraViewIn) {
             cameraView = cameraViewIn;
             view2world = Inverse(cameraViewIn->world2view);

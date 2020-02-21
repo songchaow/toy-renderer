@@ -38,6 +38,7 @@ uniform PointLight pointLights[POINT_LIGHT_NUM];
 // z ranges of CSM blocks
 uniform float zpartition[NUM_CASCADE_SHADOW-1];
 uniform mat4 world2lightndc[NUM_CASCADE_SHADOW];
+//uniform mat4 world2lightview[NUM_CASCADE_SHADOW];
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
@@ -85,27 +86,39 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 }
 // ----------------------------------------------------------------------------
 
-float calcShadow(int i, float distance) {
+vec3 calcShadow(int i, float distance) {
     // determine which shadow
     int k = 0;
     for(k=0;k<NUM_CASCADE_SHADOW-1;k++) {
         if(zValuePos < zpartition[k])
             break;
     }
+    vec3 color;
+    if(k==0)
+        color = vec3(1, 0, 0);
+    if(k==1)
+        color = vec3(0, 1, 0);
+    if(k==2)
+        color = vec3(0, 0, 1);
     float kFloat = (k + 0.5) / NUM_CASCADE_SHADOW;
     
     vec3 ndcPos = vec3(world2lightndc[k] * vec4(posWorld, 1.0));
-    float closetDepth = texture(depthSampler, ndcPos).r;
+    vec2 texPos = vec2(ndcPos.x/2 + 0.5, ndcPos.y/2 + 0.5);
+    float closetDepth = texture(depthSampler, vec3(texPos, k)).r;
     float currentDepth;
     if(pointLights[i].directional)
         currentDepth = ndcPos.z;
     else
         // for point lights, use distance
         currentDepth = distance;
-    if(closetDepth < currentDepth - 0.0015)
-        return 0.0;
+    //if(closetDepth < -1)
+        //return vec3(1, 1, 0);
+    //return closetDepth * color;
+    return (currentDepth-closetDepth) * color;
+    if(closetDepth < currentDepth - 0.015)
+        return vec3(0);
     else
-        return 1.0;
+        return vec3(1);
 }
 
 vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float metallic, float ao)
@@ -115,18 +128,19 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
-    for(int i = 0; i < POINT_LIGHT_NUM; i++)
+    for(int i = 0; i < 1; i++)
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L;
+        vec3 shadow;
         if(pointLights[i].directional)
             L = -normalize(pointLights[i].direction);
         else
             L = normalize(Lraw);
         float distance = length(pointLights[i].pos - posWorld);
         if(i==0) {
-            float shadow = calcShadow(i, distance);
-            if(shadow==0)
+            shadow = calcShadow(i, distance);
+            if(shadow==vec3(0))
                 continue;
         }
             
@@ -166,7 +180,8 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
         float NdotL = max(dot(normal, L), 0.0);        
 
         // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        //Lo = shadow;
     }
     return Lo;
 }

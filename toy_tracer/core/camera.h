@@ -27,6 +27,8 @@ class Camera {
       Point3f spinRefPoint;
       // Frustum
       View _view;
+      mutable bool ndc_transform_dirty = true;
+      mutable Matrix4 cam2ndc_cache;
       // Associated light
       bool light_associated = false;
       PointLight light;
@@ -40,14 +42,15 @@ class Camera {
 public:
       Camera(Scene* s, Transform cam2world, const Point2i& film_size, Float fov_Horizontal = 160.f * Pi / 180) : _view(Frustum((film_size.x / (Float)film_size.y)), cam2world.Inverse().m), s(s), tracer(s), _cam2world(cam2world),
             _pos(cam2world.m[0][3], cam2world.m[1][3], cam2world.m[2][3]), film(film_size), film_distance(film_size.y / 2 / std::tan(fov_Horizontal / 2)) {}
+      Camera(const Matrix4& world2cam, Float aspectRatio, Float fov_Horizontal, const Vector3f& viewDir) : _view(Frustum(aspectRatio), world2cam), _pos(Inverse(world2cam)[0][3], Inverse(world2cam)[1][3], Inverse(world2cam)[2][3]), film(Point2i(1,1)), _viewDir(Normalize(viewDir)) {}
       void Render(RenderOption& options);
       const Film& getFilm() const { return film; }
       // Generate XMMATRIX using XMMatrixPerspectiveFovLH
       // Generate OpenGL transform, row major order
-      Transform Cam2NDC() const;
+      const Matrix4& Cam2NDC() const;
       void LookAt();
       // Getters
-      const Transform& world2cam() const { return _view.world2view; }
+      const Matrix4& world2cam() const { return _view.world2view; }
       const View* cameraView() const { return &_view; }
       const Transform& cam2world() const { return _cam2world; }
       const Transform& rotation() const { return _rotation; }

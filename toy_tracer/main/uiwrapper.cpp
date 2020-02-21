@@ -69,6 +69,7 @@ void PointLight_Ui::addProperties(QWidget * parent) const {
       pl_group->setLayout(currentLayout);
       _pos.addProperties(pl_group);
       _rgb.addProperties(pl_group);
+      _dir.addProperties(pl_group);
       parent->layout()->addWidget(pl_group);
 }
 
@@ -146,6 +147,10 @@ void Point3f_Ui::updateProperties() {
       *_m = Point3f(posX->text().toFloat(), posY->text().toFloat(), posZ->text().toFloat());
 }
 
+void Vector3f_Ui::updateProperties() {
+      *_m = Vector3f(posX->text().toFloat(), posY->text().toFloat(), posZ->text().toFloat());
+}
+
 void RGB_Spectrum_Ui::updateProperties() {
       *_m = RGBSpectrum(_r->text().toFloat(), _g->text().toFloat(), _b->text().toFloat());
 }
@@ -188,6 +193,26 @@ void Point3f_Ui::addProperties(QWidget * parent) const
       QObject::connect(posZ, &QLineEdit::returnPressed, this, &Point3f_Ui::updateProperties);
 }
 
+void Vector3f_Ui::addProperties(QWidget * parent) const
+{
+      QWidget* lineWidget_t = new QWidget;
+      QHBoxLayout* lineLayout_t = new QHBoxLayout;
+      lineWidget_t->setLayout(lineLayout_t);
+      QLabel* pos_text = new QLabel("Direction:");
+      posX = new QLineEdit(QString::number(_m->x));
+      posY = new QLineEdit(QString::number(_m->y));
+      posZ = new QLineEdit(QString::number(_m->z));
+      lineLayout_t->addWidget(pos_text);
+      lineLayout_t->addWidget(posX);
+      lineLayout_t->addWidget(posY);
+      lineLayout_t->addWidget(posZ);
+      parent->layout()->addWidget(lineWidget_t);
+      // connect
+      QObject::connect(posX, &QLineEdit::returnPressed, this, &Vector3f_Ui::updateProperties);
+      QObject::connect(posY, &QLineEdit::returnPressed, this, &Vector3f_Ui::updateProperties);
+      QObject::connect(posZ, &QLineEdit::returnPressed, this, &Vector3f_Ui::updateProperties);
+}
+
 static void updateCameraSpeed(Float newSpeed) {
       RenderWorker::getCamera()->rspeed() = newSpeed;
 }
@@ -227,5 +252,11 @@ void addDefaultProperties(QWidget* parent) {
       parent->layout()->addWidget(bloom);
       QObject::connect(bloom, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->enableBloom = state == Qt::Checked;
+      });
+      QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
+      QObject::connect(bloom, &QPushButton::clicked, [](int state) {
+            for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {
+                  ;
+            }
       });
 }

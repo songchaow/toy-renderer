@@ -32,7 +32,7 @@ void RenderWorker::initialize() {
             LOG(ERROR) << "Load GL functions failed";
             return;
       }
-      
+      LOG(INFO) << "GL Version: " << m_context->format().majorVersion() << '.' << m_context->format().minorVersion();
       if(!cam)
             cam = CreateRTCamera(Point2i(_canvas->width(), _canvas->height()));
       //initializeOpenGLFunctions();
@@ -40,6 +40,7 @@ void RenderWorker::initialize() {
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
+      csm.initTexture();
       //glEnable(GL_CULL_FACE);
       // Associate light to camera
       if (cam->lightAssociated())
@@ -58,14 +59,10 @@ void RenderWorker::initialize() {
       glGenRenderbuffers(1, &ms_hdr_color);
       glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_color);
       glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_RGBA16F, _canvas->width(), _canvas->height());
-      glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, _canvas->width(), _canvas->height(), GL_TRUE);
-      glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       glGenRenderbuffers(1, &ms_hdr_emissive);
       glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_emissive);
       glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_RGBA16F, _canvas->width(), _canvas->height());
       glGenRenderbuffers(1, &ms_hdr_depth);
-      
       glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_depth);
       glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
       // attach them to a new fb
@@ -76,11 +73,12 @@ void RenderWorker::initialize() {
       glDrawBuffers(2, draw_bufs);
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_MULTISAMPLE);
-      GLenum res = glCheckFramebufferStatus(ms_hdr_fbo);
+      glEnable(GL_TEXTURE_3D);
+      GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       if (res == GL_FRAMEBUFFER_COMPLETE)
-            LOG(INFO) << "complete framebuffer";
+            LOG(INFO) << "ms hdr complete framebuffer";
       else
-            LOG(INFO) << "incomplete";
+            LOG(INFO) << "ms hdr incomplete";
       // HDR fbo (from ms)
       glGenFramebuffers(1, &hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
@@ -101,12 +99,12 @@ void RenderWorker::initialize() {
       // no depth buffer attached
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       // Shadow map
-      csm.initTexture();
+      
       csm.setCameraView(cam->cameraView());
       Shader* pbr = LoadShader(PBR, true);
       pbr->use();
-      uint32_t uniform_loc = pbr->getUniformLocation("zpartition");
-      for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
+      uint32_t uniform_loc = pbr->getUniformLocation("zpartition[0]");
+      for (int i = 0; i < NUM_CASCADED_SHADOW -1; i++) {
             pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
       }
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
@@ -148,6 +146,10 @@ void RenderWorker::configPBRShader(Shader* shader) {
       pos = shader->getUniformLocation("world2lightndc[0]");
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++)
             shader->setUniformF(pos + i, &csm.lightView()[i].world2ndc);
+      // pos = shader->getUniformLocation("world2lightview[0]");
+      // for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
+      //       shader->setUniformF(pos + i, &csm.lightView()[i].world2view);
+      // }
       // textures
       // TODO: move these to `initialize`
       shader->setUniformI("albedoSampler", 0);
@@ -157,9 +159,10 @@ void RenderWorker::configPBRShader(Shader* shader) {
       shader->setUniformI("aoSampler", 4);
       shader->setUniformI("depthSampler", 5);
       // set camera
-
-      shader->setUniformF("world2cam", RenderWorker::getCamera()->world2cam().getRowMajorData());
-      shader->setUniformF("cam2ndc", RenderWorker::getCamera()->Cam2NDC().getRowMajorData());
+      const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
+      const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
+      shader->setUniformF("world2cam", &w2c);
+      shader->setUniformF("cam2ndc", &c2ndc);
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       //shader->setUniformF("far", depthMap->depthFarPlane);
 }
@@ -168,19 +171,22 @@ void RenderWorker::GenCSM()
 {
       csm.GenLightViews(_pointLights[0]->direction());
       glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
-      glFramebufferTexture(depth_fbo, GL_DEPTH_ATTACHMENT, csm.tbo(), 0);
+      glBindTexture(GL_TEXTURE_2D_ARRAY, csm.tbo());
+      glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, csm.tbo(), 0);
+      GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
       Shader* csmShader = LoadShader(CASCADED_DEPTH_MAP, true);
       csmShader->use();
+      csmShader->setUniformBool("directional", _pointLights[0]->isDirectionalLight());
       uint32_t u_pos = csmShader->getUniformLocation("world2ndcs[0]");
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
-            csm.lightView()[i].world2ndc = csm.lightView()[i].world2view * csm.lightView()[i].f.cam2ndc_Orthogonal();
+            csm.lightView()[i].world2ndc = csm.lightView()[i].f.cam2ndc_Orthogonal() * csm.lightView()[i].world2view;
             csmShader->setUniformF(u_pos + i, &csm.lightView()[i].world2ndc);
       }
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
       for (auto &p : primitives) {
-            p->drawSimple(csmShader);
+            p->draw(csmShader);
       }
       glViewport(0, 0, _canvas->width(), _canvas->height());
 }
@@ -293,7 +299,7 @@ void RenderWorker::renderLoop() {
             if (enableShadowMap && _pointLights.size() > 0) {
                   if (alreadyClear)
                         alreadyClear = false;
-                  //GenCSM();
+                  GenCSM();
             }
             else {
                   if (!alreadyClear) {
