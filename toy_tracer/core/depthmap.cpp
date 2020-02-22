@@ -157,3 +157,32 @@ void CascadedDepthMap::initTexture() {
       float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
       glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 }
+
+void CascadedDepthMap::setCameraView(const View * cameraViewIn)
+{
+      cameraView = cameraViewIn;
+      view2world = Inverse(cameraViewIn->world2view);
+      Float ratio = cameraViewIn->f.far / cameraViewIn->f.near;
+      Float ratioPerScale = std::pow(ratio, 1.f / NUM_CASCADED_SHADOW);
+      Float currNear = cameraViewIn->f.near;
+      Float currNearScale = currNear;
+      Float currNearUni = currNear;
+      const Float weight = 0.4;
+      const Float& far = cameraViewIn->f.far;
+      Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
+      Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
+      for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
+            subFrustumPoints[4 * i + 0] = { -widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };;
+            subFrustumPoints[4 * i + 1] = { widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };
+            subFrustumPoints[4 * i + 2] = { -widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
+            subFrustumPoints[4 * i + 3] = { widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
+            currNearScale *= ratioPerScale;
+            currNearUni += (cameraViewIn->f.far - cameraViewIn->f.near) / NUM_CASCADED_SHADOW;
+            currNear = weight * currNearUni + (1 - weight) * currNearScale;
+            _zPartition[i] = currNear;
+      }
+      subFrustumPoints[4 * NUM_CASCADED_SHADOW + 0] = { -widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
+      subFrustumPoints[4 * NUM_CASCADED_SHADOW + 1] = { widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
+      subFrustumPoints[4 * NUM_CASCADED_SHADOW + 2] = { -widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
+      subFrustumPoints[4 * NUM_CASCADED_SHADOW + 3] = { widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
+}

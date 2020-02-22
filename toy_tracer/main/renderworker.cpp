@@ -178,6 +178,7 @@ void RenderWorker::GenCSM()
       Shader* csmShader = LoadShader(CASCADED_DEPTH_MAP, true);
       csmShader->use();
       csmShader->setUniformBool("directional", _pointLights[0]->isDirectionalLight());
+      csmShader->setUniformI("albedoSampler", 0);
       uint32_t u_pos = csmShader->getUniformLocation("world2ndcs[0]");
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
             csm.lightView()[i].world2ndc = csm.lightView()[i].f.cam2ndc_Orthogonal() * csm.lightView()[i].world2view;

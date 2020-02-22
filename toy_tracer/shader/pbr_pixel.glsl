@@ -114,8 +114,8 @@ vec3 calcShadow(int i, float distance) {
     //if(closetDepth < -1)
         //return vec3(1, 1, 0);
     //return closetDepth * color;
-    return (currentDepth-closetDepth) * color;
-    if(closetDepth < currentDepth - 0.015)
+    //return (currentDepth-closetDepth) * color;
+    if(closetDepth*2-1 < currentDepth - 0.0015)
         return vec3(0);
     else
         return vec3(1);
@@ -180,7 +180,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
         float NdotL = max(dot(normal, L), 0.0);        
 
         // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         //Lo = shadow;
     }
     return Lo;

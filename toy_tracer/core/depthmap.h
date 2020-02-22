@@ -47,28 +47,7 @@ class CascadedDepthMap {
       Float _zPartition[NUM_CASCADED_SHADOW]; // the last one is redundant
 public:
       void initTexture();
-      void setCameraView(const View* cameraViewIn) {
-            cameraView = cameraViewIn;
-            view2world = Inverse(cameraViewIn->world2view);
-            Float ratio = cameraViewIn->f.far / cameraViewIn->f.near;
-            Float ratioPerScale = std::pow(ratio, 1.f / NUM_CASCADED_SHADOW);
-            Float currNear = cameraViewIn->f.near;
-            const Float& far = cameraViewIn->f.far;
-            Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
-            Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
-            for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
-                  subFrustumPoints[4 * i + 0] = { -widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };;
-                  subFrustumPoints[4 * i + 1] = { widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };
-                  subFrustumPoints[4 * i + 2] = { -widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
-                  subFrustumPoints[4 * i + 3] = { widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
-                  currNear *= ratioPerScale;
-                  _zPartition[i] = currNear;
-            }
-            subFrustumPoints[4 * NUM_CASCADED_SHADOW + 0] = { -widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
-            subFrustumPoints[4 * NUM_CASCADED_SHADOW + 1] = { widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };
-            subFrustumPoints[4 * NUM_CASCADED_SHADOW + 2] = { -widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
-            subFrustumPoints[4 * NUM_CASCADED_SHADOW + 3] = { widthSlope * far, -widthSlope * far * oneDivaspectRatio, -far };
-      }
+      void setCameraView(const View* cameraViewIn);
       CascadedDepthMap() : cameraView(nullptr) {}
       CascadedDepthMap(View* cameraView) : cameraView(cameraView) {
             assert(cameraView);
