@@ -235,6 +235,19 @@ void addDefaultProperties(QWidget* parent) {
             Float newspeed = speed->text().toFloat();
             RenderWorker::getCamera()->rspeed() = newspeed;
       });
+      QLabel* nearPlaneText = new QLabel("Camera near plane:");
+      QLineEdit* nearPlane = new QLineEdit(QString::number(RenderWorker::getCamera()->nearPlane()));
+      QLabel* farPlaneText = new QLabel("Camera far plane:");
+      QLineEdit* farPlane = new QLineEdit(QString::number(RenderWorker::getCamera()->farPlane()));
+      addHLayout(parent, { nearPlaneText, nearPlane });
+      addHLayout(parent, { farPlaneText, farPlane });
+      auto setNF = [=]() {
+            Float near = nearPlane->text().toFloat();
+            Float far = farPlane->text().toFloat();
+            RenderWorker::getCamera()->setNearFar(near, far);
+      };
+      QObject::connect(nearPlane, &QLineEdit::returnPressed, setNF);
+      QObject::connect(farPlane, &QLineEdit::returnPressed, setNF);
       QCheckBox* renderLight = new QCheckBox("Render point lights");
       renderLight->setCheckState(RenderWorker::Instance()->renderPointLight ? Qt::Checked : Qt::Unchecked);
       parent->layout()->addWidget(renderLight);
