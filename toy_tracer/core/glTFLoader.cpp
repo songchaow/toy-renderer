@@ -131,32 +131,35 @@ void Matrix4fromColMajorArray(const Value& node, Matrix4& m) {
 void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<char*> &buffer_array, const std::vector<PBRMaterial>& materials,
       const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive*>& primitives) {
       // transform
+      Matrix4 new_mesh2obj;
       auto it = node.FindMember("matrix");
       if (it != node.MemberEnd()) {
             // use M * vertices
-            Matrix4fromColMajorArray(it->value, curr_mesh2obj);
+            Matrix4fromColMajorArray(it->value, new_mesh2obj);
       }
       else {
             // use TRS * vertices
             it = node.FindMember("scale");
             if (it != node.MemberEnd()) {
-                  curr_mesh2obj = ScaleM(it->value[0].GetFloat(),
+                  new_mesh2obj = ScaleM(it->value[0].GetFloat(),
                         it->value[1].GetFloat(), it->value[2].GetFloat());
             }
             it = node.FindMember("rotation");
             if (it != node.MemberEnd()) {
                   Matrix4 r;
-                  Quaternion q(it->value[0].GetFloat(), it->value[1].GetFloat(), it->value[2].GetFloat(), it->value[3].GetFloat());
+                  // it->value[3] is the scalar
+                  Quaternion q(it->value[3].GetFloat(), it->value[0].GetFloat(), it->value[1].GetFloat(), it->value[2].GetFloat());
                   r = q.toMatrix4();
-                  curr_mesh2obj = r * curr_mesh2obj;
+                  new_mesh2obj = r * new_mesh2obj;
             }
             it = node.FindMember("translation");
             if (it != node.MemberEnd()) {
                   Matrix4 t = TranslateM(it->value[0].GetFloat(),
                         it->value[1].GetFloat(), it->value[2].GetFloat());
-                  curr_mesh2obj = t * curr_mesh2obj;
+                  new_mesh2obj = t * new_mesh2obj;
             }
       }
+      curr_mesh2obj = new_mesh2obj * curr_mesh2obj;
       it = node.FindMember("mesh");
       if (it != node.MemberEnd())
       {

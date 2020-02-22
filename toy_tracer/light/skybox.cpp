@@ -18,14 +18,14 @@ bool EquiRectSkybox::Sample_wi(Point2f& sample, Interaction& i, Vector3f& wi, Fl
 }
 
 static Point3f _worldPositions[] = {
-      {-1.0f,  -1.0f, -1.0f},
-      {-1.0f, -1.0f, 1.0f},
-      {-1.0f, 1.0f, -1.0f},
-      {-1.0f, 1.0f, 1.0f},
-      {1.0f, -1.0f, -1.0f},
-      {1.0f, -1.0f, 1.0f},
-      {1.0f, 1.0f, -1.0f},
-      {1.0f, 1.0f, 1.0f}
+      {-5.0f,  -5.0f, -5.0f},
+      {-5.0f, -5.0f, 5.0f},
+      {-5.0f, 5.0f, -5.0f},
+      {-5.0f, 5.0f, 5.0f},
+      {5.0f, -5.0f, -5.0f},
+      {5.0f, -5.0f, 5.0f},
+      {5.0f, 5.0f, -5.0f},
+      {5.0f, 5.0f, 5.0f}
 };
 
 static uint32_t indices[] = {
