@@ -106,6 +106,14 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 // ----------------------------------------------------------------------------
+vec2 spin(vec2 dir, float random) {
+    return vec2(cos(random) * dir.x - sin(random) * dir.y,
+               sin(random) * dir.x - cos(random) * dir.y);
+}
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 vec3 calcShadow(int lightIdx, float distance) {
     // determine which shadow
@@ -140,8 +148,9 @@ vec3 calcShadow(int lightIdx, float distance) {
     bool totalOccluded = true;
     bool totalPass = true;
     int numOccluded = 0;
+    float r = rand(texPos);
     for(int i = 0; i < 16; i++) {
-        vec2 p = searchWidthUV * PossionDistribution[i] + texPos;
+        vec2 p = searchWidthUV * spin(PossionDistribution[i], r) + texPos;
         float currNearDepth = texture(depthSampler, vec3(p, k)).r;
         if(currNearDepth >= currentDepth - SHADOW_BIAS)
             // pass
@@ -152,10 +161,10 @@ vec3 calcShadow(int lightIdx, float distance) {
             averageDepth += currNearDepth;
         }
     }
-    // if(totalOccluded)
-    //     return vec3(0);
-    // if(totalPass)
-    //     return vec3(1);
+    if(totalOccluded)
+        return vec3(0);
+    if(totalPass)
+        return vec3(1);
     // compute PCF range
     averageDepth /= numOccluded;
     float actualPenumbraSize = max(currentDepth - averageDepth, 0) * lightfrustumSize[k].z * pointLights[lightIdx].size;
@@ -163,7 +172,7 @@ vec3 calcShadow(int lightIdx, float distance) {
     vec2 actualPenumbraSizeUV = vec2(actualPenumbraSize/lightfrustumSize[k].x, actualPenumbraSize/lightfrustumSize[k].y);
     float shadow = 0;
     for(int i=0;i<16;i++) {
-        vec2 p = actualPenumbraSizeUV * PossionDistribution[i] + texPos;
+        vec2 p = actualPenumbraSizeUV * spin(PossionDistribution[i], r) + texPos;
         float d = texture(depthSampler, vec3(p, k)).r;
         if(d >= currentDepth - SHADOW_BIAS)
             // pass
