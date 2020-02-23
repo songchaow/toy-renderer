@@ -11,7 +11,7 @@ void PointLight::drawDepthMap_Point(const View& v) const
       s->setUniformF("world2cam", &v.world2view);
       Matrix4 cam2ndc = v.f.cam2ndc_Orthogonal();
       s->setUniformF("cam2ndc", &cam2ndc);
-      s->setUniformF("far", v.f.far);
+      s->setUniformF("far", v.f.Far);
 
 }
 

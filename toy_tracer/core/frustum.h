@@ -7,7 +7,7 @@ struct Frustum {
       };
       FrustumType type;
       Float near;
-      Float far;
+      Float Far;
       // Orthogonal
       Float width;
       Float height; // not used
@@ -15,11 +15,11 @@ struct Frustum {
       Float aspectRatio;
       Float fov_Horizontal;
       // default Prospective ctor
-      Frustum(Float aspectRatio) : near(1.f), far(2000.f), aspectRatio(aspectRatio),
+      Frustum(Float aspectRatio) : near(1.f), Far(2000.f), aspectRatio(aspectRatio),
             fov_Horizontal(90.f * Pi / 180), type(Projective) {}
       Frustum() : Frustum(1.6f) {}
       Frustum(Float width, Float height, Float length) : width(width), height(height), near(0.f),
-            far(length) {}
+            Far(length) {}
       Matrix4 cam2ndc_Perspective() const;
       Matrix4 cam2ndc_Orthogonal() const;
 };

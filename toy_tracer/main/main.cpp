@@ -67,6 +67,7 @@ int main(int argc, char *argv[])
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
       //PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
       PointLight* l = new PointLight(RGBSpectrum(1, 1, 1), Vector3f(0.f, -1.f, -1.f));
+      l->setLightSize(0.1);
       //RenderWorker::Instance()->loadPointLight(l);
       MainWindow::getInstance()->addPointLight(l);
 #endif

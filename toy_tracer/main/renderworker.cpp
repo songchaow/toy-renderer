@@ -140,12 +140,20 @@ void RenderWorker::configPBRShader(Shader* shader) {
       // 6: cosAngle
       for (int i = 0; i < pointLights.size(); i++)
             shader->setUniformF(pos++, pointLights[i]->HalfAngle());
+      pos += Shader::maxPointLightNum - pointLights.size();
+      // 7: light size
+      for (int i = 0; i < pointLights.size(); i++)
+            shader->setUniformF(pos++, pointLights[i]->lightSize());
       // point shadow
       glActiveTexture(GL_TEXTURE5);
       glBindTexture(GL_TEXTURE_2D_ARRAY, csm.tbo());
       pos = shader->getUniformLocation("world2lightndc[0]");
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++)
             shader->setUniformF(pos + i, &csm.lightView()[i].world2ndc);
+      pos = shader->getUniformLocation("lightfrustumSize[0]");
+      for (int i = 0; i < NUM_CASCADED_SHADOW; i++)
+            shader->setUniformF(pos + i, csm.lightView()[i].f.width, csm.lightView()[i].f.height,
+                  csm.lightView()[i].f.Far);
       // pos = shader->getUniformLocation("world2lightview[0]");
       // for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
       //       shader->setUniformF(pos + i, &csm.lightView()[i].world2view);

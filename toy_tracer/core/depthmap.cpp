@@ -149,8 +149,8 @@ void CascadedDepthMap::initTexture() {
       glBindTexture(GL_TEXTURE_2D_ARRAY, texArray);
       // use floating point!
       glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, SHADOW_WIDTH, SHADOW_HEIGHT, NUM_CASCADED_SHADOW, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
       // set border color to black!
       glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
       glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
@@ -162,13 +162,13 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
 {
       cameraView = cameraViewIn;
       view2world = Inverse(cameraViewIn->world2view);
-      Float ratio = cameraViewIn->f.far / cameraViewIn->f.near;
+      Float ratio = cameraViewIn->f.Far / cameraViewIn->f.near;
       Float ratioPerScale = std::pow(ratio, 1.f / NUM_CASCADED_SHADOW);
       Float currNear = cameraViewIn->f.near;
       Float currNearScale = currNear;
       Float currNearUni = currNear;
       const Float weight = 0.4;
-      const Float& far = cameraViewIn->f.far;
+      const Float& far = cameraViewIn->f.Far;
       Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
       Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
@@ -177,7 +177,7 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
             subFrustumPoints[4 * i + 2] = { -widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
             subFrustumPoints[4 * i + 3] = { widthSlope * currNear, -widthSlope * currNear * oneDivaspectRatio, -currNear };
             currNearScale *= ratioPerScale;
-            currNearUni += (cameraViewIn->f.far - cameraViewIn->f.near) / NUM_CASCADED_SHADOW;
+            currNearUni += (cameraViewIn->f.Far - cameraViewIn->f.near) / NUM_CASCADED_SHADOW;
             currNear = weight * currNearUni + (1 - weight) * currNearScale;
             _zPartition[i] = currNear;
       }

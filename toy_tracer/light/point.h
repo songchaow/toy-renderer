@@ -8,6 +8,9 @@ class PointLight : public Light {
       bool _spot = false;
       bool _directional = false;
       Float _angle;
+      // for directional light, the angle the area subtends;
+      // for point light, the light size
+      Float _lightSize = 0.f;
       Vector3f _direction;
 public:
       // without dividing r squared
@@ -33,6 +36,8 @@ public:
       Transform world2obj() const { return Translate(-_posWorld.x, -_posWorld.y, -_posWorld.z); }
       void drawDepthMap_Point(const View& v) const;
       void CreateDepthMap_Direction(const View& v) const;
+      void setLightSize(Float size) { _lightSize = size; }
+      const Float& lightSize() const { return _lightSize; }
 };
 
 class DirectionalLight {

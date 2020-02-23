@@ -58,8 +58,8 @@ public:
       bool rotationYTrigger() const { return _rotationYTrigger; }
       bool rotationTrigger() const { return _rotationXTrigger || _rotationYTrigger; }
       Float nearPlane() const { return _view.f.near; }
-      void setNearFar(Float n, Float f) { _view.f.near = n; _view.f.far = f; ndc_transform_dirty = true; }
-      Float farPlane() const { return _view.f.far; }
+      void setNearFar(Float n, Float f) { _view.f.near = n; _view.f.Far = f; ndc_transform_dirty = true; }
+      Float farPlane() const { return _view.f.Far; }
       bool lightAssociated() const { return light_associated; }
       PointLight* associatedLight() { return &light; }
       void setAssociatedLight(PointLight l);

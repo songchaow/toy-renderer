@@ -8,6 +8,16 @@
 #include <QCheckBox>
 #include <QRadioButton>
 
+void addHLayout(QWidget* parent, const std::vector<QWidget*>& elements) {
+      QWidget* lineWidget = new QWidget;
+      QHBoxLayout* lineLayout = new QHBoxLayout;
+      lineWidget->setLayout(lineLayout);
+      for (auto* e : elements) {
+            lineLayout->addWidget(e);
+      }
+      parent->layout()->addWidget(lineWidget);
+}
+
 void PBRMaterial_Ui::updateProperties() {
       if (!albedo_text->text().isEmpty())
             _m->albedo_map.resetImage(albedo_text->text().toStdString());
@@ -70,6 +80,12 @@ void PointLight_Ui::addProperties(QWidget * parent) const {
       _pos.addProperties(pl_group);
       _rgb.addProperties(pl_group);
       _dir.addProperties(pl_group);
+      QLabel* size_text = new QLabel("Light Size:");
+      QLineEdit* size_edit = new QLineEdit(QString::number(_m->lightSize()));
+      QObject::connect(size_edit, &QLineEdit::returnPressed, [=]() {
+            _m->setLightSize(size_edit->text().toFloat());
+      });
+      addHLayout(parent, { size_text, size_edit });
       parent->layout()->addWidget(pl_group);
 }
 
@@ -217,15 +233,7 @@ static void updateCameraSpeed(Float newSpeed) {
       RenderWorker::getCamera()->rspeed() = newSpeed;
 }
 
-void addHLayout(QWidget* parent, const std::vector<QWidget*>& elements) {
-      QWidget* lineWidget = new QWidget;
-      QHBoxLayout* lineLayout = new QHBoxLayout;
-      lineWidget->setLayout(lineLayout);
-      for (auto* e : elements) {
-            lineLayout->addWidget(e);
-      }
-      parent->layout()->addWidget(lineWidget);
-}
+
 
 void addDefaultProperties(QWidget* parent) {
       QLabel* camSpeed_text = new QLabel("Camera speed:");

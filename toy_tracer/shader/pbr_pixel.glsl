@@ -8,6 +8,8 @@ in vec4 tangentWorld;
 in float zValuePos;
 #define POINT_LIGHT_NUM 4
 #define NUM_CASCADE_SHADOW 4
+#define DEPTH_SEARCH_NUM  6
+#define SHADOW_BIAS 0.0015
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
@@ -32,17 +34,36 @@ struct PointLight {
     bool directional;
     vec3 direction;
     float cosAngle;
+    float size;
 
 };
 uniform PointLight pointLights[POINT_LIGHT_NUM];
 // z ranges of CSM blocks
 uniform float zpartition[NUM_CASCADE_SHADOW-1];
 uniform mat4 world2lightndc[NUM_CASCADE_SHADOW];
+uniform vec3 lightfrustumSize[NUM_CASCADE_SHADOW]; // width, height, length
 //uniform mat4 world2lightview[NUM_CASCADE_SHADOW];
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
-
+uniform vec2 PossionDistribution[16] = vec2[](
+    vec2(-0.94201624, -0.39906216),
+    vec2( 0.94558609, -0.76890725 ),
+    vec2(-0.094184101, -0.92938870),
+    vec2( 0.34495938, 0.29387760),
+    vec2(-0.91588581, 0.45771432),
+    vec2(-0.81544232, -0.87912464),
+    vec2(-0.38277543, 0.27676845),
+    vec2( 0.97484398, 0.75648379),
+    vec2( 0.44323325, -0.97511554),
+    vec2( 0.53742981, -0.47373420),
+    vec2(-0.26496911, -0.41893023),
+    vec2( 0.79197514, 0.19090188),
+    vec2(-0.24188840, 0.99706507),
+    vec2(-0.81409955, 0.91437590),
+    vec2( 0.19984126, 0.78641367),
+    vec2( 0.14383161, -0.14100790)
+                              );
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -86,7 +107,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 }
 // ----------------------------------------------------------------------------
 
-vec3 calcShadow(int i, float distance) {
+vec3 calcShadow(int lightIdx, float distance) {
     // determine which shadow
     int k = 0;
     for(k=0;k<NUM_CASCADE_SHADOW-1;k++) {
@@ -104,21 +125,52 @@ vec3 calcShadow(int i, float distance) {
     
     vec3 ndcPos = vec3(world2lightndc[k] * vec4(posWorld, 1.0));
     vec2 texPos = vec2(ndcPos.x/2 + 0.5, ndcPos.y/2 + 0.5);
+    
+    
     float closetDepth = texture(depthSampler, vec3(texPos, k)).r;
     float currentDepth;
-    if(pointLights[i].directional)
-        currentDepth = ndcPos.z;
+    if(pointLights[lightIdx].directional)
+        currentDepth = (ndcPos.z + 1) / 2; // map to [0, 1]
     else
         // for point lights, use distance
         currentDepth = distance;
-    //if(closetDepth < -1)
-        //return vec3(1, 1, 0);
-    //return closetDepth * color;
-    //return (currentDepth-closetDepth) * color;
-    if(closetDepth*2-1 < currentDepth - 0.0015)
-        return vec3(0);
-    else
-        return vec3(1);
+    // search the block which subtends the area light
+    float searchWidthUV = currentDepth * lightfrustumSize[k].z * pointLights[lightIdx].size / lightfrustumSize[k].x;
+    float averageDepth = 0;
+    bool totalOccluded = true;
+    bool totalPass = true;
+    int numOccluded = 0;
+    for(int i = 0; i < 16; i++) {
+        vec2 p = searchWidthUV * PossionDistribution[i] + texPos;
+        float currNearDepth = texture(depthSampler, vec3(p, k)).r;
+        if(currNearDepth >= currentDepth - SHADOW_BIAS)
+            // pass
+            totalOccluded = false;
+        else {
+            totalPass = false;
+            numOccluded++;
+            averageDepth += currNearDepth;
+        }
+    }
+    // if(totalOccluded)
+    //     return vec3(0);
+    // if(totalPass)
+    //     return vec3(1);
+    // compute PCF range
+    averageDepth /= numOccluded;
+    float actualPenumbraSize = max(currentDepth - averageDepth, 0) * lightfrustumSize[k].z * pointLights[lightIdx].size;
+    //actualPenumbraSize = 1.0;
+    vec2 actualPenumbraSizeUV = vec2(actualPenumbraSize/lightfrustumSize[k].x, actualPenumbraSize/lightfrustumSize[k].y);
+    float shadow = 0;
+    for(int i=0;i<16;i++) {
+        vec2 p = actualPenumbraSizeUV * PossionDistribution[i] + texPos;
+        float d = texture(depthSampler, vec3(p, k)).r;
+        if(d >= currentDepth - SHADOW_BIAS)
+            // pass
+            shadow += 1.0;
+    }
+    shadow /= 16;
+    return vec3(shadow);
 }
 
 vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float metallic, float ao)
@@ -140,8 +192,6 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
         float distance = length(pointLights[i].pos - posWorld);
         if(i==0) {
             shadow = calcShadow(i, distance);
-            if(shadow==vec3(0))
-                continue;
         }
             
         // calculate per-light radiance
@@ -180,7 +230,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
         float NdotL = max(dot(normal, L), 0.0);        
 
         // add to outgoing radiance Lo
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL * shadow;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         //Lo = shadow;
     }
     return Lo;
