@@ -167,7 +167,7 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
       Float currNear = cameraViewIn->f.near;
       Float currNearScale = currNear;
       Float currNearUni = currNear;
-      const Float weight = 0.4;
+      const Float weight = 0.13;
       const Float& far = cameraViewIn->f.Far;
       Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
       Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
