@@ -105,7 +105,7 @@ void renderText(const std::string& txt, Point2f startPos, Float scale) {
       glDisable(GL_DEPTH_TEST);
       for (const char& c : txt) {
             if (c == '\n') {
-                  currPosx = 0;
+                  currPosx = startPos.x;
                   currPosy -= (pixelHeight + lineMargin);
                   continue;
             }
@@ -137,5 +137,9 @@ void renderText(const std::string& txt, Point2f startPos, Float scale) {
 
 void renderTextAtTopLeft(const std::string& txt, Float scale) {
       Point2f startPos = { 0, (Float)RenderWorker::Instance()->resolution().y - (Float)pixelHeight };
+      renderText(txt, startPos, scale);
+}
+void renderTextAtTopRight(const std::string& txt, Float scale) {
+      Point2f startPos = { (Float)RenderWorker::Instance()->resolution().x - 200, (Float)RenderWorker::Instance()->resolution().y - (Float)pixelHeight };
       renderText(txt, startPos, scale);
 }

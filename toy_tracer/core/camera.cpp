@@ -1,4 +1,5 @@
 #include "core/camera.h"
+#include "main/renderworker.h"
 #include <cassert>
 
 Ray Camera::GenerateRay(const Point2f& pFilm)
@@ -39,9 +40,19 @@ const Matrix4& Camera::Cam2NDC() const
       return cam2ndc_cache;
 }
 
+// TODO: remove
 void Camera::setOrientationTransform(Float offsetX, Float offsetY) {
-      _rotation = Rotate(offsetY/50.f, offsetX/50.f);
+      _rotation = Rotate(offsetY * rotateScale, offsetX * rotateScale);
       _rotationXTrigger = true;
+}
+
+void Camera::calcRotationMatrix(Float offX, Float offY) {
+      static Vector3f hRotateAxis(0, 1, 0);
+      static Vector3f vRotateAxis;
+      vRotateAxis = Cross(_viewDir, Vector3f(0, 1, 0));
+      Quaternion vRotation(vRotateAxis, offY);
+      Quaternion hRotation(hRotateAxis, offX);
+      _rotation = (vRotation * hRotation).toMatrix4();
 }
 
 // assume the axis is z for now
@@ -146,6 +157,22 @@ void Camera::applyTranslation(volatile bool* keyStatuses, Float deltaT) {
             // Right
             _pos += offset * localX;
       LookAt();
+}
+
+void Camera::Tick()
+{
+      Canvas* c = RenderWorker::Instance()->canvas();
+      // apply rotation
+      
+      const Point2f mouseMove = c->lastMouseMove();
+      if (mouseMove.x == 0 && mouseMove.y == 0)
+            ;
+      else {
+            calcRotationMatrix(mouseMove.x / 500, mouseMove.y / 500);
+            _viewDir = Normalize(_rotation(_viewDir));
+            LookAt();
+      }
+      // apply translation
 }
 
 void Camera::applyRotation() {

@@ -7,6 +7,7 @@
 #include "main/renderworker.h"
 #include "main/ResourceManager.h"
 #include "core/glTFLoader.h"
+#include <thread>
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -29,11 +30,13 @@ int main(int argc, char *argv[])
       RenderWorker* worker = RenderWorker::Instance();
       worker->setCanvas(canvas);
       worker->setCamera(cam);
-      QThread workerThread;
-      worker->moveToThread(&workerThread);
-      QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
-      QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
+      /*QThread workerThread;
+      worker->moveToThread(&workerThread);*/
+      //QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
+      //worker->initialize();
+      //QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
       worker->skybox().loadSkybox();
+      std::thread renderThread(&RenderWorker::start, worker);
 #if 0
       // create albedo texture for balls
       Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
@@ -56,9 +59,9 @@ int main(int argc, char *argv[])
       //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;
-      glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
-      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
+      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)
@@ -71,7 +74,7 @@ int main(int argc, char *argv[])
       //RenderWorker::Instance()->loadPointLight(l);
       MainWindow::getInstance()->addPointLight(l);
 #endif
-      workerThread.start();
+      //workerThread.start();
       a.exec();
 	return 0;
 }

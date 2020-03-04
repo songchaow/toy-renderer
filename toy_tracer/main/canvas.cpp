@@ -16,6 +16,15 @@ Canvas::Canvas(int width, int height) {
       create();
 }
 
+const Point2f Canvas::lastMouseMove()
+{
+      static bool firstDrag = false;
+      auto pMouse = QCursor::pos();
+      Point2f oldPos = _pos0;
+      _pos0 = Point2f(pMouse.x(), pMouse.y());
+      return Point2f(_pos0 - oldPos);
+}
+
 void Canvas::mousePressEvent(QMouseEvent *ev) {
       _drag = true;
       _pos0 = ev->pos();
@@ -24,15 +33,17 @@ void Canvas::mousePressEvent(QMouseEvent *ev) {
 void Canvas::mouseReleaseEvent(QMouseEvent *ev) {
       _drag = false;
 }
-
+#if 0
 void Canvas::mouseMoveEvent(QMouseEvent *ev) {
-      if (_drag) {
+      //if (_drag) {
+      if(false) {
             // apply transform: cam()->setTransform(t)
             Float dx = ev->pos().x() - _pos0.x, dy = ev->pos().y() - _pos0.y;
             _pendingRotation = Rotate(dx / 50.f, dy / 50.f);
             if (camera_obj) {
                   // TODO: Camera's setTransform's parameters should be of type Transform
                   RenderWorker::getCamera()->setOrientationTransform(dx, dy);
+                  RenderWorker::getCamera()->applyRotation();
                   //RenderWorker::getCamera()->setSpinTransform(dx, Point3f(0.f, 0.f, 0.f));
             }
             else {
@@ -47,6 +58,7 @@ void Canvas::mouseMoveEvent(QMouseEvent *ev) {
             _pos0 = ev->pos();
       }
 }
+#endif
 
 void Canvas::keyPressEvent(QKeyEvent *ev) {
       switch (ev->key()) {

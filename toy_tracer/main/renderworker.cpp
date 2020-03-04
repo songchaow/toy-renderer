@@ -19,6 +19,11 @@ Camera* CreateRTCamera(const Point2i& screen_size) {
       return new Camera(nullptr, Translate(0.f, 0.f, 5.f), screen_size, 90.f * Pi / 180);
 }
 
+void RenderWorker::start() {
+      initialize();
+      renderLoop();
+}
+
 void RenderWorker::initialize() {
       qDebug() << "RenderWorker Thread:" << QThread::currentThread();
       m_context = new QOpenGLContext();
@@ -243,10 +248,11 @@ void RenderWorker::renderPassCubeMapDepth() {
 void RenderWorker::renderLoop() {
       int loopN = 0;
       for(;;) {
-            m_context->makeCurrent(_canvas);
+            
             profiler.Clear();
-            // resize the camera if needed
             profiler.AddTimeStamp();
+            m_context->makeCurrent(_canvas);
+            // resize the camera if needed
             assert(_canvas);
             if (_canvas->resized()) {
                   // set glSetViewport
@@ -254,9 +260,10 @@ void RenderWorker::renderLoop() {
                   _canvas->clearResized();
             }
             // update the camera's orientation
-            if (RenderWorker::cam->rotationTrigger()) {
+            cam->Tick();
+            /*if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
-            }
+            }*/
             if (_canvas->keyPressed()) {
                   if (_canvas->CameraorObject())
                         cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
@@ -375,9 +382,12 @@ void RenderWorker::renderLoop() {
             hdr->setUniformF("explosure", 1.0);
             glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
             // Profiling
-            profiler.AddTimeStamp();
             profiler.PrintProfile();
+            profiler.PrintWorstProfile();
+            
+            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
             m_context->swapBuffers(_canvas);
+            profiler.AddTimeStamp();
       }
 }
 

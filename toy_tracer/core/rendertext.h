@@ -9,4 +9,5 @@ struct Character {
 };
 
 void renderTextAtTopLeft(const std::string& txt, Float scale);
+void renderTextAtTopRight(const std::string& txt, Float scale);
 void renderText(const std::string& txt, Point2f startPos, Float scale);

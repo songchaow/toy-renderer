@@ -3,23 +3,20 @@
 #include <vector>
 #include <core/rendertext.h>
 class Profiler {
-      std::vector<std::chrono::time_point<std::chrono::system_clock>> times;
+      static const char numBuffer = 2;
+      std::vector<std::chrono::time_point<std::chrono::system_clock>> times[numBuffer];
+      // the following two vectors are paired
+      std::vector<std::chrono::microseconds> worst_intervals;
+      std::vector<std::chrono::time_point<std::chrono::system_clock>> worst_interval_record_times;
       std::vector<std::string> phaseNames;
+      uint32_t currIndex = 0;
+      std::chrono::microseconds frame_duration;
+      unsigned char currRecordBuffer;
 public:
-      Profiler() = default;
-      void AddTimeStamp() { times.push_back(std::chrono::system_clock::now()); }
-      void Clear() { times.clear(); }
-      void setPhaseNames(const std::vector<std::string>& names) { phaseNames = names; }
-      void PrintProfile() {
-            std::chrono::microseconds elapsed_seconds =
-                  std::chrono::duration_cast<std::chrono::microseconds>(times.back() - times.front());
-            std::string duration_str = "Total Frame: " + std::to_string((Float)elapsed_seconds.count()/1000) + "ms";
-            for (int i = 0; i < times.size() - 1; i++) {
-                  std::chrono::microseconds period =
-                        std::chrono::duration_cast<std::chrono::microseconds>(times[i+1] - times[i]);
-                  duration_str += '\n';
-                  duration_str += phaseNames[i] + ": " + std::to_string((Float)period.count()/1000) + "ms";
-            }
-            renderTextAtTopLeft(duration_str, 1.0);
-      }
+      Profiler() : currRecordBuffer(0) {}
+      void AddTimeStamp();
+      void Clear() { currIndex = 0; currRecordBuffer = (currRecordBuffer + 1) % 2; }
+      void setPhaseNames(const std::vector<std::string>& names);
+      void PrintProfile();
+      void PrintWorstProfile();
 };

@@ -26,10 +26,10 @@ public:
       void setControlCamera() { camera_obj = true; }
       void setControlObject() { camera_obj = false; }
       bool CameraorObject() { return camera_obj; }
+      const Point2f lastMouseMove();
 protected:
       void mousePressEvent(QMouseEvent *ev) override;
       void mouseReleaseEvent(QMouseEvent *ev) override;
-      void mouseMoveEvent(QMouseEvent *ev) override;
       void keyPressEvent(QKeyEvent *ev) override;
       void keyReleaseEvent(QKeyEvent *ev) override;
 };

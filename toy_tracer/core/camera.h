@@ -21,6 +21,7 @@ class Camera {
       volatile bool _rotationYTrigger = false;
       Vector3f localX;
       Vector3f localY;
+      Float rotateScale = 1 / 50.f;
       Transform _rotation;
       Float _speed = 2.f;
       Float spinAngle = 0.f;
@@ -69,6 +70,8 @@ public:
       void setSpinTransform(Float offset, const Point3f& refPoint);
       void applyRotation();
       void applyTranslation(volatile bool* statuses, Float deltaT);
+      void calcRotationMatrix(Float offX, Float offY);
+      void Tick();
       Point3f pos() const { return _pos; }
       Point3f& rpos() { return _pos; }
       

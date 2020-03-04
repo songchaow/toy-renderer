@@ -16,8 +16,7 @@ extern RenderWorker _worker;
 
 Camera* CreateRTCamera(const Point2i& screen_size);
 
-class RenderWorker : public QObject {
-      Q_OBJECT
+class RenderWorker {
       QOpenGLContext* m_context;
       TwoThreadQueue<Primitive*> primitiveQueue;
       TwoThreadQueue<PointLight*> lightQueue;
@@ -73,6 +72,7 @@ private:
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }
+      void start();
       // thread-safe using mutex
       void loadObject(Primitive* p);
       void loadPointLight(PointLight* l);
