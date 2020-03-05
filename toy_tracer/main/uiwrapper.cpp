@@ -286,7 +286,13 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(fixCSMLightFrustum, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->csm_fixedLightFrustum = state == Qt::Checked;
       });
-      
+      QCheckBox* csmStable = new QCheckBox("CSM Stabalization");
+      csmStable->setCheckState(RenderWorker::Instance()->csm_stable ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(csmStable);
+      QObject::connect(csmStable, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->csm_stable = state == Qt::Checked;
+      });
+
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
             for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {

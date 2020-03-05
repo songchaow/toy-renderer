@@ -165,8 +165,17 @@ void CascadedDepthMap::GenLightViews(const Vector3f& dir)
             
             // move the light frustum as far as possible
             
+            if (RenderWorker::Instance()->csm_stable) {
+                  // make translations in light view multiples of (light view width)/(shadow map resolution)
+                  Float widthUnit = lightViews[i].f.width / static_cast<Float>(SHADOW_WIDTH);
+                  Float heightUnit = lightViews[i].f.height / static_cast<Float>(SHADOW_HEIGHT);
+                  centerX = std::lround(centerX / widthUnit) * widthUnit;
+                  centerY = std::lround(centerY / heightUnit) * heightUnit;
+            }
             lightViews[i].world2view = TranslateM(-centerX, -centerY, -globalMaxz) * world2light;
             //lightViews[i].world2view = TranslateM(-centerX, -centerY, -bbox.pMax.z) * world2light;
+            
+
       }
       
 }
@@ -194,7 +203,7 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
       Float currNear = cameraViewIn->f.near;
       Float currNearScale = currNear;
       Float currNearUni = currNear;
-      const Float weight = 0.13;
+      const Float weight = 0.13f;
       const Float& far = cameraViewIn->f.Far;
       Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
       Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);

@@ -63,6 +63,7 @@ public:
       bool renderPointLight = true;
       bool enableShadowMap = true;
       bool csm_fixedLightFrustum = true;
+      bool csm_stable = true;
       bool enableBloom = true;
       bool drawSkybox = true;
 public slots:

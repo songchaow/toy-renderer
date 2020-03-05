@@ -149,7 +149,7 @@ vec3 calcShadow(int lightIdx, float distance) {
     bool totalPass = true;
     int numOccluded = 0;
     float r = rand(texPos);
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < 8; i++) {
         vec2 p = searchWidthUV * spin(PossionDistribution[i], r) + texPos;
         float currNearDepth = texture(depthSampler, vec3(p, k)).r;
         if(currNearDepth >= currentDepth - SHADOW_BIAS)
