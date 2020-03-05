@@ -274,6 +274,12 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(bloom, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->enableBloom = state == Qt::Checked;
       });
+      QCheckBox* skyBoxEnable = new QCheckBox("Enable Skybox");
+      skyBoxEnable->setCheckState(RenderWorker::Instance()->drawSkybox ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(skyBoxEnable);
+      QObject::connect(skyBoxEnable, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->drawSkybox = state == Qt::Checked;
+      });
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
             for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {

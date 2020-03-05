@@ -63,6 +63,7 @@ public:
       bool renderPointLight = true;
       bool enableShadowMap = true;
       bool enableBloom = true;
+      bool drawSkybox = true;
 public slots:
       void initialize();
       void renderLoop();

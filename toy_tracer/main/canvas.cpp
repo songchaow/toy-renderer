@@ -22,12 +22,15 @@ const Point2f Canvas::lastMouseMove()
       auto pMouse = QCursor::pos();
       Point2f oldPos = _pos0;
       _pos0 = Point2f(pMouse.x(), pMouse.y());
-      return Point2f(_pos0 - oldPos);
+      // if pressed, return the difference
+      if (_drag)
+            return Point2f(_pos0 - oldPos);
+      else
+            return Point2f(0,0);
 }
 
 void Canvas::mousePressEvent(QMouseEvent *ev) {
       _drag = true;
-      _pos0 = ev->pos();
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent *ev) {
