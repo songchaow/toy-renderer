@@ -223,7 +223,7 @@ Matrix4 Frustum::cam2ndc_Perspective() const
 
 Matrix4 Frustum::cam2ndc_Orthogonal() const
 {
-      // x: [-width/2, width/2] | y: [-height/2, height/2] z:[-1, 1]
+      // source x: [-width/2, width/2] |  source y: [-height/2, height/2]  output z:[-1, 1]
       Matrix4 orthogonal(2 / width, 0, 0, 0,
             0, 2 / height, 0, 0,
             0, 0, -2.f/(Far-near), -(Far + near)/(Far-near),

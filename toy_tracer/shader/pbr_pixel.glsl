@@ -141,7 +141,7 @@ vec3 calcShadow(int lightIdx, float distance) {
         currentDepth = (ndcPos.z + 1) / 2; // map to [0, 1]
     else
         // for point lights, use distance
-        currentDepth = distance;
+        currentDepth = distance; // Still is absolute value!
     // search the block which subtends the area light
     float searchWidthUV = currentDepth * lightfrustumSize[k].z * pointLights[lightIdx].size / lightfrustumSize[k].x;
     float averageDepth = 0;

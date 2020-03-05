@@ -129,6 +129,14 @@ void CascadedDepthMap::GenLightViews(const Vector3f& dir)
       for (int i = 0; i < numFrustumPoints; i++) {
             frustumPoints[i] = view2light(subFrustumPoints[i]);
       }
+      // far direction:
+      Vector3f farDirection = (frustumPoints[4 * (0 + 1)] - frustumPoints[4 * 0])
+            + (frustumPoints[4 * (0 + 1) + 1] - frustumPoints[4 * 0 + 1]);
+      Float globalMaxz = 0;
+      Float globalMaxDepth = 0;
+      AABB wholeBBox = FindAABB(frustumPoints, frustumPoints + numFrustumPoints);
+      globalMaxz = wholeBBox.pMax.z;
+      globalMaxDepth = wholeBBox.pMax.z - wholeBBox.pMin.z;
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
             const Point3f* pbegin = frustumPoints + 4 * i;
             const Point3f* pEnd = frustumPoints + 4 * i + 8;
@@ -136,12 +144,31 @@ void CascadedDepthMap::GenLightViews(const Vector3f& dir)
             Float centerX = (bbox.pMax.x + bbox.pMin.x) / 2;
             Float centerY = (bbox.pMax.y + bbox.pMin.y) / 2;
             // light dir is to the -Z direction, so the pMax.z is the starting
-            lightViews[i].f = Frustum(bbox.pMax.x - bbox.pMin.x, bbox.pMax.y - bbox.pMin.y, bbox.pMax.z - bbox.pMin.z);
-            lightViews[i].world2view = TranslateM(-centerX, -centerY, -bbox.pMax.z) * world2light;
+            // now fix the width and height of frustum
+            if (RenderWorker::Instance()->csm_fixedLightFrustum) {
+                  Float maxFrustumWidth = std::abs(subFrustumPoints[4 * (i + 1)].x) * 2;
+                  Float maxFrustumHeight = std::abs(subFrustumPoints[4 * (i + 1)].x) * 2;
+                  if (farDirection.x < 0) {
+                        centerX = bbox.pMax.x - maxFrustumWidth / 2;
+                  }
+                  else // x > 0
+                        centerX = bbox.pMin.x + maxFrustumWidth / 2;
+                  if (farDirection.y > 0) {
+                        centerY = bbox.pMin.y + maxFrustumHeight / 2;
+                  }
+                  else // y < 0
+                        centerY = bbox.pMax.y - maxFrustumHeight / 2;
+                  lightViews[i].f = Frustum(maxFrustumWidth, maxFrustumHeight, globalMaxDepth);
+            }
+            else
+                  lightViews[i].f = Frustum(bbox.pMax.x - bbox.pMin.x, bbox.pMax.y - bbox.pMin.y, globalMaxDepth);
+            
+            // move the light frustum as far as possible
+            
+            lightViews[i].world2view = TranslateM(-centerX, -centerY, -globalMaxz) * world2light;
+            //lightViews[i].world2view = TranslateM(-centerX, -centerY, -bbox.pMax.z) * world2light;
       }
-      // determine length(far-near), x, y, and position in view space first
-      // iterate through 4 points: 
-      Point2f trazepoid[4];
+      
 }
 
 void CascadedDepthMap::initTexture() {

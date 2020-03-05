@@ -62,6 +62,7 @@ public:
       Primitive* curr_primitive;
       bool renderPointLight = true;
       bool enableShadowMap = true;
+      bool csm_fixedLightFrustum = true;
       bool enableBloom = true;
       bool drawSkybox = true;
 public slots:

@@ -280,6 +280,13 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(skyBoxEnable, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->drawSkybox = state == Qt::Checked;
       });
+      QCheckBox* fixCSMLightFrustum = new QCheckBox("Fixed CSM Light Frustum Size");
+      fixCSMLightFrustum->setCheckState(RenderWorker::Instance()->csm_fixedLightFrustum ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(fixCSMLightFrustum);
+      QObject::connect(fixCSMLightFrustum, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->csm_fixedLightFrustum = state == Qt::Checked;
+      });
+      
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
             for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {
