@@ -21,15 +21,16 @@ struct Frustum {
             fov_Horizontal(90.f * Pi / 180), type(Projective) {}
       Frustum() : Frustum(1.6f) {}
       Frustum(Float width, Float height, Float length) : width(width), height(height), near(0.f),
-            Far(length) {}
+            Far(length), type(Orthogonal) {}
       Matrix4 cam2ndc_Perspective() const;
       Matrix4 cam2ndc_Orthogonal() const;
+      static void randomShift_Perspective(Matrix4& cam2ndc);
 };
 
 struct View {
       Frustum f;
       Matrix4 world2view;
-      Matrix4 world2ndc;
+      Matrix4 world2ndc; // cached
       View() = default;
       View(const Frustum& f, const Matrix4& m) : f(f), world2view(m) {}
 };

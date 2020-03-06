@@ -25,7 +25,6 @@ class RenderWorker {
       std::vector<PointLight*> _pointLights;
       std::vector<PointLight*> pendingLights, pendingDelLights;
       std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
-      // TODO: define an update info structure
       static Camera* cam;
       Canvas* _canvas = nullptr;
       Point2i _resolution;
@@ -52,13 +51,18 @@ class RenderWorker {
       GLuint ms_hdr_depth = 0;
       GLuint hdr_fbo;
       GLuint hdr_color;
+      GLuint pp_depth;
       GLuint hdr_emissive[2];
-      GLuint hdr_depth; // not used now
-
+      unsigned char currTAAIdx = 0;
+      GLuint taa_fbo = 0;
+      static const unsigned char numTAABuffer = 2;
+      GLuint taa_results[numTAABuffer];
       Skybox sky;
+      bool firstFrame = true;
 
 
 public:
+      // attributes
       Primitive* curr_primitive;
       bool renderPointLight = true;
       bool enableShadowMap = true;

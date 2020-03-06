@@ -260,6 +260,12 @@ class Point2 {
         DCHECK(!v.HasNaNs());
         return Point2<T>(x - v.x, y - v.y);
     }
+    Point2<T> operator-(const Float v) const {
+          return Point2<T>(x - v, y - v);
+    }
+    Point2<T> operator+(const Float v) const {
+          return Point2<T>(x + v, y + v);
+    }
     Point2<T> operator-() const { return Point2<T>(-x, -y); }
     Point2<T> &operator-=(const Vector2<T> &v) {
         DCHECK(!v.HasNaNs());

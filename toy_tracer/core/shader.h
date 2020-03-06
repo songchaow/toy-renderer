@@ -16,6 +16,7 @@ enum ShaderType {
       DEPTH_CUBE_MAP,
       SKY_BOX,
       HDR_TONE_MAP,
+      IMAGE,
       GAUSSIAN_BLUR_H,
       GAUSSIAN_BLUR_V,
       TANGENE_TEST,
@@ -23,6 +24,7 @@ enum ShaderType {
       PBR_INSTANCED,
       DEPTH_CUBE_MAP_INSTANCED,
       CASCADED_DEPTH_MAP,
+      TAA,
       NUM_SHADER_TYPE,
 };
 

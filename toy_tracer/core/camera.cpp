@@ -173,6 +173,9 @@ void Camera::Tick()
             LookAt();
       }
       // apply translation
+
+      // shift in ndc space
+      Frustum::randomShift_Perspective(cam2ndc_cache);
 }
 
 void Camera::applyRotation() {

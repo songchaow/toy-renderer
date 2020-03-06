@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
       constexpr int window_width = 1280;
       Canvas* canvas = new Canvas(window_width, window_height);
       //Camera* cam = CreateRTCamera(Point2i(canvas->width(), canvas->height()));
-      Matrix4 world2cam = LookAt({ 0,0,0 }, { 0, -1, -1 });
+      Matrix4 world2cam = LookAt({ 0,100,0 }, { 0, -1, -1 });
       Camera* cam = new Camera(world2cam, (Float)window_width / (Float)window_height, 90.f / 180.f*Pi, { 0, -1, -1 });
       
       //PointLight spot(RGBSpectrum(10.f, 10.f, 10.f), Point3f(), std::cos(Pi / 20.f), Vector3f(0.f, 0.f, 1.f));
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
       //worker->initialize();
       //QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
       worker->skybox().loadSkybox();
-      std::thread renderThread(&RenderWorker::start, worker);
+      
 #if 0
       // create albedo texture for balls
       Image* off_color = new Image(R8G8B8(25, 25, 25), false, 0.f);
@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
       MainWindow::getInstance()->addPointLight(l);
 #endif
       //workerThread.start();
+      std::thread renderThread(&RenderWorker::start, worker);
       a.exec();
 	return 0;
 }
