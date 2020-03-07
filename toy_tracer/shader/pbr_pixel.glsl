@@ -1,11 +1,13 @@
 #version 330 core
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 EmitColor;
+layout (location = 2) out vec2 Motion;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
 in vec4 tangentWorld;
 in float zValuePos;
+in vec2 offset2PrevFrame;
 #define POINT_LIGHT_NUM 4
 #define NUM_CASCADE_SHADOW 4
 #define DEPTH_SEARCH_NUM  6
@@ -282,6 +284,7 @@ void main()
         Le += color;
     FragColor = vec4(color, 1.0);
     EmitColor = vec4(Le, 1.0);
+    Motion = offset2PrevFrame;
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

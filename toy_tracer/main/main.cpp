@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
       constexpr int window_width = 1280;
       Canvas* canvas = new Canvas(window_width, window_height);
       //Camera* cam = CreateRTCamera(Point2i(canvas->width(), canvas->height()));
-      Matrix4 world2cam = LookAt({ 0,100,0 }, { 0, -1, -1 });
+      Matrix4 world2cam = LookAt({ 0,10,0 }, { 0, -1, -1 });
       Camera* cam = new Camera(world2cam, (Float)window_width / (Float)window_height, 90.f / 180.f*Pi, { 0, -1, -1 });
       
       //PointLight spot(RGBSpectrum(10.f, 10.f, 10.f), Point3f(), std::cos(Pi / 20.f), Vector3f(0.f, 0.f, 1.f));
@@ -59,9 +59,9 @@ int main(int argc, char *argv[])
       //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;
-      //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
-      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
+      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)

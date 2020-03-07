@@ -86,11 +86,17 @@ void RenderWorker::initialize() {
       // 3 color buffers: 2 for blooms
       glGenFramebuffers(1, &hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
-      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-      glDrawBuffers(2, draw_bufs);
+      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+      glDrawBuffers(3, draw_bufs);
       glGenTextures(1, &hdr_color);
       glBindTexture(GL_TEXTURE_2D, hdr_color);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, nullptr);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      // HDR motion buffer
+      glGenTextures(1, &hdr_motion);
+      glBindTexture(GL_TEXTURE_2D, hdr_motion);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, _canvas->width(), _canvas->height(), 0, GL_RG, GL_FLOAT, nullptr);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       // HDR fbo depth buffer
@@ -110,9 +116,11 @@ void RenderWorker::initialize() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       }
-      // attachment1 is fixed
+      // attachment 1 and 2 is fixed
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, hdr_motion, 0);
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, pp_depth);
+      
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       // Shader initialization
 
@@ -127,6 +135,7 @@ void RenderWorker::initialize() {
       taa->use();
       taa->setUniformI("currentColor", 0);
       taa->setUniformI("historyTAAResult", 1);
+      taa->setUniformI("motionVector", 2);
       err = glGetError();
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
 }
@@ -189,8 +198,10 @@ void RenderWorker::configPBRShader(Shader* shader) {
       shader->setUniformI("depthSampler", 5);
       // set camera
       const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
+      const Matrix4& w2c_prev = RenderWorker::getCamera()->world2camPrev();
       const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
       shader->setUniformF("world2cam", &w2c);
+      shader->setUniformF("world2camPrev", &w2c_prev);
       shader->setUniformF("cam2ndc", &c2ndc);
       shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       //shader->setUniformF("far", depthMap->depthFarPlane);
@@ -281,9 +292,7 @@ void RenderWorker::renderLoop() {
                   cam->applyRotation();
             }*/
             if (_canvas->keyPressed()) {
-                  if (_canvas->CameraorObject())
-                        cam->applyTranslation(_canvas->keyStatuses(), 0.01f);
-                  else {
+                  if (!_canvas->CameraorObject()) {
                         applyTranslation(curr_primitive->obj2world().translation(), _canvas->keyStatuses(), 0.01f, Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f));
                         curr_primitive->obj2world().update();
                   }
@@ -387,6 +396,8 @@ void RenderWorker::renderLoop() {
                   glBindTexture(GL_TEXTURE_2D, hdr_color);
                   glActiveTexture(GL_TEXTURE1);
                   glBindTexture(GL_TEXTURE_2D, taa_results[historyTAAIdx]);
+                  glActiveTexture(GL_TEXTURE2);
+                  glBindTexture(GL_TEXTURE_2D, hdr_motion);
                   TriangleMesh::screenMesh.glUse();
                   glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
             }

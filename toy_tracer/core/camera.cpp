@@ -93,6 +93,7 @@ void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec, 
 
 void Camera::LookAt() {
       // newZ = _viewDir;
+      world2view_prev = _view.world2view;
       ::LookAt(_pos, _viewDir, Vector3f(0.f, 1.f, 0.f), _view.world2view);
       localX = Normalize(Cross(Vector3f(0.f, 1.f, 0.f), -_viewDir));
 #if 0
@@ -163,15 +164,27 @@ void Camera::Tick()
 {
       Canvas* c = RenderWorker::Instance()->canvas();
       // apply rotation
-      
+      static bool world2view_prev_dirty = true;
       const Point2f mouseMove = c->lastMouseMove();
-      if (mouseMove.x == 0 && mouseMove.y == 0)
-            ;
-      else {
-            calcRotationMatrix(mouseMove.x / 500, mouseMove.y / 500);
-            _viewDir = Normalize(_rotation(_viewDir));
-            LookAt();
+      if (mouseMove.x == 0 && mouseMove.y == 0 && !c->keyPressed()) {
+            // static
+            if (world2view_prev_dirty)
+                  world2view_prev = _view.world2view;
+            world2view_prev_dirty = false;
       }
+      else {
+            if (!(mouseMove.x == 0 && mouseMove.y == 0)) {
+                  calcRotationMatrix(mouseMove.x / 500, mouseMove.y / 500);
+                  _viewDir = Normalize(_rotation(_viewDir));
+                  LookAt();
+                  world2view_prev_dirty = true;
+            }
+            if (c->keyPressed()) {
+                  applyTranslation(c->keyStatuses(), 0.01f);
+                  world2view_prev_dirty = true;
+            }
+      }
+      
       // apply translation
 
       // shift in ndc space
@@ -227,6 +240,7 @@ Matrix4 Frustum::cam2ndc_Perspective() const
 Matrix4 Frustum::cam2ndc_Orthogonal() const
 {
       // source x: [-width/2, width/2] |  source y: [-height/2, height/2]  output z:[-1, 1]
+      // Far and near are absolute values here!
       Matrix4 orthogonal(2 / width, 0, 0, 0,
             0, 2 / height, 0, 0,
             0, 0, -2.f/(Far-near), -(Far + near)/(Far-near),

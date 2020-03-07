@@ -16,6 +16,7 @@ class Camera {
       AnimatedTransform _world2cam_a;
       Vector3f _viewDir = { 0.f,0.f,-1.f };
       Point3f _pos = { 0.f, 0.f, -10.f };
+      Matrix4 world2view_prev;
       // Contrl
       volatile bool _rotationXTrigger = false;
       volatile bool _rotationYTrigger = false;
@@ -52,6 +53,7 @@ public:
       void LookAt();
       // Getters
       const Matrix4& world2cam() const { return _view.world2view; }
+      const Matrix4& world2camPrev() const { return world2view_prev; }
       const View* cameraView() const { return &_view; }
       const Transform& cam2world() const { return _cam2world; }
       const Transform& rotation() const { return _rotation; }

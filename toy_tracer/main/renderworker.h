@@ -51,6 +51,7 @@ class RenderWorker {
       GLuint ms_hdr_depth = 0;
       GLuint hdr_fbo;
       GLuint hdr_color;
+      GLuint hdr_motion;
       GLuint pp_depth;
       GLuint hdr_emissive[2];
       unsigned char currTAAIdx = 0;

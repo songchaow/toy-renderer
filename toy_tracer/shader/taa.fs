@@ -6,8 +6,17 @@ in vec2 TexCoord;
 
 uniform sampler2D currentColor;
 uniform sampler2D historyTAAResult;
+uniform sampler2D motionVector;
 uniform float weightofHistory = 0.95;
 
 void main() {
-      hdrColor = texture(currentColor, TexCoord) * (1-weightofHistory) + texture(historyTAAResult, TexCoord) * weightofHistory;
+      vec2 lastUV = TexCoord + texture(motionVector, TexCoord).xy;
+      vec4 curr = texture(currentColor, TexCoord);
+      vec4 historyColor;
+      if(all(lessThan(abs(lastUV), vec2(1.0))))
+            historyColor = texture(historyTAAResult, lastUV);
+      else
+            historyColor = curr;
+      hdrColor =  curr * (1-weightofHistory) + historyColor * weightofHistory;
+      //hdrColor = vec4(abs(texture(motionVector, TexCoord).xy), 0, 1);
 }
