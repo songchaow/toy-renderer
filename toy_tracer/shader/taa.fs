@@ -13,7 +13,7 @@ void main() {
       vec2 lastUV = TexCoord + texture(motionVector, TexCoord).xy;
       vec4 curr = texture(currentColor, TexCoord);
       vec4 historyColor;
-      if(all(lessThan(abs(lastUV), vec2(1.0))))
+      if (0<lastUV.x && lastUV.x<1 && 0<lastUV.y && lastUV.y<1)
             historyColor = texture(historyTAAResult, lastUV);
       else
             historyColor = curr;

@@ -291,12 +291,12 @@ void RenderWorker::renderLoop() {
             /*if (RenderWorker::cam->rotationTrigger()) {
                   cam->applyRotation();
             }*/
-            if (_canvas->keyPressed()) {
+            /*if (_canvas->keyPressed()) {
                   if (!_canvas->CameraorObject()) {
                         applyTranslation(curr_primitive->obj2world().translation(), _canvas->keyStatuses(), 0.01f, Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f));
                         curr_primitive->obj2world().update();
                   }
-            }
+            }*/
             // add/remove pending primitives
             if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {
                   for (auto* d : pendingDelPrimitives) {
@@ -346,6 +346,7 @@ void RenderWorker::renderLoop() {
                   if (!alreadyClear) {
                         glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
                         // TODO: csm clear
+
                         glViewport(0, 0, _canvas->width(), _canvas->height());
                         alreadyClear = true;
                   }

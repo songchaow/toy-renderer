@@ -157,18 +157,17 @@ void Camera::applyTranslation(volatile bool* keyStatuses, Float deltaT) {
       else if (keyStatuses[3])
             // Right
             _pos += offset * localX;
-      LookAt();
 }
 
 void Camera::Tick()
 {
       Canvas* c = RenderWorker::Instance()->canvas();
-      // apply rotation
+      // apply rotation and translation
       static bool world2view_prev_dirty = true;
       const Point2f mouseMove = c->lastMouseMove();
       if (mouseMove.x == 0 && mouseMove.y == 0 && !c->keyPressed()) {
             // static
-            if (world2view_prev_dirty)
+            //if (world2view_prev_dirty)
                   world2view_prev = _view.world2view;
             world2view_prev_dirty = false;
       }
@@ -176,16 +175,13 @@ void Camera::Tick()
             if (!(mouseMove.x == 0 && mouseMove.y == 0)) {
                   calcRotationMatrix(mouseMove.x / 500, mouseMove.y / 500);
                   _viewDir = Normalize(_rotation(_viewDir));
-                  LookAt();
-                  world2view_prev_dirty = true;
             }
             if (c->keyPressed()) {
                   applyTranslation(c->keyStatuses(), 0.01f);
-                  world2view_prev_dirty = true;
             }
+            LookAt();
+            world2view_prev_dirty = true;
       }
-      
-      // apply translation
 
       // shift in ndc space
       Frustum::randomShift_Perspective(cam2ndc_cache);

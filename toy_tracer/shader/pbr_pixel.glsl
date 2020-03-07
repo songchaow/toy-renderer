@@ -26,6 +26,10 @@ uniform vec3 emissiveFactor;
 uniform float metallicFactor;
 uniform float roughFactor;
 
+uniform mat4 world2camPrev;
+uniform mat4 world2cam;
+uniform mat4 cam2ndc;
+
 uniform vec3 globalEmission = vec3(0.0, 0.0, 0.0);
 float bloomThreashold = 1.0;
 // lights
@@ -284,7 +288,14 @@ void main()
         Le += color;
     FragColor = vec4(color, 1.0);
     EmitColor = vec4(Le, 1.0);
-    Motion = offset2PrevFrame;
+    //Motion = offset2PrevFrame;
+    mat4 cam2ndc0 = cam2ndc;
+    cam2ndc0[0][2] = cam2ndc0[1][2] = 0.0;
+    vec4 lastNDCPosition = cam2ndc0 * world2camPrev * vec4(posWorld, 1.0);
+    vec4 currNDCPosition = cam2ndc0 * world2cam * vec4(posWorld, 1.0);
+    vec2 mmm = lastNDCPosition.xy/lastNDCPosition.w - currNDCPosition.xy/currNDCPosition.w;
+    mmm *= 0.5;
+    Motion = mmm;
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
