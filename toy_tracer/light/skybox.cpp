@@ -91,7 +91,10 @@ void Skybox::draw()
       Matrix4 rotation = RenderWorker::getCamera()->world2cam();
       const Matrix4& cam2ndc = RenderWorker::getCamera()->Cam2NDC();
       rotation[0][3] = rotation[1][3] = rotation[2][3] = 0.f;
+      Matrix4 rotationPrev = RenderWorker::getCamera()->world2camPrev();
+      rotationPrev[0][3] = rotationPrev[1][3] = rotationPrev[2][3] = 0.f;
       s->setUniformF("rotation", &rotation);
+      s->setUniformF("rotationPrev", &rotationPrev);
       s->setUniformF("cam2ndc", &cam2ndc);
       s->setUniformI("skybox", 0);
       glDepthMask(GL_FALSE);
