@@ -66,7 +66,7 @@ public:
       // attributes
       Primitive* curr_primitive;
       bool renderPointLight = true;
-      bool enableShadowMap = true;
+      bool enableShadowMap = false;
       bool csm_fixedLightFrustum = true;
       bool csm_stable = true;
       bool enableBloom = true;

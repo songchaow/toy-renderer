@@ -136,6 +136,7 @@ void RenderWorker::initialize() {
       taa->setUniformI("currentColor", 0);
       taa->setUniformI("historyTAAResult", 1);
       taa->setUniformI("motionVector", 2);
+      taa->setUniformF("windowSize", _canvas->width(), _canvas->height());
       err = glGetError();
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
 }

@@ -12,6 +12,7 @@ Canvas::Canvas(int width, int height) {
       format.setMajorVersion(3);
       format.setMinorVersion(3);
       format.setProfile(QSurfaceFormat::CoreProfile);
+      format.setSwapInterval(0);
       setFormat(format);
       create();
 }
