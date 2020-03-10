@@ -52,10 +52,10 @@ void main() {
             // vec4 maxmax0 = max(max_nb0, max_nb1);
             // vec4 maxmax1 = max(max_nb2, max_nb3);
             // vec4 maxColor = max(maxmax0, maxmax1);
-            vec4 minColor = texture(currentColor, vec2(lastUV.x-xunit, lastUV.y+yunit));
+            vec4 minColor = texture(currentColor, vec2(TexCoord.x-xunit, TexCoord.y+yunit));
             vec4 maxColor = minColor;
             for(int i=1;i<NUM_PATT_POINT;i++) {
-                  vec2 p = lastUV + vec2(xunit, yunit) * threebythreePattern[i];
+                  vec2 p = TexCoord + vec2(xunit, yunit) * threebythreePattern[i];
                   minColor = min(texture(currentColor, p), minColor);
                   maxColor = max(texture(currentColor, p), maxColor);
             }
