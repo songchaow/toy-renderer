@@ -66,13 +66,27 @@ void main() {
             // vec4 maxmax1 = max(max_nb2, max_nb3);
             // vec4 maxColor = max(maxmax0, maxmax1);
             historyColor = texture(historyTAAResult, lastUV);
+            if(historyColor.a < 500)
+                  historyColor.a = historyColor.a + 1.0;
             bool moving = any(notEqual(maxSpeed, vec2(0)));
-            if(moving || (!moving && !disableClampWhenStatic))
-                  historyColor = clamp(historyColor, minColor, maxColor);
+            if(moving || (!moving && !disableClampWhenStatic)) {
+                  // do clamp check
+                  vec3 prevHistoryColor = historyColor.rgb;
+                  historyColor.rgb = clamp(historyColor.rgb, minColor.rgb, maxColor.rgb);
+                  vec3 diff = abs(prevHistoryColor - historyColor.rgb);
+                  //if(any(notEqual(prevHistoryColor, historyColor.rgb)))
+                  if(any(greaterThan(diff, vec3(0.1))))
+                        // a clamp has happened
+                        historyColor.a = 0.0;
+            }
       }
       else
             historyColor = curr;
-      hdrColor =  curr * (1-weightofHistory) + historyColor * weightofHistory;
-      hdrColor.a = 1.0;
+      // weightofHistoryD increases if history is near clamping, i.e., history.a is small
+      float t = max(0, 1 - historyColor.a / 500);
+      float weightofHistoryD = mix(0.95, 0.9999, t);
+      //weightofHistoryD = 0.95;
+      hdrColor =  curr * (1-weightofHistoryD) + historyColor * weightofHistoryD; // next history color
+      hdrColor.a = historyColor.a;
       //hdrColor = vec4(abs(texture(motionVector, TexCoord).xy), 0, 1);
 }

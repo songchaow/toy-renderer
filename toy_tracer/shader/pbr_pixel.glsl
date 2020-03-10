@@ -287,8 +287,8 @@ void main()
     if(brightness > bloomThreashold)
         Le += color;
     FragColor = vec4(color, 1.0);
-    EmitColor = vec4(Le, 1.0);
-    //Motion = offset2PrevFrame;
+    //EmitColor = vec4(Le, 1.0);
+    EmitColor = vec4(0);
     mat4 cam2ndc0 = cam2ndc;
     cam2ndc0[0][2] = cam2ndc0[1][2] = 0.0;
     vec4 lastNDCPosition = cam2ndc0 * world2camPrev * vec4(posWorld, 1.0);

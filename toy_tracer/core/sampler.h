@@ -9,7 +9,7 @@ class Sampler {
       std::uniform_real_distribution<Float> uniform_dist;
       std::uniform_real_distribution<Float> uniform_dist2;
 public:
-      Sampler() : raw_random(r()), uniform_dist(0.0, 1.0) {}
+      Sampler() : raw_random(r()), uniform_dist(0.0, 1.0), uniform_dist2(0.0, 1.0) {}
       bool SampleBool(Float p_true = 0.5);
       Float Sample1D() { return uniform_dist(raw_random); }
       Point2f Sample2D() {
