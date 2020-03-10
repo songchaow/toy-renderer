@@ -21,6 +21,7 @@ uniform vec2 threebythreePattern[NUM_PATT_POINT] = vec2[](
       vec2(-1, 0),
       vec2(-1, 1)
 );
+uniform bool disableClampWhenStatic = true;
 
 void main() {
       float xunit = 1.0 / windowSize.x;
@@ -65,7 +66,9 @@ void main() {
             // vec4 maxmax1 = max(max_nb2, max_nb3);
             // vec4 maxColor = max(maxmax0, maxmax1);
             historyColor = texture(historyTAAResult, lastUV);
-            historyColor = clamp(historyColor, minColor, maxColor);
+            bool moving = any(notEqual(maxSpeed, vec2(0)));
+            if(moving || (!moving && !disableClampWhenStatic))
+                  historyColor = clamp(historyColor, minColor, maxColor);
       }
       else
             historyColor = curr;

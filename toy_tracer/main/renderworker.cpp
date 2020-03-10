@@ -394,6 +394,7 @@ void RenderWorker::renderLoop() {
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
                   Shader* taa_shader = LoadShader(TAA, true);
                   taa_shader->use();
+                  taa_shader->setUniformBool("disableClampWhenStatic", disableClampWhenStatic);
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, hdr_color);
                   glActiveTexture(GL_TEXTURE1);

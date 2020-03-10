@@ -71,6 +71,7 @@ public:
       bool csm_stable = true;
       bool enableBloom = true;
       bool drawSkybox = true;
+      bool disableClampWhenStatic = true;
 public slots:
       void initialize();
       void renderLoop();

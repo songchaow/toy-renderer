@@ -292,7 +292,12 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(csmStable, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->csm_stable = state == Qt::Checked;
       });
-
+      QCheckBox* disableclamping = new QCheckBox("Disable Clamping when static");
+      disableclamping->setCheckState(RenderWorker::Instance()->disableClampWhenStatic ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(disableclamping);
+      QObject::connect(disableclamping, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->disableClampWhenStatic = state == Qt::Checked;
+      });
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
             for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {
