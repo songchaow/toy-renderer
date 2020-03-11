@@ -77,7 +77,7 @@ void main() {
                   historyColor.rgb = clamp(historyColor.rgb, minColor.rgb, maxColor.rgb);
                   vec3 diff = abs(prevHistoryColor - historyColor.rgb);
                   //if(any(notEqual(prevHistoryColor, historyColor.rgb)))
-                  if(any(greaterThan(diff, vec3(0.1))))
+                  if(any(greaterThan(diff, vec3(0.012))))
                         // a clamp has happened
                         historyColor.a = 0.0;
             }
