@@ -83,7 +83,8 @@ void main() {
             }
       }
       else
-            historyColor = curr;
+            // for new pixels, assume clamping haven't happened to them.
+            historyColor = vec4(curr.rgb, 500);
       // weightofHistoryD increases if history is near clamping, i.e., history.a is small
       float t = max(0, 1 - historyColor.a / 500);
       float weightofHistoryD = mix(0.95, 0.9999, t);
