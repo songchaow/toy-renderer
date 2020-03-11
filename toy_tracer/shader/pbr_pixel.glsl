@@ -1,7 +1,6 @@
 #version 330 core
 layout (location = 0) out vec4 FragColor;
-layout (location = 1) out vec4 EmitColor;
-layout (location = 2) out vec2 Motion;
+layout (location = 1) out vec2 Motion;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
@@ -283,12 +282,9 @@ void main()
     vec3 ambient = vec3(0.03) * albedo * ao;
 
     vec3 color = ambient + Lo + Le;
-    float brightness =  dot(color, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > bloomThreashold)
-        Le += color;
     FragColor = vec4(color, 1.0);
     //EmitColor = vec4(Le, 1.0);
-    EmitColor = vec4(0);
+    //EmitColor = vec4(0);
     mat4 cam2ndc0 = cam2ndc;
     cam2ndc0[0][2] = cam2ndc0[1][2] = 0.0;
     vec4 lastNDCPosition = cam2ndc0 * world2camPrev * vec4(posWorld, 1.0);

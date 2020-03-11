@@ -116,9 +116,8 @@ void RenderWorker::initialize() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       }
-      // attachment 1 and 2 is fixed
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, hdr_motion, 0);
+      // attachment 1 is fixed
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_motion, 0);
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, pp_depth);
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -358,6 +357,7 @@ void RenderWorker::renderLoop() {
             err = glGetError();
             glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_motion, 0);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClearDepth(1.0f);
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -369,6 +369,7 @@ void RenderWorker::renderLoop() {
             // taa
             unsigned char historyTAAIdx = (currTAAIdx + 1) % numTAABuffer;
             // if first frame, just copy to current taa result buffer
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
             if (firstFrame) {
 #if 0
                   // another method using glCopyTexSubImage2D

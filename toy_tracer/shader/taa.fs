@@ -1,6 +1,7 @@
 #version 330 core
 
 layout (location = 0) out vec4 hdrColor;
+layout (location = 1) out vec3 bloomColor;
 
 in vec2 TexCoord;
 
@@ -10,6 +11,7 @@ uniform sampler2D motionVector;
 uniform float weightofHistory = 0.95;
 uniform vec2 windowSize;
 #define NUM_PATT_POINT 9
+#define bloomThreashold 1.0
 uniform vec2 threebythreePattern[NUM_PATT_POINT] = vec2[](
       vec2(-1, 1),
       vec2(0, 1),
@@ -89,4 +91,9 @@ void main() {
       hdrColor =  curr * (1-weightofHistoryD) + historyColor * weightofHistoryD; // next history color
       hdrColor.a = historyColor.a;
       //hdrColor = vec4(abs(texture(motionVector, TexCoord).xy), 0, 1);
+      // bloom
+      float brightness =  dot(hdrColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+      if(brightness > bloomThreashold) {
+            bloomColor = hdrColor.rgb;
+      }
 }
