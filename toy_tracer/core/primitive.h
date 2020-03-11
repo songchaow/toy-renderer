@@ -34,7 +34,7 @@ public:
 };
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh);
-Primitive* CreatePrimitiveFromModelFile(std::string path);
+//Primitive* CreatePrimitiveFromModelFile(std::string path);
 
 class InstancedPrimitive : public Primitive {
       std::vector<Matrix4> obj2worlds;

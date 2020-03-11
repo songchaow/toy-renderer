@@ -1,11 +1,8 @@
 #include "shape/triangle.h"
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
-#include <assimp/vector3.h>
 #include <cstring>
 #include <map>
 
+#if 0
 void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, std::vector<TriangleMesh*>& meshes) {
       aiMatrix4x4 o2w = local2world * node->mTransformation;
       for (int idx = 0; idx < node->mNumMeshes; idx++) {
@@ -81,7 +78,9 @@ void addMesh(const aiNode* node, const aiScene* scene, aiMatrix4x4 local2world, 
             addMesh(node->mChildren[i], scene, o2w, meshes);
       }
 }
+#endif
 
+#if 0
 std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene) {
       if (scene->mNumMeshes == 0)
             return {};
@@ -89,6 +88,7 @@ std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene) {
       addMesh(scene->mRootNode, scene, aiMatrix4x4(), meshes);
       return meshes;
 }
+#endif
 
 std::map<ArrayType, uint16_t> ShaderLocMap = {
       {ArrayType::ARRAY_VERTEX, 0},

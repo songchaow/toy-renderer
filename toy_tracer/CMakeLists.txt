@@ -40,10 +40,6 @@ file(GLOB IMAGE_IO ext/std_image/include/*.h
 # glad
 file(GLOB GLAD ${CMAKE_CURRENT_SOURCE_DIR}/ext/glad/src/*.c)
 
-# assimp
-INCLUDE_DIRECTORIES (
-  ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/include
-)
 # Don't process generated source files with AUTOMOC
 if(POLICY CMP0071)
       cmake_policy(SET CMP0071 OLD)
@@ -69,9 +65,6 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 add_library(tracer_lib ${TRACER_LIB} ${IMAGE_IO} ${GLAD})
 target_link_libraries(tracer_lib glog Qt5::Widgets)
 target_link_libraries(tracer_lib freetype)
-if (MSVC)
-  target_link_libraries(tracer_lib ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp.lib)
-endif (MSVC)
 # TODO: add link statements for Linux
 
 file(GLOB TRACER_EXE
@@ -109,9 +102,6 @@ add_custom_command(TARGET toytracer POST_BUILD
 # runtime dependencies
 if(MSVC)
   target_compile_options(toytracer PRIVATE "/MP")
-  add_custom_command(TARGET toytracer POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-      ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
 endif (MSVC)
 
 file(GLOB BALL_SRC
@@ -132,9 +122,6 @@ add_custom_command(TARGET ball POST_BUILD
                        ${CMAKE_CURRENT_SOURCE_DIR}/shader ${PROJECT_BINARY_DIR}/toy_tracer/shader)
 if(MSVC)
   target_compile_options(ball PRIVATE "/MP")
-  add_custom_command(TARGET ball POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-      ${CMAKE_CURRENT_SOURCE_DIR}/ext/assimp/lib_x64/assimp-vc140-mt.dll ${PROJECT_BINARY_DIR}/toy_tracer)
 endif (MSVC)
 
 # TODO: 如有需要，请添加测试并安装目标。
