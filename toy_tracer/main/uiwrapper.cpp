@@ -298,6 +298,12 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(disableclamping, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->disableClampWhenStatic = state == Qt::Checked;
       });
+      QCheckBox* en_TAA = new QCheckBox("TAA");
+      en_TAA->setCheckState(RenderWorker::Instance()->enableTAA ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(en_TAA);
+      QObject::connect(en_TAA, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->enableTAA = state == Qt::Checked;
+      });
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
             for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {

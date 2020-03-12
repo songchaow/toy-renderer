@@ -72,6 +72,7 @@ public:
       bool enableBloom = false;
       bool drawSkybox = true;
       bool disableClampWhenStatic = true;
+      bool enableTAA = true;
 public slots:
       void initialize();
       void renderLoop();

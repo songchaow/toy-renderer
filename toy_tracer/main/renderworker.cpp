@@ -370,7 +370,7 @@ void RenderWorker::renderLoop() {
             unsigned char historyTAAIdx = (currTAAIdx + 1) % numTAABuffer;
             // if first frame, just copy to current taa result buffer
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
-            if (firstFrame) {
+            if (firstFrame || !enableTAA) {
 #if 0
                   // another method using glCopyTexSubImage2D
                   err = glGetError();

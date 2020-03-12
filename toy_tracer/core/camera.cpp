@@ -184,7 +184,8 @@ void Camera::Tick()
       }
 
       // shift in ndc space
-      Frustum::randomShift_Perspective(cam2ndc_cache);
+      if(RenderWorker::Instance()->enableTAA)
+            Frustum::randomShift_Perspective(cam2ndc_cache);
 }
 
 void Camera::applyRotation() {
