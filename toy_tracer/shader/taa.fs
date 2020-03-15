@@ -33,17 +33,30 @@ uniform mat3 ycbcr2rgb = mat3(1, 1, 1,
 
 // clip in YCbCr space
 vec3 clipColor(vec3 minColor, vec3 maxColor, vec3 historyColor) {
-      vec3 center = 0.5 * (minColor + maxColor);
-      vec3 halfSizeAbs = maxColor - center;
-      // in cw order
-      vec3 cp = historyColor - center;
-      //cp = clamp(cp, -halfSizeAbs, halfSizeAbs);
-      float xShrink = clamp(abs(halfSizeAbs.x/cp.x), 0, 1);
-      float yShrink = clamp(abs(halfSizeAbs.y/cp.y), 0, 1);
-      float zShrink = clamp(abs(halfSizeAbs.z/cp.z), 0, 1);
-      float minShrink = min(min(xShrink, yShrink), zShrink);
-      cp *= minShrink;
-      return center+cp;
+      // vec3 center = 0.5 * (minColor + maxColor);
+      // vec3 halfSizeAbs = maxColor - center;
+      // // in cw order
+      // vec3 cp = historyColor - center;
+      // //cp = clamp(cp, -halfSizeAbs, halfSizeAbs);
+      // float xShrink;
+      // float yShrink;
+      // float zShrink;
+      // if(cp.x==0)
+      //       xShrink = 1.0;
+      // else
+      //       xShrink = clamp(abs(halfSizeAbs.x/cp.x), 0, 1);
+      // if(cp.y==0)
+      //       yShrink = 1.0;
+      // else
+      //       yShrink = clamp(abs(halfSizeAbs.y/cp.y), 0, 1);
+      // if(cp.z==0)
+      //       zShrink = 1.0;
+      // else
+      //       zShrink = clamp(abs(halfSizeAbs.z/cp.z), 0, 1);
+      // float minShrink = min(min(xShrink, yShrink), zShrink);
+      // cp *= minShrink;
+      // return center+cp;
+      return clamp(historyColor, minColor, maxColor);
 }
 
 void main() {
