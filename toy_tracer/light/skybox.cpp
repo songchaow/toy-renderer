@@ -81,6 +81,10 @@ void Skybox::loadSkybox()
       map.loadImage(images);
 }
 
+void Skybox::loadfromPanorama() {
+
+}
+
 void Skybox::draw()
 {
       glActiveTexture(GL_TEXTURE0);

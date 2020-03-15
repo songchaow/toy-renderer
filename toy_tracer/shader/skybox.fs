@@ -5,7 +5,7 @@ uniform samplerCube skybox;
 uniform mat4 rotationPrev;
 uniform mat4 cam2ndc;
 layout (location = 0) out vec4 FragColor;
-layout (location = 2) out vec2 Motion;
+layout (location = 1) out vec2 Motion;
 
 void main() {
       //gl_FragDepth = ;

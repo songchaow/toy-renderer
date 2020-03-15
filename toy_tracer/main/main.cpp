@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
 #else
       std::vector<Primitive*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
-      glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
-      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
+      //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
+      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)

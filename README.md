@@ -1,18 +1,15 @@
-# Toy Tracer(under construction)
-Everyone learning CG seems to have his/her own ray-tracer. So this one is mine.
+# Toy Renderer
+Everyone learning CG seems to have implemented his/her own toy renderer from scratch. So this one is mine.
 
-## To-do list
+Toy Renderer is implemented using OpenGL 3.3.
 
-- [x] Design and implement `Spectrum` and other color-related interfaces.
+# Features
+- glTF format support
 
-- [x] Add basic math utilities.
+- PBR
 
-  - [x] Transformation, matrix.
+- Temporal Antialiasing
 
-- [x] Design and implement scattering-related interfaces.
-  - Reflection and transmission of dielectrics.
-  - 
+- Cascaded Shadow Mapping
 
-- [x] Prepare test framework.
-
-- ...
+- PCSS
