@@ -11,6 +11,7 @@ in vec2 offset2PrevFrame;
 #define NUM_CASCADE_SHADOW 4
 #define DEPTH_SEARCH_NUM  6
 #define SHADOW_BIAS 0.0015
+#define MAX_MIP_LEVEL 9 // mip level: 0, 1, 2, ..., MAX_MIP_LEVEL
 
 // material parameters
 uniform sampler2D albedoSampler; // vec3
@@ -18,6 +19,8 @@ uniform sampler2D mrSampler; // g: roughness value | b: metalness
 uniform sampler2D emissionSampler; // vec3
 uniform sampler2D normalSampler; // initially 0-1
 uniform sampler2D aoSampler;
+uniform sampler2D lut;
+uniform samplerCube envSpecular;
 uniform sampler2DArray depthSampler;
 uniform float far;
 uniform vec3 albedoFactor;
@@ -250,6 +253,23 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     return Lo;
 }
 
+vec3 addIndirectLight(vec3 N, vec3 V, vec3 albedo, float roughness, float metallic) {
+    // specular environment 
+    vec3 specularlobeCenterDir = reflect(-V, N);
+    float alpha = roughness * roughness;
+    float currMipLevel = roughness * MAX_MIP_LEVEL;
+    vec3 lightSum = texture(envSpecular, specularlobeCenterDir, currMipLevel).rgb;
+    float cosNV = dot(N,V);
+    if(cosNV < 0)
+        return vec3(0);
+    vec2 lutRes = texture(lut, vec2(cosNV,roughness)).rg;
+    vec3 F0 = mix(vec3(0.03), albedo, metallic);
+    vec3 fSum = lutRes.x * F0 + lutRes.y;
+
+    // diffuse
+    return lightSum * fSum;
+}
+
 void main()
 {		
     vec3 Nt = vec3(texture(normalSampler, TexCoord));
@@ -279,7 +299,7 @@ void main()
     
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = addIndirectLight(N, V, albedo, roughness, metallic);
 
     vec3 color = ambient + Lo + Le;
     FragColor = vec4(color, 1.0);

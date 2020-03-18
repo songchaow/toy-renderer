@@ -53,29 +53,14 @@ void RenderWorker::initialize() {
       // Skybox
       sky.glLoad();
       TriangleMesh::screenMesh.load();
+      // LUT
+      PBRMaterial::loadLUTFile();
+      PBRMaterial::glLoadLUT();
       // Depth fbo
       glGenFramebuffers(1, &depth_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
-      //// Multi-sample fbo
-      //glGenFramebuffers(1, &ms_hdr_fbo);
-      //glBindFramebuffer(GL_FRAMEBUFFER, ms_hdr_fbo);
-      //glGenRenderbuffers(1, &ms_hdr_color);
-      //glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_color);
-      //glRenderbufferStorageMultisample(GL_RENDERBUFFER, 1, GL_RGBA16F, _canvas->width(), _canvas->height());
-      //glGenRenderbuffers(1, &ms_hdr_emissive);
-      //glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_emissive);
-      //glRenderbufferStorageMultisample(GL_RENDERBUFFER, 1, GL_RGBA16F, _canvas->width(), _canvas->height());
-      //glGenRenderbuffers(1, &ms_hdr_depth);
-      //glBindRenderbuffer(GL_RENDERBUFFER, ms_hdr_depth);
-      //glRenderbufferStorageMultisample(GL_RENDERBUFFER, 1, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
-      // attach them to a new fb
-      /*glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, ms_hdr_color);
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_RENDERBUFFER, ms_hdr_emissive);
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, ms_hdr_depth);
-      
-      glDrawBuffers(2, draw_bufs);*/
       glEnable(GL_DEPTH_TEST);
       /*GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       if (res == GL_FRAMEBUFFER_COMPLETE)
@@ -130,6 +115,14 @@ void RenderWorker::initialize() {
       for (int i = 0; i < NUM_CASCADED_SHADOW -1; i++) {
             pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
       }
+      // TODO: lut
+      glActiveTexture(GL_TEXTURE6);
+      glBindTexture(GL_TEXTURE_2D, PBRMaterial::lut.tbo());
+      glActiveTexture(GL_TEXTURE7);
+      glBindTexture(GL_TEXTURE_CUBE_MAP, sky.specularMaptbo());
+      pbr->setUniformI("lut", 6);
+      pbr->setUniformI("envSpecular", 7);
+      // TODO: environment map
       Shader* taa = LoadShader(TAA, true);
       taa->use();
       taa->setUniformI("currentColor", 0);

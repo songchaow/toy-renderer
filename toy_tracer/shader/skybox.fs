@@ -13,5 +13,5 @@ void main() {
       position0.xy /= position0.w;
       vec2 offset = (position0.xy - ndcPos.xy/ndcPos.z) / 2;
       Motion = offset;
-      FragColor = vec4(texture(skybox, coord).rgb, 1.0);
+      FragColor = vec4(textureLod(skybox, coord, 0).rgb, 1.0);
 }

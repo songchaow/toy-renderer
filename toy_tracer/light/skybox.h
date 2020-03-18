@@ -21,6 +21,7 @@ public:
 // uses a cube map for rt rendering
 struct Skybox {
       CubeMap map;
+      CubeMap diffuse;
       Image* panorama = nullptr;
       static TriangleMesh cube;
       static const std::vector<std::string> default_files;
@@ -31,4 +32,5 @@ struct Skybox {
       void loadSkybox();
       void loadfromPanorama();
       void draw();
+      GLuint specularMaptbo() const { return map.cubeMapObj; }
 };

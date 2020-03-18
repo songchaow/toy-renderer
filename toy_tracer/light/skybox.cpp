@@ -63,6 +63,7 @@ void Skybox::loadSkybox()
       for (auto& i : Skybox::default_files) {
             skybox_paths.push_back(Skybox::default_path + '/' + i);
       }
+#if 0
       std::vector<Image*> images;
       for (auto& path : skybox_paths) {
             if (path.substr(path.size() - 6, 6) == "up.tga") {
@@ -79,6 +80,24 @@ void Skybox::loadSkybox()
                   images.push_back(new Image(path, Image::Format::RGBSpectrum, false));
       }
       map.loadImage(images);
+#endif
+      // specular
+      const uint32_t maxMipLevelExist = 9;
+      // determine the largest mip level (omitted for now)
+
+      std::vector<std::vector<Image*>> images;
+      for (int mipLevel = 0; mipLevel <= maxMipLevelExist; mipLevel++) {
+            std::vector<Image*> mipLevelImages;
+            for (int faceIdx = 0; faceIdx < 6; faceIdx++) {
+                  std::string name = std::string("specular") + '-' + std::to_string(mipLevel) + '-' + std::to_string(faceIdx) + ".hdr";
+                  std::string path = default_path + '/' + name;
+                  Image* tex = new Image();
+                  tex->LoadHDR(path, false);
+                  mipLevelImages.push_back(tex);
+            }
+            images.push_back(mipLevelImages);
+      }
+      map.loadMipmapImage(images);
 }
 
 void Skybox::loadfromPanorama() {

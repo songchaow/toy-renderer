@@ -15,15 +15,22 @@ Matrix4 LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVe
 // may uses gl before renderloop. but not necessarily
 struct CubeMap {
       GLuint cubeMapObj = 0;
-      Image* _image[6] = {0};
+      std::vector<std::vector<Image*>> _mipImages;
       Point2i resolution;
       CubeMap() = default;
       CubeMap(const std::vector<std::string>& paths) { loadImage(paths); }
+      void deleteImages();
       void loadImage(const std::vector<std::string>& paths);
       void loadImage(const std::vector<Image*> images);
+      // each outer element is one mipmap level, which contains 6 faces
+      void loadMipmapImage(const std::vector<std::vector<Image*>>& images);
       bool ready2Load() {
+            if (_mipImages.size() < 1)
+                  return false;
+            if (_mipImages[0].size() < 6)
+                  return false;
             for (int i = 0; i < 6; i++)
-                  if (_image[i] == nullptr)
+                  if (_mipImages[0][i] == nullptr)
                         return false;
             return true;
       }

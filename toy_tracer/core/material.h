@@ -93,11 +93,14 @@ public:
       Float metallicFactor = 1.f;
       Float roughFactor = 1.f;
       AlphaMode alphaMode = OPACITY;
+      static ImageTexture lut;
 protected:
       // TODO: seems _shader can be shared among multiple PBRMaterials
       volatile bool _dirty; // need to update some of those `tbo`s.
       RGBSpectrum _globalEmission;
 public:
+      static void loadLUTFile();
+      static void glLoadLUT();
       void load();
       void update();
       bool dirty() const { return _dirty; }

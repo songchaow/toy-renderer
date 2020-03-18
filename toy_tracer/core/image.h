@@ -21,6 +21,7 @@ private:
       Point2i _resolution;
       bool loaded = false;
       bool convertfromsRGB = true;
+      bool isHDR = false;
       Format flags = UNSPECIFIED;
       void* _data = nullptr;
       size_t numChannel;
@@ -48,7 +49,9 @@ public:
       ::R8G8B8 R8G8B8Pixel(int i, int j);
       ::RGBSpectrum SpectrumPixel(int i, int j);
       bool LoadFromFile(std::string path, bool flip_y = true);
+      bool LoadHDR(std::string path, bool flip_y = true);
       void setFormat(Format f) { flags = f; }
+      void setRequestNumChannel(unsigned int c) { numChannel = c; }
       void Load() { LoadFromFile(_path, _flipY); }
       Format format() const { return flags; }
       GLenum glPixelFormat() const {

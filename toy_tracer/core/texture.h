@@ -90,7 +90,11 @@ public:
                   destruct();
             }
       }
-      void resetImage(Image* i) { _image = i; }
+      void resetImage(Image* i) { 
+            if (_image)
+                  delete _image;
+            _image = i; 
+      }
       void resetImage(std::string path) {
             if (_image)
                   delete _image;

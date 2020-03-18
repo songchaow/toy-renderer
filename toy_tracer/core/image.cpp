@@ -117,6 +117,23 @@ bool Image::LoadFromFile(std::string path, bool flip_y/*=true*/)
       
 }
 
+bool Image::LoadHDR(std::string path, bool flip_y)
+{
+      if (!stbi_is_hdr(path.c_str()))
+            return false;
+      stbi_set_flip_vertically_on_load(flip_y);
+      int originalChannel;
+      numChannel = 3;
+      Float* data = stbi_loadf(path.c_str(), &_resolution.x, &_resolution.y, &originalChannel, numChannel);
+      if (!data)
+            return false;
+      _data = data;
+      _elementType = GL_FLOAT;
+      isHDR = true;
+      flags = Image::Format::RGBSpectrum;
+      return false;
+}
+
 void Image::RotateCW()
 {
       if (flags == RGBSpectrum) {
@@ -187,7 +204,7 @@ void Image::RotateCCW()
 Image::~Image()
 {
       if(_data) {
-            if (_elementType == GL_FLOAT) {
+            if (_elementType == GL_FLOAT && !isHDR) {
                   ::RGBSpectrum* d = (::RGBSpectrum*)_data;
                   delete[] d;
             }
