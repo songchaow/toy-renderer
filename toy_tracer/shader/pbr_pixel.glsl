@@ -258,7 +258,7 @@ vec3 addIndirectLight(vec3 N, vec3 V, vec3 albedo, float roughness, float metall
     vec3 specularlobeCenterDir = reflect(-V, N);
     float alpha = roughness * roughness;
     float currMipLevel = roughness * MAX_MIP_LEVEL;
-    vec3 lightSum = texture(envSpecular, specularlobeCenterDir, currMipLevel).rgb;
+    vec3 lightSum = textureLod(envSpecular, specularlobeCenterDir, currMipLevel).rgb;
     float cosNV = dot(N,V);
     if(cosNV < 0)
         return vec3(0);

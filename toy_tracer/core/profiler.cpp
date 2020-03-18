@@ -44,12 +44,14 @@ void Profiler::PrintProfile() {
       const char currReadBuffer = (currRecordBuffer + 1) % 2;
       auto& last_times = times[currReadBuffer];
       std::string duration_str = "Total Frame: " + std::to_string((Float)frame_duration.count() / 1000.f) + "ms";
+#if 0
       for (int i = 0; i < last_times.size() - 1; i++) {
             std::chrono::microseconds period =
                   std::chrono::duration_cast<std::chrono::microseconds>(last_times[i + 1] - last_times[i]);
             duration_str += '\n';
             duration_str += phaseNames[i] + ": " + std::to_string((Float)period.count() / 1000.f) + "ms";
       }
+#endif
       renderTextAtTopLeft(duration_str, 1.0);
 }
 
@@ -60,9 +62,11 @@ void Profiler::PrintWorstProfile() {
 
       std::string duration_str = "Worst Total: " + std::to_string(sum) + "ms" + '\n';
       //duration_str += "Total Frame: " + std::to_string()
+#if 0
       for (int i = 0; i < phaseNames.size(); i++) {
             duration_str += phaseNames[i] + ": " + std::to_string((Float)worst_intervals[i].count() / 1000.f) + "ms";
             duration_str += '\n';
       }
+#endif
       renderTextAtTopRight(duration_str, 1.0);
 }
