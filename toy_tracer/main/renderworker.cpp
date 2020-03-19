@@ -45,6 +45,7 @@ void RenderWorker::initialize() {
       GLenum err = glGetError();
       glViewport(0, 0, _canvas->width(), _canvas->height());
       glEnable(GL_DEPTH_TEST);
+      glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
       csm.initTexture();
       //glEnable(GL_CULL_FACE);
       // Associate light to camera

@@ -8,6 +8,7 @@ Toy Renderer is implemented using OpenGL 3.3.
 
 - PBR
 ![pbr](screenshots/pbr.png)
+![pbr2](screenshots/pbr2.png)
 - Temporal Antialiasing
   - TAA Disabled
   ![taadisabled](screenshots/taa_disabled.png)
