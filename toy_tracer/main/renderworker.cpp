@@ -379,7 +379,8 @@ void RenderWorker::renderLoop() {
                   glBindTexture(GL_TEXTURE_2D, hdr_color);
                   LoadShader(IMAGE, true)->use();
                   TriangleMesh::screenMesh.glUse();
-                  glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+                  //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+                  glDrawArrays(GL_TRIANGLES, 0, 3);
                   firstFrame = false;
             }
             else {
@@ -397,7 +398,8 @@ void RenderWorker::renderLoop() {
                   glActiveTexture(GL_TEXTURE2);
                   glBindTexture(GL_TEXTURE_2D, hdr_motion);
                   TriangleMesh::screenMesh.glUse();
-                  glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
+                  //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+                  glDrawArrays(GL_TRIANGLES, 0, 3);
             }
             err = glGetError();
             // blit to hdr frame buffer
