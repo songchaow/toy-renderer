@@ -190,13 +190,12 @@ vec3 calcShadow(int lightIdx, float distance) {
     return vec3(shadow);
 }
 
-vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float metallic, float ao)
+vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float metallic, float ao, vec3 F0)
 {
     // add point lights
     vec3 Lo = vec3(0.0);
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
-    vec3 F0 = mix(vec3(0.03), albedo, metallic);
     for(int i = 0; i < 1; i++)
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
@@ -253,7 +252,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     return Lo;
 }
 
-vec3 addIndirectLight(vec3 N, vec3 V, vec3 albedo, float roughness, float metallic) {
+vec3 addIndirectLight(vec3 N, vec3 V, vec3 albedo, float roughness, vec3 F0) {
     // specular environment 
     vec3 specularlobeCenterDir = reflect(-V, N);
     float alpha = roughness * roughness;
@@ -263,7 +262,7 @@ vec3 addIndirectLight(vec3 N, vec3 V, vec3 albedo, float roughness, float metall
     if(cosNV < 0)
         return vec3(0);
     vec2 lutRes = texture(lut, vec2(cosNV,roughness)).rg;
-    vec3 F0 = mix(vec3(0.03), albedo, metallic);
+
     vec3 fSum = lutRes.x * F0 + lutRes.y;
 
     // diffuse
@@ -289,8 +288,10 @@ void main()
     float ao = texture(aoSampler, TexCoord).r;
     // ao is invalid now, so use 1 instead
     ao = 1;
+    vec3 F0 = mix(vec3(0.03), albedo, metallic);
+
     // reflectance equation
-    vec3 Lo = addDirectLight(V, N, albedo, roughness, metallic, ao);
+    vec3 Lo = addDirectLight(V, N, albedo, roughness, metallic, ao, F0);
     vec3 Le;
     if(globalEmission == vec3(0.0,0.0,0.0))
         Le = vec3(texture(emissionSampler, TexCoord).rgb * emissiveFactor);
@@ -299,7 +300,7 @@ void main()
     
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
-    vec3 ambient = addIndirectLight(N, V, albedo, roughness, metallic);
+    vec3 ambient = addIndirectLight(N, V, albedo, roughness, F0);
 
     vec3 color = ambient + Lo + Le;
     FragColor = vec4(color, 1.0);
