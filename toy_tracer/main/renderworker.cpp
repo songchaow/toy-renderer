@@ -63,6 +63,7 @@ void RenderWorker::initialize() {
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
       glEnable(GL_DEPTH_TEST);
+      glDisable(GL_FRAMEBUFFER_SRGB);
       /*GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       if (res == GL_FRAMEBUFFER_COMPLETE)
             LOG(INFO) << "ms hdr complete framebuffer";
@@ -72,8 +73,8 @@ void RenderWorker::initialize() {
       // 3 color buffers: 2 for blooms
       glGenFramebuffers(1, &hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
-      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-      glDrawBuffers(3, draw_bufs);
+      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+      glDrawBuffers(2, draw_bufs);
       glGenTextures(1, &hdr_color);
       glBindTexture(GL_TEXTURE_2D, hdr_color);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, nullptr);
@@ -359,6 +360,7 @@ void RenderWorker::renderLoop() {
             if (drawSkybox)
                   sky.draw();
             renderPassPBR();
+            err = glGetError();
             profiler.AddTimeStamp();
             // taa
             unsigned char historyTAAIdx = (currTAAIdx + 1) % numTAABuffer;
@@ -439,8 +441,8 @@ void RenderWorker::renderLoop() {
             profiler.AddTimeStamp();
             // render to screen
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            glClearDepth(1.0f);
-            glClear(GL_DEPTH_BUFFER_BIT);
+            //glClearDepth(1.0f);
+            //glClear(GL_DEPTH_BUFFER_BIT);
             Shader* hdr = LoadShader(HDR_TONE_MAP, true);
             hdr->use();
             glActiveTexture(GL_TEXTURE0);
@@ -453,7 +455,8 @@ void RenderWorker::renderLoop() {
             hdr->setUniformI("bloom", 1);
             hdr->setUniformF("explosure", 1.0);
             glDisable(GL_DEPTH_TEST);
-            glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+            //glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count()*3, GL_UNSIGNED_INT, nullptr);
             glEnable(GL_DEPTH_TEST);
             err = glGetError();
             // Profiling
@@ -462,6 +465,7 @@ void RenderWorker::renderLoop() {
             
             //std::this_thread::sleep_for(std::chrono::milliseconds(10));
             m_context->swapBuffers(_canvas);
+            err = glGetError();
             profiler.AddTimeStamp();
             
             currTAAIdx = (currTAAIdx + 1) % numTAABuffer;

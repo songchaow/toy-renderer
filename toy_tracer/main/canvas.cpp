@@ -7,14 +7,19 @@
 Canvas::Canvas(int width, int height) {
       QWindow::resize(width, height);
       setSurfaceType(QWindow::OpenGLSurface);
-      QSurfaceFormat format;
-      format.setSamples(1);
-      format.setMajorVersion(3);
-      format.setMinorVersion(3);
-      format.setProfile(QSurfaceFormat::CoreProfile);
-      format.setSwapInterval(0);
-      setFormat(format);
+      QSurfaceFormat reqformat;
+      //reqformat.setSamples(1);
+      reqformat.setMajorVersion(3);
+      reqformat.setMinorVersion(3);
+      reqformat.setProfile(QSurfaceFormat::CoreProfile);
+      reqformat.setSwapInterval(0);
+      setFormat(reqformat);
       create();
+      QSurfaceFormat actualFormat = format();
+      int alphaDepth = actualFormat.alphaBufferSize();
+      int blueDepth = actualFormat.blueBufferSize();
+
+
 }
 
 const Point2f Canvas::lastMouseMove()

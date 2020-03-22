@@ -21,3 +21,8 @@ Toy Renderer is implemented using OpenGL 3.3.
 
 - Percentage-Closer Soft Shadow
 ![pcss](screenshots/pcss.png)
+
+# To-do
+
+- Bugs
+  - Store g channel of the LUT image in float, NOT int, for higher precision.

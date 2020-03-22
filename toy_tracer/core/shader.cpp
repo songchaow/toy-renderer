@@ -12,7 +12,7 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/vertex.glsl",              "",                     "shader/depth.fs"},                 // DEPTH_MAP
       {"shader/vertex2World.glsl",        "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP
       {"shader/skybox.vs",                "",                     "shader/skybox.fs"},                // SKY_BOX
-      {"shader/posAndTex.vs",             "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
+      {"shader/fullscreen.vs",            "",                     "shader/hdr_tonemap.fs"},           // HDR_TONE_MAP
       {"shader/fullscreen.vs",            "",                     "shader/image.fs"},                 // IMAGE
       {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurH.fs"},         // GAUSSIAN_BLUR_H
       {"shader/posAndTex.vs",             "",                     "shader/gaussianBlurV.fs"},         // GAUSSIAN_BLUR_V

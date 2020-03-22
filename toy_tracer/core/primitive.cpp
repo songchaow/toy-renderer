@@ -82,9 +82,7 @@ void Primitive::draw(Shader* shader) {
             shader->setUniformF("obj2world", _obj2world.getRowMajorData());
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
-            GLenum err = glGetError();
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
-            err = glGetError();
       }
       glBindVertexArray(0);
 }
