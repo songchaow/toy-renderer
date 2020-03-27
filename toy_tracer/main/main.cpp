@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
       //RenderWorker::Instance()->loadPointLight(l);
 #else
       std::vector<Primitive*> glTFPrimitives;
-      glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
+      //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
       //glTFPrimitives = LoadGLTF("model/pbrspheres/MetalRoughSpheres.gltf");
-      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
+      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
       MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
       //PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));
-      PointLight* l = new PointLight(RGBSpectrum(1, 1, 1), Vector3f(0.f, -1.f, -1.f));
+      PointLight* l = new PointLight(RGBSpectrum(1, 1, 1), Vector3f(0.f, -5.f, 16.f));
       l->setLightSize(0.01);
       //RenderWorker::Instance()->loadPointLight(l);
       MainWindow::getInstance()->addPointLight(l);

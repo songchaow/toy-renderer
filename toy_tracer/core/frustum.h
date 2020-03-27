@@ -15,7 +15,7 @@ struct Frustum {
       Float aspectRatio;
       Float fov_Horizontal;
       // default Prospective ctor
-      Frustum(Float aspectRatio) : near(0.1f), Far(1200.f), aspectRatio(aspectRatio),
+      Frustum(Float aspectRatio) : near(0.1f), Far(200.f), aspectRatio(aspectRatio),
             fov_Horizontal(90.f * Pi / 180), type(Projective) {}
       /*Frustum(Float aspectRatio) : near(1.f), Far(1500.f), aspectRatio(aspectRatio),
             fov_Horizontal(90.f * Pi / 180), type(Projective) {}*/

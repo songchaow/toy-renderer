@@ -207,6 +207,13 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
       const Float& far = cameraViewIn->f.Far;
       Float oneDivaspectRatio = 1.f / cameraViewIn->f.aspectRatio;
       Float widthSlope = std::tan(cameraViewIn->f.fov_Horizontal / 2);
+#if 0
+      // test:
+      Float division[3];
+      division[0] = cameraViewIn->f.Far - 0.02;
+      division[1] = cameraViewIn->f.Far - 0.01;
+      division[2] = cameraViewIn->f.Far - 0.005;
+#endif
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
             subFrustumPoints[4 * i + 0] = { -widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };;
             subFrustumPoints[4 * i + 1] = { widthSlope * currNear, widthSlope * currNear * oneDivaspectRatio, -currNear };
@@ -215,6 +222,11 @@ void CascadedDepthMap::setCameraView(const View * cameraViewIn)
             currNearScale *= ratioPerScale;
             currNearUni += (cameraViewIn->f.Far - cameraViewIn->f.near) / NUM_CASCADED_SHADOW;
             currNear = weight * currNearUni + (1 - weight) * currNearScale;
+            // test:
+            /*
+            if (i <= 2)
+                  currNear = division[i];
+                  */
             _zPartition[i] = currNear;
       }
       subFrustumPoints[4 * NUM_CASCADED_SHADOW + 0] = { -widthSlope * far, widthSlope * far * oneDivaspectRatio, -far };

@@ -169,8 +169,15 @@ void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<ch
             std::vector<PBRMaterial> rtms;
             for (int j = 0; j < p_meshes.Size(); j++) {
                   const Value& mesh = p_meshes[j];
-                  rtms.push_back(materials[mesh["material"].GetUint()]);
-                  auto it = mesh.FindMember("mode");
+                  auto it = mesh.FindMember("material");
+
+                  if (it != mesh.MemberEnd()) {
+                        rtms.push_back(materials[mesh["material"].GetUint()]);
+
+                  }
+                  else
+                        rtms.push_back(defaultMaterial);
+                  it = mesh.FindMember("mode");
                   GLenum primitive_mode = GL_TRIANGLES;
                   if (it != mesh.MemberEnd())
                         primitive_mode = mesh["mode"].GetUint();
