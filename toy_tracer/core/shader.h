@@ -28,6 +28,8 @@ enum ShaderType {
       NUM_SHADER_TYPE,
 };
 
+constexpr unsigned char POINT_LIGHT_MAX_NUM = 4;
+
 class Shader {
       ShaderPath path;
       std::string vertex_shader_code;
@@ -72,8 +74,31 @@ public:
       void setUniformI(unsigned int loc, const int val);
       void setUniformI(const std::string& name, const int val1, const int val2);
       unsigned int getUniformLocation(const std::string& name) { return glGetUniformLocation(program_id, name.c_str()); }
-
+      
 };
+
+struct PunctualLightLoc {
+      uint16_t pos[POINT_LIGHT_MAX_NUM];
+      uint16_t irradiance[POINT_LIGHT_MAX_NUM];
+      uint16_t spot[POINT_LIGHT_MAX_NUM];
+      uint16_t directional[POINT_LIGHT_MAX_NUM];
+      uint16_t direction[POINT_LIGHT_MAX_NUM];
+      uint16_t cosAngle[POINT_LIGHT_MAX_NUM];
+      uint16_t size[POINT_LIGHT_MAX_NUM];
+      void queryLocation(Shader* pbrShader) {
+            for (int i = 0; i < POINT_LIGHT_MAX_NUM; i++) {
+                  pos[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].pos");
+                  irradiance[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].irradiance");
+                  spot[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].spot");
+                  directional[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].directional");
+                  direction[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].direction");
+                  cosAngle[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].cosAngle");
+                  size[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].size");
+            }
+      }
+};
+
+extern PunctualLightLoc punctualLightLocations_pbr;
 
 
 

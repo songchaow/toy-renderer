@@ -9,8 +9,8 @@ Canvas::Canvas(int width, int height) {
       setSurfaceType(QWindow::OpenGLSurface);
       QSurfaceFormat reqformat;
       //reqformat.setSamples(1);
-      reqformat.setMajorVersion(3);
-      reqformat.setMinorVersion(3);
+      reqformat.setMajorVersion(4);
+      reqformat.setMinorVersion(6);
       reqformat.setProfile(QSurfaceFormat::CoreProfile);
       reqformat.setSwapInterval(0);
       reqformat.setAlphaBufferSize(8);
