@@ -13,9 +13,14 @@ Canvas::Canvas(int width, int height) {
       reqformat.setMinorVersion(3);
       reqformat.setProfile(QSurfaceFormat::CoreProfile);
       reqformat.setSwapInterval(0);
+      reqformat.setAlphaBufferSize(8);
+      reqformat.setRedBufferSize(8);
+      reqformat.setGreenBufferSize(8);
+      reqformat.setBlueBufferSize(8);
       setFormat(reqformat);
       create();
       QSurfaceFormat actualFormat = format();
+      bool alp = actualFormat.hasAlpha();
       int alphaDepth = actualFormat.alphaBufferSize();
       int blueDepth = actualFormat.blueBufferSize();
 

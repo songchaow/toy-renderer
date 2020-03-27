@@ -15,7 +15,8 @@ void main() {
       color += bloomColor;
       // HDR tonemapping
       //color = color / (color + vec3(1.0));
-      color = vec3(1.0) - exp(color* explosure);
+
+      color = vec3(1.0) - exp(-color* explosure);
       // debug
       //color.r = colorAll.a / 200;
       //color.r = max(0, 1 - colorAll.a / 500);
