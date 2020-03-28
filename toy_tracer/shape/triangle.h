@@ -112,12 +112,16 @@ class TriangleMesh {
       GLuint _vbo = 0; // vertex buffer object
       GLuint _ebo = 0; // element buffer object
       //  GLuint _normTexture = 0;  // normal buffer texture
+      SphereBound _sb;
+      AABB _aabb;
+      bool glLoaded = false;
 private:
       uint8_t indexElementSize = 0;
       GLenum indexFormat = GL_UNSIGNED_INT; // 4 byte int
 public:
 
       TriangleMesh() = default;
+      // vertex buffer format: X32Y32Z32
       TriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world, GLenum primMode)
             : vertex_num(vertex_num), vertex_data(vbuffer), _layout(l), vbuffer_size(vertex_num*l.strip()),
             index_data(index_data), face_num(faceNum), indexFormat(idxFormat), _primitiveMode(primMode) {
@@ -167,12 +171,15 @@ public:
       GLenum indexElementT() const { return indexFormat; }
       GLenum primitiveMode() const { return _primitiveMode; }
       void fillTangent();
+      void calcLocalSphereBound();
       ~TriangleMesh() { 
             if (vertex_data) delete[](char*)vertex_data; 
             if (index_data) delete[](char*)index_data;
+            // TODO: unload somewhere if glLoaded is true
       }
       const char* face_triangle(int faceIdx) const { return index_data + faceIdx * 3 * indexElementSize; }
       static TriangleMesh screenMesh;
+      const AABB aabb() const { return _aabb; }
 };
 
 class Triangle : public Shape {

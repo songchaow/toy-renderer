@@ -131,6 +131,7 @@ void TriangleMesh::load() {
       glBindVertexArray(0);
       glBindBuffer(GL_ARRAY_BUFFER, 0);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+      glLoaded = true;
 }
 
 void TriangleMesh::fillTangent()
@@ -204,6 +205,29 @@ void TriangleMesh::fillTangent()
             // handness
             ((Float*)tangent)[3] = 1.0;
       }
+}
+
+void TriangleMesh::calcLocalSphereBound() {
+      unsigned char* pVertexData = static_cast<unsigned char*>(vertex_data);
+      const LayoutItem* vertexPosLayout = _layout.getLayoutItem(ArrayType::ARRAY_VERTEX);
+      uint16_t vertexPosOffset = vertexPosLayout->offset;
+
+      _aabb = AABB();
+
+      for(int i = 0; i < vertex_num; i++) {
+            Point3f* pos = reinterpret_cast<Point3f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
+            _aabb.Add(*pos);
+      }
+      Vector3f halfExtent = _aabb.extent();
+      _sb.center = _aabb.center();
+      Float radius2 = 0;
+      for(int i = 0; i < vertex_num; i++) {
+            Point3f* pos = reinterpret_cast<Point3f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
+            Float currRadius2 = (*pos - _sb.center).LengthSquared();
+            if(currRadius2 > radius2)
+                  radius2 = currRadius2;
+      }
+      _sb.radius = std::sqrt(radius2);
 }
 
 const LayoutItem* Layout::getLayoutItem(ArrayType t) const {

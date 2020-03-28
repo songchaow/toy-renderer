@@ -123,6 +123,13 @@ void RenderWorker::initialize() {
       glBindTexture(GL_TEXTURE_2D, PBRMaterial::lut.tbo());
       glActiveTexture(GL_TEXTURE7);
       glBindTexture(GL_TEXTURE_CUBE_MAP, sky.specularMaptbo());
+      // textures
+      pbr->setUniformI("albedoSampler", 0);
+      pbr->setUniformI("mrSampler", 1);
+      pbr->setUniformI("normalSampler", 2);
+      pbr->setUniformI("emissionSampler", 3);
+      pbr->setUniformI("aoSampler", 4);
+      pbr->setUniformI("depthSampler", 5);
       pbr->setUniformI("lut", 6);
       pbr->setUniformI("envSpecular", 7);
       Shader* taa = LoadShader(TAA, true);
@@ -136,7 +143,7 @@ void RenderWorker::initialize() {
 }
 
 void RenderWorker::configPBRShader(Shader* shader) {
-      // set lights
+      // lights
       uint16_t startPos = shader->getUniformLocation("pointLights[0].pos");
       uint16_t pos = startPos;
       const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
@@ -179,18 +186,7 @@ void RenderWorker::configPBRShader(Shader* shader) {
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++)
             shader->setUniformF(pos + i, csm.lightView()[i].f.width, csm.lightView()[i].f.height,
                   csm.lightView()[i].f.Far);
-      // pos = shader->getUniformLocation("world2lightview[0]");
-      // for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
-      //       shader->setUniformF(pos + i, &csm.lightView()[i].world2view);
-      // }
-      // textures
-      // TODO: move these to `initialize`
-      shader->setUniformI("albedoSampler", 0);
-      shader->setUniformI("mrSampler", 1);
-      shader->setUniformI("normalSampler", 2);
-      shader->setUniformI("emissionSampler", 3);
-      shader->setUniformI("aoSampler", 4);
-      shader->setUniformI("depthSampler", 5);
+      
       // set camera
       const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
       const Matrix4& w2c_prev = RenderWorker::getCamera()->world2camPrev();

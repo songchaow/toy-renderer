@@ -610,6 +610,7 @@ class Vector3 {
         return z;
     }
     Vector3() { x = y = z = 0; }
+    Vector3(T t) { x = y = z = t; }
     Vector3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!HasNaNs()); }
     Vector3(std::initializer_list<T> i) {
           x = *i.begin();
@@ -699,33 +700,6 @@ class Vector3 {
 
     // Vector3 Public Data
     T x, y, z;
-};
-
-// Axis aligned bounding box
-struct AABB {
-      Point3f pMax;
-      Point3f pMin;
-      AABB() {
-            Float max = std::numeric_limits<Float>::max();
-            Float min = std::numeric_limits<Float>::lowest();
-            pMax = { max, max, max };
-            pMin = { min,min,min };
-      }
-      AABB(const Point3f& initPoint) : pMax(initPoint), pMin(initPoint) {}
-      void Add(const Point3f& p) {
-            if (p.x > pMax.x)
-                  pMax.x = p.x;
-            if (p.y > pMax.y)
-                  pMax.y = p.y;
-            if (p.z > pMax.z)
-                  pMax.z = p.z;
-            if (p.x < pMin.x)
-                  pMin.x = p.x;
-            if (p.y < pMin.y)
-                  pMin.y = p.y;
-            if (p.z < pMin.z)
-                  pMin.z = p.z;
-      }
 };
 
 template <typename T>
@@ -1115,3 +1089,43 @@ inline Float SphericalPhi(const Vector3f &v) {
 inline bool SameOpposition(const Normal3f& n, const Vector3f& wi) {
       return Dot(n, wi) > 0;
 }
+
+// Axis aligned bounding box
+struct AABB {
+      Point3f pMax;
+      Point3f pMin;
+      AABB() {
+            Float max = std::numeric_limits<Float>::max();
+            Float min = std::numeric_limits<Float>::lowest();
+            pMin = { max, max, max };
+            pMax = { min,min,min };
+      }
+      AABB(const Point3f& initPoint) : pMax(initPoint), pMin(initPoint) {}
+      void Add(const Point3f& p) {
+            if (p.x > pMax.x)
+                  pMax.x = p.x;
+            if (p.y > pMax.y)
+                  pMax.y = p.y;
+            if (p.z > pMax.z)
+                  pMax.z = p.z;
+            if (p.x < pMin.x)
+                  pMin.x = p.x;
+            if (p.y < pMin.y)
+                  pMin.y = p.y;
+            if (p.z < pMin.z)
+                  pMin.z = p.z;
+      }
+      Point3f center() const { return 0.5 * (pMax + pMin); }
+      Vector3f extent() const { return (pMax - pMin); }
+      Point3f& operator[](uint8_t i) { return i == 0 ? pMax : pMin; }
+      const Point3f& operator[](uint8_t i) const { return i == 0 ? pMax : pMin; }
+      AABB& operator+=(const AABB& rhs) {
+            Add(rhs.pMax);
+            Add(rhs.pMin);
+      }
+};
+
+struct SphereBound {
+      Point3f center;
+      Float radius;
+};
