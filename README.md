@@ -24,5 +24,7 @@ Toy Renderer is implemented using OpenGL 3.3.
 
 # To-do
 
+- [ ] Scene representation using Octree.
+
 - Bugs
   - Store g channel of the LUT image in float, NOT int, for higher precision.
