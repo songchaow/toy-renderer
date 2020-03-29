@@ -161,6 +161,20 @@ class Point3 {
         z *= inv;
         return *this;
     }
+    Point3<T> &operator/=(const Point3<T>& rhs) {
+          x /= rhs.x;
+          y /= rhs.y;
+          z /= rhs.z;
+          return *this;
+    }
+
+    Point3<T> &operator/=(const Vector3<T>& rhs) {
+          x /= rhs.x;
+          y /= rhs.y;
+          z /= rhs.z;
+          return *this;
+    }
+
     T operator[](int i) const {
         DCHECK(i >= 0 && i <= 2);
         if (i == 0) return x;
@@ -312,6 +326,13 @@ class Point2 {
         y *= inv;
         return *this;
     }
+    Point2<T> &operator/=(const Point2<T>& rhs) {
+          
+          x /= rhs.x;
+          y /= rhs.y;
+          return *this;
+    }
+
     T operator[](int i) const {
         DCHECK(i >= 0 && i <= 1);
         if (i == 0) return x;
@@ -1101,6 +1122,7 @@ struct AABB {
             pMax = { min,min,min };
       }
       AABB(const Point3f& initPoint) : pMax(initPoint), pMin(initPoint) {}
+      AABB(const Point3f& pMax, const Point3f& pMin) : pMax(pMax), pMin(pMin) {}
       void Add(const Point3f& p) {
             if (p.x > pMax.x)
                   pMax.x = p.x;
