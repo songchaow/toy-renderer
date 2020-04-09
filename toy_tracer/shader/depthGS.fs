@@ -15,6 +15,9 @@ void main() {
       float alpha = texture(albedoSampler, texCoord).a;
       if(alpha < 0.1)
             discard;
+      // TODO: if using psm, calculate distanceNDC
+      // need to pass from geometry shader posNDC
+      // or compute difference between gl_Position/z and posLightNDC
       //if (directional)
             //gl_FragDepth = depth;//depth = gl_Position.z;
       // else {

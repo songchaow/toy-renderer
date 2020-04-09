@@ -20,11 +20,11 @@ enum ArrayType {
 };
 
 struct LayoutItem {
-      uint16_t strip;   // same in all items
+      uint16_t strip;   // same in all items, size of the item in byte
       ArrayType type;
-      GLenum e_format;    // type of element in one item
-      GLint e_size;     // size of one element
-      uint16_t e_count; // element count in one item
+      GLenum e_format;    // type of component in one item
+      GLint e_size;     // size of one component in byte
+      uint16_t e_count; // component count in one item
       GLenum normalized = GL_FALSE;
       GLint offset;     // offset in the strip
       void* data_ptr;
@@ -37,6 +37,7 @@ struct LayoutItem {
 
 static LayoutItem DEFAULT_POINT3F_LAYOUT = LayoutItem(12, ARRAY_VERTEX, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_POINT2F_LAYOUT = LayoutItem(8, ARRAY_VERTEX, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
+static LayoutItem DEFAULT_UINT8_LAYOUT = LayoutItem(8, ARRAY_INDEX, GL_UNSIGNED_BYTE, 1, 1, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_TEXUV_LAYOUT = LayoutItem(8, ARRAY_TEX_UV, GL_FLOAT, 4, 2, GL_FALSE, 0, nullptr);
 static LayoutItem DEFAULT_NORMAL_LAYOUT = LayoutItem(12, ARRAY_NORMAL, GL_FLOAT, 4, 3, GL_FALSE, 0, nullptr);
 

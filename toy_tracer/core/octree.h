@@ -196,6 +196,7 @@ struct OctreeNode {
                   }
             }
       }
+      
 };
 
 template<typename T>
@@ -279,3 +280,9 @@ public:
       }
 
 };
+
+// debug use. 
+template<typename T>
+void glDrawOctree(Octree<T>* tree) {
+
+}
