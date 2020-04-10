@@ -75,6 +75,13 @@ void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec, 
       world2cam = Inverse(world2cam);
 }
 
+void Camera::LookAt(Point3f pos, Vector3f viewDir) {
+      ::LookAt(pos, viewDir, Vector3f(0, 1, 0), _world2cam.m);
+      _pos = pos;
+      _viewDir = viewDir;
+      localX = Normalize(Cross(Vector3f(0.f, 1.f, 0.f), -_viewDir));
+}
+
 void Camera::LookAt() {
       // newZ = _viewDir;
       ::LookAt(_pos, _viewDir, Vector3f(0.f, 1.f, 0.f), _world2cam.m);

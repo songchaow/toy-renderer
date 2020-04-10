@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
       constexpr int window_width = 1280;
       Canvas* canvas = new Canvas(window_width, window_height);
       Camera* cam = CreateRTCamera(Point2i(canvas->width(), canvas->height()));
+
+      cam->LookAt(Point3f(-13, 32, -13), Normalize(Vector3f(1, -0.8, 1)));
       //PointLight spot(RGBSpectrum(10.f, 10.f, 10.f), Point3f(), std::cos(Pi / 20.f), Vector3f(0.f, 0.f, 1.f));
       //cam->setAssociatedLight(spot);
       //window.winWidget = QWidget::createWindowContainer(canvas);
@@ -53,7 +55,7 @@ int main(int argc, char *argv[])
       InstancedPrimitive* matrix = createRandomCubeMatrix();
       matrix->GenMeshes();
       RenderWorker::Instance()->loadObject(matrix);
-      PointLight* l2 = new PointLight(RGBSpectrum(1.f, 1.f, 1.f), Normalize(Vector3f(-1.f, 2.f, -3.f)));
+      PointLight* l2 = new PointLight(RGBSpectrum(3.f, 3.f, 3.f), Normalize(Vector3f(1.f, -2.f, 3.f)));
       //MainWindow::getInstance()->addPointLight(l2);
       RenderWorker::Instance()->loadPointLight(l2);
 #else

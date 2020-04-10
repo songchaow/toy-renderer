@@ -50,6 +50,7 @@ public:
       // Generate OpenGL transform, row major order
       Transform Cam2NDC() const;
       void LookAt();
+      void LookAt(Point3f pos, Vector3f viewDir);
       // Getters
       const Transform& world2cam() const { return _world2cam; }
       const Transform& cam2world() const { return _cam2world; }
