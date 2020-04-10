@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <core/transform.h>
 
+constexpr unsigned char POINT_LIGHT_MAX_NUM = 4;
+
 struct ShaderPath {
       std::string vertex;
       std::string geometry;
@@ -70,7 +72,28 @@ public:
 
 };
 
+struct PunctualLightLoc {
+      uint16_t pos[POINT_LIGHT_MAX_NUM];
+      uint16_t irradiance[POINT_LIGHT_MAX_NUM];
+      uint16_t spot[POINT_LIGHT_MAX_NUM];
+      uint16_t directional[POINT_LIGHT_MAX_NUM];
+      uint16_t direction[POINT_LIGHT_MAX_NUM];
+      uint16_t cosAngle[POINT_LIGHT_MAX_NUM];
+      uint16_t size[POINT_LIGHT_MAX_NUM];
+      void queryLocation(Shader* pbrShader) {
+            for (int i = 0; i < POINT_LIGHT_MAX_NUM; i++) {
+                  pos[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].pos");
+                  irradiance[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].irradiance");
+                  spot[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].spot");
+                  directional[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].directional");
+                  direction[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].direction");
+                  cosAngle[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].cosAngle");
+                  //size[i] = pbrShader->getUniformLocation("pointLights[" + std::to_string(i) + "].size");
+            }
+      }
+};
 
+extern PunctualLightLoc punctualLightLocations_pbr;
 
 // Convenience functions
 Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_path, bool compile);

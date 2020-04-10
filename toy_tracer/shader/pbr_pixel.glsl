@@ -27,6 +27,7 @@ struct PointLight {
     bool directional;
     vec3 direction;
     float cosAngle;
+    float size;
 
 };
 uniform PointLight pointLights[POINT_LIGHT_NUM];
@@ -85,7 +86,7 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
     // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
     // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
     vec3 F0 = mix(vec3(0.03), albedo, metallic);
-    for(int i = 0; i < POINT_LIGHT_NUM; i++)
+    for(int i = 0; i < 1; i++)
     {
         vec3 Lraw = pointLights[i].pos - posWorld;
         vec3 L;
@@ -104,11 +105,12 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
                 light_distance = distance;
             if(maxDepth < light_distance - 0.15)
             // occluded
-                continue;
+                //continue;
+                ;
         }
         // calculate per-light radiance
-        if(pointLights[i].directional && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
-            continue; // skip
+        if(pointLights[i].directional && pointLights[i].spot && dot(-L, pointLights[i].direction) < pointLights[i].cosAngle)
+            ; // skip
         vec3 H = normalize(wi + L);
         
         float attenuation;
@@ -143,6 +145,8 @@ vec3 addDirectLight(vec3 wi, vec3 normal, vec3 albedo, float roughness, float me
 
         // add to outgoing radiance Lo
         Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        // debug
+        //Lo += (kD * albedo / PI + 1) * radiance * 1;
     }
     return Lo;
 }

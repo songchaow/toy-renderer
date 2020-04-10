@@ -313,3 +313,5 @@ Shader* LoadShader(ShaderType t, bool compile) {
                   return nullptr;
       }
 }
+
+PunctualLightLoc punctualLightLocations_pbr;

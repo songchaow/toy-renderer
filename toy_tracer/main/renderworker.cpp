@@ -97,6 +97,8 @@ void RenderWorker::initialize() {
       // no depth buffer attached
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       depthMap = new CubeDepthMap();
+      Shader* pbr = LoadShader(PBR_INSTANCED, true);
+      punctualLightLocations_pbr.queryLocation(pbr);
 }
 
 void RenderWorker::configPBRShader(Shader* shader) {
@@ -106,29 +108,32 @@ void RenderWorker::configPBRShader(Shader* shader) {
       const std::vector<PointLight*>& pointLights = RenderWorker::Instance()->pointLights();
       // 1: vec3 pos
       for (int i = 0; i < pointLights.size(); i++) {
-            shader->setUniformF(pos++, pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
+            shader->setUniformF(punctualLightLocations_pbr.pos[i], pointLights[i]->pos().x, pointLights[i]->pos().y, pointLights[i]->pos().z);
       }
       pos += Shader::maxPointLightNum - pointLights.size();
       // 2: vec3 irradiance
       for (int i = 0; i < pointLights.size(); i++) {
-            shader->setUniformF(pos++, pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
+            uint16_t e = glGetError();
+            shader->setUniformF(punctualLightLocations_pbr.irradiance[i], pointLights[i]->radiance().rgb[0], pointLights[i]->radiance().rgb[1], pointLights[i]->radiance().rgb[2]);
+            e = glGetError();
+            e = glGetError();
       }
       pos += Shader::maxPointLightNum - pointLights.size();
       // 3: bool spot
       for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformBool(pos++, pointLights[i]->isSpotLight());
+            shader->setUniformBool(punctualLightLocations_pbr.spot[i], pointLights[i]->isSpotLight());
       pos += Shader::maxPointLightNum - pointLights.size();
       // 4: bool directional
       for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformBool(pos++, pointLights[i]->isDirectionalLight());
+            shader->setUniformBool(punctualLightLocations_pbr.directional[i], pointLights[i]->isDirectionalLight());
       pos += Shader::maxPointLightNum - pointLights.size();
       // 5: vec3 direction
       for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformF(pos++, pointLights[i]->direction());
+            shader->setUniformF(punctualLightLocations_pbr.direction[i], pointLights[i]->direction());
       pos += Shader::maxPointLightNum - pointLights.size();
       // 6: cosAngle
       for (int i = 0; i < pointLights.size(); i++)
-            shader->setUniformF(pos++, pointLights[i]->HalfAngle());
+            shader->setUniformF(punctualLightLocations_pbr.cosAngle[i], pointLights[i]->HalfAngle());
       // point shadow
       glActiveTexture(GL_TEXTURE5);
       glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap->cubeMapObj);

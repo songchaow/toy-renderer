@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
       InstancedPrimitive* matrix = createRandomCubeMatrix();
       matrix->GenMeshes();
       RenderWorker::Instance()->loadObject(matrix);
-      PointLight* l2 = new PointLight(RGBSpectrum(5000.f, 5000.f, 5000.f), Point3f(-40.f, 32.f, -40.f));
-      MainWindow::getInstance()->addPointLight(l2);
-      //RenderWorker::Instance()->loadPointLight(l);
+      PointLight* l2 = new PointLight(RGBSpectrum(1.f, 1.f, 1.f), Normalize(Vector3f(-1.f, 2.f, -3.f)));
+      //MainWindow::getInstance()->addPointLight(l2);
+      RenderWorker::Instance()->loadPointLight(l2);
 #else
       std::vector<Primitive*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
