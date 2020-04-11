@@ -56,6 +56,8 @@ class RenderWorker : public QObject {
 public:
       Primitive* curr_primitive;
       bool renderPointLight = true;
+      void renderFrame();
+      void renderDiff();
 public slots:
       void initialize();
       void renderLoop();

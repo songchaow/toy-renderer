@@ -23,6 +23,7 @@ enum ShaderType {
       TEXT,
       PBR_INSTANCED,
       DEPTH_MAP_INSTANCED,
+      DIFFERENCE_SHADER,
       NUM_SHADER_TYPE,
 };
 

@@ -52,4 +52,6 @@ public:
       void GenInstancedArray();
       void draw(Shader* s);
       bool isInstanced() const override { return true; }
+      void remove(const Vector3i& flattenIndex);
+      void updateInstancedArray();
 };

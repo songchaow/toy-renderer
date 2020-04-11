@@ -112,11 +112,30 @@ void InstancedPrimitive::GenInstancedArray() {
       }
 }
 
+void InstancedPrimitive::updateInstancedArray() {
+      glBindBuffer(GL_ARRAY_BUFFER, iabo);
+      glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(Matrix4)*obj2worlds.size(), obj2worlds.data());
+}
+
 void InstancedPrimitive::draw(Shader* s) {
       for (int i = 0; i < _meshes.size(); i++) {
             drawPrepare(s, i);
             TriangleMesh* mesh = _meshes[i];
             glDrawElementsInstanced(mesh->primitiveMode(), mesh->face_count() * 3, mesh->indexElementT(), 0, obj2worlds.size());
             glBindVertexArray(0);
+      }
+}
+
+void InstancedPrimitive::remove(const Vector3i& flattenIndex)
+{
+      // now, just search for the object
+      for (auto it = obj2worlds.begin(); it < obj2worlds.end(); it++) {
+            auto& mat = it->m_matrix;
+            // matrices in obj2worlds are transposed
+            if (mat[3][0] == flattenIndex.x && mat[3][1] == flattenIndex.y && mat[3][2] == flattenIndex.z) {
+                  obj2worlds.erase(it);
+                  break;
+            }
+
       }
 }

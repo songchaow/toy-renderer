@@ -18,6 +18,7 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/screenTransform.vs", "",                     "shader/text.fs"},                  // TEXT
       {"shader/vertexInstance.vs",  "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
       {"shader/vertexInstance.vs",  "",                     "shader/depth.fs"},                 // DEPTH_MAP_INSTANCED
+      {"shader/posAndTex.vs",       "",                     "shader/difference.fs"},            // DIFFERENCE
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -261,6 +262,10 @@ void Shader::setUniformF(unsigned int loc, const Vector3f& vec3) {
 void Shader::setUniformF(unsigned int loc, const float val, const float val2, const float val3, const float val4)
 {
       glUniform4f(loc, val, val2, val3, val4);
+}
+
+void Shader::setUniformI(unsigned int loc, const int val) {
+      glUniform1f(loc, val);
 }
 
 void Shader::setUniformI(const std::string& name, const int val)

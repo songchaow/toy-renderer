@@ -13,7 +13,7 @@ using namespace std;
 int main(int argc, char *argv[])
 {
       QApplication a(argc, argv);
-      MainWindow window;
+      //MainWindow window;
       constexpr int window_height = 800;
       constexpr int window_width = 1280;
       Canvas* canvas = new Canvas(window_width, window_height);
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
       //PointLight spot(RGBSpectrum(10.f, 10.f, 10.f), Point3f(), std::cos(Pi / 20.f), Vector3f(0.f, 0.f, 1.f));
       //cam->setAssociatedLight(spot);
       //window.winWidget = QWidget::createWindowContainer(canvas);
-      window.show();
+      //window.show();
       canvas->show();
       //canvas->initialize(); // use RenderWorker's
       RenderWorker* worker = RenderWorker::Instance();
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
       QThread workerThread;
       worker->moveToThread(&workerThread);
       QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::initialize);
-      QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderLoop);
+      QObject::connect(&workerThread, &QThread::started, worker, &RenderWorker::renderDiff);
       worker->skybox().loadSkybox();
 #if 1
       // create albedo texture for balls
