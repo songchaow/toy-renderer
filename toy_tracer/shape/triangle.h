@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <string>
 #include <memory>
-#include <assimp/scene.h>           // Output data structure
 
 class Triangle;
 
@@ -189,5 +188,4 @@ public:
 
 };
 
-std::vector<TriangleMesh*> LoadMeshes(const aiScene* scene);
 extern std::map<ArrayType, uint16_t> ShaderLocMap;
