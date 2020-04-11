@@ -1,18 +1,52 @@
-# Toy Tracer(under construction)
-Everyone learning CG seems to have his/her own ray-tracer. So this one is mine.
+功能：用于32x32x32的体素化方块的渲染结果求差。
 
-## To-do list
+输入：
 
-- [x] Design and implement `Spectrum` and other color-related interfaces.
+- `index.txt`
 
-- [x] Add basic math utilities.
+  内容为三个整数，用空格分隔。用来指明要求导的方块的xyz坐标
 
-  - [x] Transformation, matrix.
+- `matrix.txt`
 
-- [x] Design and implement scattering-related interfaces.
-  - Reflection and transmission of dielectrics.
-  - 
+  内容为32x32x32个0/1数字，用空格分隔。
 
-- [x] Prepare test framework.
+  每个数字表示对应的位置处，方块是否存在。1表示存在。
 
-- ...
+  相应的位置 按顺序依次为：
+
+  ```c
+           x, y, z:
+           0, 0, 0,
+           0, 0, 1,
+           0, 0, 2,
+           ...
+           0, 0, 31,
+           0, 1, 0,
+           0, 1, 1,
+           ...
+           0, 31, 31,
+           1, 0, 0,
+           ...
+  ```
+
+  即方块阵列所包含的xyz坐标范围为：
+
+  x: [0,31]
+
+  y: [0,31]
+
+  z: [0,31]
+
+运行流程：
+
+- 摄像机位于y轴上方，面朝矩阵方向，即下前方
+
+- 渲染原本的方块阵列，将图像保存
+
+- 将`index.txt`指明的一个方块去掉，再渲染一次，将图像保存
+
+- 将两幅保存的图像求差
+
+- 结果输出为`outputRaw.bin`，像素顺序为从左上角到右下角（行主序）；每个像素的格式为R8G8B8，即每个channel一个字节。
+
+  也会输出图片文件`outputDifference.png`，用于可视化。

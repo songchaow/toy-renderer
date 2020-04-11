@@ -3,9 +3,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
-#include <assimp/Importer.hpp>      // C++ importer interface
-#include <assimp/scene.h>           // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
+
 #include "main/renderworker.h"
 
 Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
@@ -14,13 +12,7 @@ Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
       return p;
 }
 Primitive* CreatePrimitiveFromModelFile(std::string path) {
-      Assimp::Importer importer;
-      const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-      std::vector<TriangleMesh*> meshes = LoadMeshes(scene);
-      // TODO: maybe other stuff(texture map info, etc.) could be load together
-      Primitive* p = new Primitive(nullptr, nullptr);
-      p->setMeshes(meshes);
-      return p;
+      return nullptr;
 }
 
 void Primitive::load() {

@@ -8,15 +8,19 @@ constexpr unsigned int edgeLength = 32;
 Vector3i differenceIdx;
 
 InstancedPrimitive* createCubeMatrix() {
+      // first read 3 integers which representing the difference index
+      std::ifstream fIdx("index.txt");
+      if (!fIdx.is_open())
+            LOG(ERROR) << "index.txt does not exist";
+      fIdx >> differenceIdx.x;
+      fIdx >> differenceIdx.y;
+      fIdx >> differenceIdx.z;
       std::ifstream fposition("matrix.txt");
       if (!fposition.is_open()) {
             LOG(ERROR) << "matrix.txt does not exist";
             return nullptr;
       }
-      // first read 3 integers which representing the difference index
-      fposition >> differenceIdx.x;
-      fposition >> differenceIdx.y;
-      fposition >> differenceIdx.z;
+      
       /* then read 32x32x32 elements
          the order:
          x, y, z
@@ -35,6 +39,7 @@ InstancedPrimitive* createCubeMatrix() {
       */
       std::vector<Matrix4> obj2worlds;
       for (int i = 0; i < edgeLength; i++) {
+            bool ended = false;
             for (int j = 0; j < edgeLength; j++) {
                   for (int k = 0; k < edgeLength; k++) {
                         int val;
@@ -43,8 +48,18 @@ InstancedPrimitive* createCubeMatrix() {
                               // create a position
                               obj2worlds.push_back(TranslateM(Float(i), Float(j), Float(k)));
                         }
+                        // if ended
+                        if (!fposition.good()) {
+                              LOG(WARNING) << "matrix.txt ends prematurely.";
+                              ended = true;
+                              break;
+                        }
                   }
+                  if (ended)
+                        break;
             }
+            if (ended)
+                  break;
       }
       return new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
 } 

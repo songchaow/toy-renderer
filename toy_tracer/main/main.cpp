@@ -52,7 +52,8 @@ int main(int argc, char *argv[])
       std::vector<Matrix4> obj2worlds = { TranslateM(-1, -1, 0), TranslateM(-1, 1, 0), TranslateM(1, -1, 0), TranslateM(1, 1, 0) };
       //InstancedPrimitive* cubes = new InstancedPrimitive(new FlatCube(), defaultMaterial, obj2worlds);
       //cubes->GenMeshes();
-      InstancedPrimitive* matrix = createRandomCubeMatrix();
+      //InstancedPrimitive* matrix = createRandomCubeMatrix();
+      InstancedPrimitive* matrix = createCubeMatrix();
       matrix->GenMeshes();
       RenderWorker::Instance()->loadObject(matrix);
       PointLight* l2 = new PointLight(RGBSpectrum(3.f, 3.f, 3.f), Normalize(Vector3f(1.f, -2.f, 3.f)));
