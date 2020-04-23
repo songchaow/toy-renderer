@@ -47,8 +47,8 @@ const std::string Skybox::default_path = "texture/skybox";
 const std::vector<std::string> Skybox::default_files = { "right.tga", "left.tga", "up.tga", "down.tga", "back.tga", "front.tga" };
 //const std::vector<std::string> Skybox::default_files = { "left.tga", "right.tga", "up.tga", "down.tga", "front.tga", "back.tga" };
 
-TriangleMesh Skybox::cube = TriangleMesh(_worldPositions, std::vector<LayoutItem>(1, DEFAULT_POINT3F_LAYOUT),
-      8, (char*)indices, 12, GL_UNSIGNED_INT, Transform::Identity());
+TriangleMesh Skybox::cube = CreateTriangleMesh(_worldPositions, std::vector<LayoutItem>(1, DEFAULT_POINT3F_LAYOUT),
+      8, (char*)indices, 12, GL_UNSIGNED_INT, Transform::Identity(), GL_TRIANGLES);
 
 void Skybox::glLoad()
 {

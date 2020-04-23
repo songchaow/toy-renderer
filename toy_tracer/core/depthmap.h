@@ -55,7 +55,8 @@ public:
       }
       void GenLightViews(const Vector3f& dir);
       ~CascadedDepthMap() {
-            glDeleteTextures(1, &texArray);
+            if (texArray)
+                  glDeleteTextures(1, &texArray);
       }
       View* lightView() { return lightViews; }
       const Float* zPartition() const { return _zPartition; }

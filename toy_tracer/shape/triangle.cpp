@@ -248,5 +248,26 @@ static uint32_t screenMeshIndices[] = {
       1, 0, 2, 1, 2, 3
 };
 
-TriangleMesh TriangleMesh::screenMesh = TriangleMesh(screenVertex, std::vector<LayoutItem>{DEFAULT_POINT2F_LAYOUT, DEFAULT_TEXUV_LAYOUT},
- 4, (char*)screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity());
+TriangleMesh CreateTriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world, GLenum primMode) {
+      const uint32_t lenVbuffer = l.strip() * vertex_num;
+      char* newVertexBuffer = new char[lenVbuffer];
+      std::memcpy(newVertexBuffer, vbuffer, lenVbuffer);
+      uint32_t indexElementSize;
+      switch (idxFormat) {
+      case GL_INT:
+      case GL_UNSIGNED_INT:
+            indexElementSize = 4; break;
+      case GL_SHORT:
+      case GL_UNSIGNED_SHORT:
+            indexElementSize = 2; break;
+      case GL_UNSIGNED_BYTE:
+      case GL_BYTE:
+            indexElementSize = 1; break;
+      }
+      char* newIndexData = new char[3 * faceNum * indexElementSize];
+      std::memcpy(newIndexData, index_data, 3 * faceNum * indexElementSize);
+      return TriangleMesh(newVertexBuffer, l, vertex_num, newIndexData, faceNum, idxFormat, obj2world);
+}
+
+TriangleMesh TriangleMesh::screenMesh = CreateTriangleMesh(screenVertex, std::vector<LayoutItem>{DEFAULT_POINT2F_LAYOUT, DEFAULT_TEXUV_LAYOUT},
+ 4, (char*)screenMeshIndices, 2, GL_UNSIGNED_INT, Transform::Identity(), GL_TRIANGLES);

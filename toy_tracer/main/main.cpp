@@ -62,7 +62,9 @@ int main(int argc, char *argv[])
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
       //glTFPrimitives = LoadGLTF("model/pbrspheres/MetalRoughSpheres.gltf");
-      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/tree/tree.gltf");
+      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/FlightHelmet/FlightHelmet.gltf");
+      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/player/scene.gltf");
+      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/playerSmall/player.gltf");
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)
@@ -76,7 +78,7 @@ int main(int argc, char *argv[])
       MainWindow::getInstance()->addPointLight(l);
 #endif
       //workerThread.start();
-      std::thread renderThread(&RenderWorker::start, worker);
+      //std::thread renderThread(&RenderWorker::start, worker);
       a.exec();
 	return 0;
 }

@@ -143,7 +143,7 @@ public:
             // calculate tangent vectors if none
             LayoutItem* tangentL = _layout.Find(ARRAY_TANGENT);
             if (tangentL && tangentL->valid==false) {
-                  fillTangent();
+                  //fillTangent();
                   tangentL->valid = true;
             }
       }
@@ -182,6 +182,8 @@ public:
       static TriangleMesh screenMesh;
       const AABB aabb() const { return _aabb; }
 };
+
+TriangleMesh CreateTriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world, GLenum primMode);
 
 class Triangle : public Shape {
       TriangleMesh* mesh;
