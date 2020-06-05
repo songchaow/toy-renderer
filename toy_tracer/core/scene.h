@@ -7,7 +7,7 @@
 class Scene {
       EquiRectSkybox* _skybox = nullptr;
       // including shaped lights and primitives
-      std::vector<Shapeable*> shapes;
+      std::vector<Primitive3D*> shapes;
       std::vector<Light*> lights; // shapeable lights are also included in shapes.
 public:
       bool Intercept(const Ray& r, Interaction& i) const;
@@ -16,5 +16,5 @@ public:
       Spectrum SampleDirectLight(Interaction& i) const;
       void setSkybox(EquiRectSkybox* skybox) { _skybox = skybox; }
       EquiRectSkybox* skybox() const { return _skybox; }
-      void AddObj(Shapeable* obj);
+      void AddObj(Primitive3D* obj);
 };

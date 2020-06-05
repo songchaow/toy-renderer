@@ -26,7 +26,7 @@ class RenderWorker {
       std::vector<PointLight*> _pointLights;
       // intermediate storage
       std::vector<PointLight*> pendingLights, pendingDelLights;
-      std::vector<Primitive3D*> pendingAddPrimitives, pendingDelPrimitives;
+      std::vector<PrimitiveBase*> pendingAddPrimitives, pendingDelPrimitives;
 
       static Camera* cam;
       Canvas* _canvas = nullptr;
@@ -89,7 +89,7 @@ public:
       RenderWorker(Camera* c) { cam = c; }
       void start();
       // thread-safe using mutex
-      void loadObject(Primitive3D* p);
+      void loadObject(PrimitiveBase* p);
       void loadPointLight(PointLight* l);
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }

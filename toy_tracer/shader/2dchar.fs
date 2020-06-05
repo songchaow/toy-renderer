@@ -3,15 +3,19 @@ layout (location = 0) out vec4 FragColor;
 
 uniform sampler2D albedoSampler;
 
-#ifdef WITH_GEOMETRY
+// #ifdef WITH_GEOMETRY
+// in GeometryOutput {
+//     vec2 TexCoord;
+// } VOutput;
+// #else
+// in VertexOutput {
+//     vec2 TexCoord;
+// } VOutput;
+// #endif
+
 in GeometryOutput {
     vec2 TexCoord;
 } VOutput;
-#else
-in VertexOutput {
-    vec2 TexCoord;
-} VOutput;
-#endif
 
 void main() {
     vec4 albedoAlpha = texture(albedoSampler, VOutput.TexCoord);

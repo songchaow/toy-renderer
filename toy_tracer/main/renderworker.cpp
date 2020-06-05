@@ -25,9 +25,23 @@ void RenderWorker::start() {
 }
 
 void RenderWorker::glLoadPrimitive() {
-      for (auto* p : pendingAddPrimitives) {
-            p->load();
-            primitives.push_back(p);
+      for (auto* o : pendingAddPrimitives) {
+            // o is primitive now
+            o->load();
+            if (o->is3D()) {
+                  Primitive3D* p3d = static_cast<Primitive3D*>(o);
+                  if (!p3d->isInstanced()) {
+                        primitives.push_back(p3d);
+                  }
+                  else {
+                        static_cast<InstancedPrimitive*>(p3d)->GenInstancedArray();
+                        instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(p3d));
+                  }
+            }
+            else {
+                  Primitive2D* p2d = static_cast<Primitive2D*>(o);
+                  primitives2D.push_back(p2d);
+            }
       }
       pendingAddPrimitives.clear();
 }
@@ -302,21 +316,13 @@ void RenderWorker::renderLoop() {
                   }
             }*/
             if (loadObjectMutex.try_lock()) {
-                  // add/remove pending primitives
+                  // add pending primitives
+                  glLoadPrimitive();
+
+                  // remove ...
                   for (auto* d : pendingDelPrimitives) {
                         ;
                   }
-                  for (auto* o : pendingAddPrimitives) {
-                        // o is primitive now
-                        o->load();
-                        if (!o->isInstanced())
-                              primitives.push_back(o);
-                        else {
-                              static_cast<InstancedPrimitive*>(o)->GenInstancedArray();
-                              instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(o));
-                        }
-                  }
-                  pendingAddPrimitives.clear();
                   pendingDelPrimitives.clear();
 
                   // add/remove pending lights
@@ -369,6 +375,7 @@ void RenderWorker::renderLoop() {
             if (drawSkybox)
                   sky.draw();
             renderPassPBR();
+            
             err = glGetError();
             profiler.AddTimeStamp();
             // taa
@@ -429,6 +436,8 @@ void RenderWorker::renderLoop() {
                   _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 #endif
             profiler.AddTimeStamp();
+            // 2D character
+            primitives2D[0]->draw();
             // Bloom
             TriangleMesh::screenMesh.glUse(); // now already using
             if (enableBloom) {
@@ -481,7 +490,7 @@ void RenderWorker::renderLoop() {
       }
 }
 
-void RenderWorker::loadObject(Primitive3D* p)
+void RenderWorker::loadObject(PrimitiveBase* p)
 {
       std::lock_guard<std::mutex> lck(loadObjectMutex);
       pendingAddPrimitives.push_back(p);

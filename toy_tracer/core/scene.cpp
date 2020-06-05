@@ -3,10 +3,11 @@
 
 bool Scene::Intercept(const Ray& r, Interaction& i) const {
       i.t = 0.f;
-      Shapeable* min_s = nullptr;
+      Primitive3D* min_s = nullptr;
       for (auto& p : shapes) {
+            auto* s = p->shape();
             Interaction tmp;
-            if (!p->InterceptP(r, &tmp))
+            if (!s->InterceptP(r, &tmp))
                   continue;
             if (!min_s) {
                   min_s = p;
@@ -19,7 +20,7 @@ bool Scene::Intercept(const Ray& r, Interaction& i) const {
             }
       }
       if (!min_s) return false;
-      min_s->ComputeDiff(r, &i);
+      min_s->shape()->ComputeDiff(r, &i);
       i.pTo = min_s;
       return true;
 }
@@ -36,7 +37,7 @@ bool Scene::Visible(Interaction & i, const Vector3f& wi, Light* l) const
 
 Spectrum Scene::SampleDirectLight(Interaction & i) const
 {
-      assert(i.pTo->isPrimitive());
+      //assert(i.pTo->isPrimitive());
       Primitive3D* p = static_cast<Primitive3D*>(i.pTo);
       // material must be gloss
       if (p->getMaterial()->isFlat()) {
@@ -66,8 +67,9 @@ Spectrum Scene::SampleDirectLight(Interaction & i) const
       return Ld;
 }
 
-void Scene::AddObj(Shapeable* obj) {
+void Scene::AddObj(Primitive3D* obj) {
       shapes.push_back(obj);
-      if (obj->isLight())
-            lights.push_back((Light*)(obj));
+      // TODO: AddLight()
+      /*if (obj->isLight())
+            lights.push_back((Light*)(obj));*/
 }

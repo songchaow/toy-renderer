@@ -133,19 +133,29 @@ void InstancedPrimitive::draw(Shader* s) {
 
 void Primitive2D::draw()
 {
-      static Shader* s = LoadShader(CHAR_2D, true);
+      Shader* s = LoadShader(CHAR_2D, true);
       s->use();
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, image.tbo());
       // might be vertex attributes
       _obj2world.m[0][3] = posWorld.x;
       _obj2world.m[1][3] = posWorld.y;
       _obj2world.m[2][3] = posWorld.z;
-      s->setUniformF("obj2world", &_obj2world.m);
+      s->setUniformF("obj2world", _obj2world.getRowMajorData());
       s->setUniformF("size", size.x, size.y);
       // same for all 2d primitives
       const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
       const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
       s->setUniformF("world2cam", &w2c);
       s->setUniformF("cam2ndc", &c2ndc);
+      // vao doesn't matter
+      TriangleMesh::screenMesh.glUse();
+      // draw a point
+      uint32_t e = glGetError();
+      glDrawArrays(GL_POINTS, 0, 1);
+      e = glGetError();
+      e = glGetError();
+
 }
 
 void Primitive2D::load() {

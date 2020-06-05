@@ -2,11 +2,11 @@
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/shape.h"
-class Shapeable;
+class Primitive3D;
 struct Interaction {
       Point3f pWorld;
       // Primitive* pFrom;
-      Shapeable* pTo = nullptr;
+      Primitive3D* pTo = nullptr;
       Float u;
       Float v;
       Normal3f n;

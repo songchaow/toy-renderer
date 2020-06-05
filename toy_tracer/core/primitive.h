@@ -17,28 +17,29 @@ public:
       PrimitiveBase() = default;
       bool isLoad() const { return loaded; }
       virtual bool is3D() const = 0;
+      virtual void load() = 0;
 };
 
 class Primitive3D : public PrimitiveBase
 {
 protected:
       Material* material = nullptr; // old
-      Shape* shape;
+      Shape* _shape;
       std::vector<TriangleMesh*> _meshes;
       // TODO: don't use pointer, or modify the dctor
       std::vector<PBRMaterial> rt_m;
       
 public:
-      Primitive3D(Shape* shape, Material* m) : shape(shape), material(m) {}
-      Primitive3D(Shape* shape, PBRMaterial m, Transform t) : shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
-      Primitive3D(Shape* shape, PBRMaterial m) : shape(shape), rt_m(1, m), material(nullptr) {}
+      Primitive3D(Shape* shape, Material* m) : _shape(shape), material(m) {}
+      Primitive3D(Shape* shape, PBRMaterial m, Transform t) : _shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
+      Primitive3D(Shape* shape, PBRMaterial m) : _shape(shape), rt_m(1, m), material(nullptr) {}
       Primitive3D(PBRMaterial m, Transform t) : Primitive3D(nullptr, m, t) {}
       Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), _meshes(meshes) {}
       Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), _meshes(meshes), PrimitiveBase(t) {}
       Material* getMaterial() const { return material; }
       std::vector<PBRMaterial>& getPBRMaterial() { return rt_m; }
       //void setPBRMaterial(PBRMaterial m) { rt_m = m; }
-      void load();
+      void load() override;
       void draw(Shader* shader);
       // Do not bind textures and material properties
       void drawSimple(Shader* shader);
@@ -46,7 +47,13 @@ public:
       void drawPrepare(Shader* shader, int meshIndex);
       virtual bool isInstanced() const { return false; }
       bool is3D() const { return true; }
+      Shape* shape() const { return _shape; }
       AnimatedTransform& obj2world() { return _obj2world; }
+      void GenMeshes() {
+            assert(_shape);
+            _meshes = _shape->GenMesh();
+      }
+      const std::vector<TriangleMesh*>& meshes() const { return _meshes; }
 };
 
 Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh);
@@ -81,9 +88,9 @@ class Primitive2D : public PrimitiveBase {
       //Matrix4 _obj2world; // calculated from posWorld
       Point2f size;
       ImageTexture image;
-      void draw();
-      void load();
 public:
+      void load() override;
+      void draw();
       Primitive2D(Point3f pos, Point2f size, ImageTexture i) : posWorld(pos), size(size), image(i) {}
       bool is3D() const { return false; }
 };

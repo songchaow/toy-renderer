@@ -64,13 +64,15 @@ int main(int argc, char *argv[])
       //glTFPrimitives = LoadGLTF("model/pbrspheres/MetalRoughSpheres.gltf");
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/FlightHelmet/FlightHelmet.gltf");
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/player/scene.gltf");
-      glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/playerSmall/player.gltf");
+      
+      //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/playerSmall/player.gltf");
       ImageTexture char2dAlbedo("texture/character/char2d.png");
       Primitive2D* char2d = new Primitive2D(Point3f(0, 0, 0), Point2f(0.5, 1), char2dAlbedo);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)
             RenderWorker::Instance()->loadObject(p);
+      RenderWorker::Instance()->loadObject(char2d);
       MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));
       //PointLight* l2 = new PointLight(RGBSpectrum(2000.f, 2000.f, 2000.f), Point3f(10.f, 0.f, -20.f));

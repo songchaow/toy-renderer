@@ -9,24 +9,25 @@ Spectrum PathTracer::Li(Ray& ro) {
       Interaction i;
       Spectrum Li(0.f);
       int currSegment = 0;
-      Shapeable* curr_p = nullptr;
+      Primitive3D* curr_p = nullptr;
       // TODO: add routtelle in while's condition
       while (currSegment < maxSegment) {
             Vector3f wo;
             if(i.pTo) {
-                  if (i.pTo->isLight()) {
+                  /*if (i.pTo->isLight()) {
                         // TODO: general light classes should also have Li method, replace following codes
                         UniformAreaLight* el = static_cast<UniformAreaLight*>(i.pTo);
                         Li = prefix * el->Li(wo);
                         break; // TODO: should be return?
                   }
-                  else {
+                  else*/ {
                         Primitive3D* p = static_cast<Primitive3D*>(i.pTo);
                         Material* material = p->getMaterial();
                         Float pdf;
                         Spectrum fr = material->sample_f(i, sampler.Sample2D(), &pdf);
                         prefix *= (fr * AbsDot(i.wi, i.n) / pdf);
                         ro = Ray(i.pWorld, i.wi);
+                        // TODO: add self-emitting
                   }
 
             }
@@ -43,9 +44,10 @@ Spectrum PathTracer::Li(Ray& ro) {
       }
       // At last, track to the light
       LOG(INFO) << "Abort tracing";
-      if (i.pTo->isLight()) {
-            UniformAreaLight* el = static_cast<UniformAreaLight*>(i.pTo);
-            Li = prefix * el->Li(i.wo);
+      if (false) {
+            // TODO: self emitting Li(wo)
+            // UniformAreaLight* el = static_cast<UniformAreaLight*>(i.pTo);
+            // Li = prefix * el->Li(i.wo);
       }
       else {
             Spectrum Ld = scene->SampleDirectLight(i);
