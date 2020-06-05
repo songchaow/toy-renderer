@@ -27,6 +27,7 @@ void Primitive::load() {
       // TODO: consider other types of RTMaterial
       for (auto& m : rt_m)
             m.load();
+      loaded = true;
 }
 
 void Primitive::drawPrepare(Shader* shader, int meshIndex) {
@@ -128,4 +129,9 @@ void InstancedPrimitive::draw(Shader* s) {
             glDrawElementsInstanced(mesh->primitiveMode(), mesh->face_count() * 3, mesh->indexElementT(), 0, obj2worlds.size());
             glBindVertexArray(0);
       }
+}
+
+void Primitive2D::draw()
+{
+      static Shader* s = LoadShader(CHAR_2D, true);
 }

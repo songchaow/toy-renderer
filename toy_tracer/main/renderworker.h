@@ -77,8 +77,10 @@ public slots:
       void initialize();
       void renderLoop();
 private:
+      std::mutex loadObjectMutex;
       void configPBRShader(Shader* shader);
       void GenCSM();
+      void glLoadPrimitive();
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }

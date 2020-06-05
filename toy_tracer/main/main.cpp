@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
       MainWindow::getInstance()->addPointLight(l);
 #endif
       //workerThread.start();
-      //std::thread renderThread(&RenderWorker::start, worker);
+      std::thread renderThread(&RenderWorker::start, worker);
       a.exec();
 	return 0;
 }

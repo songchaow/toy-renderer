@@ -24,6 +24,13 @@ void RenderWorker::start() {
       renderLoop();
 }
 
+void RenderWorker::glLoadPrimitive() {
+      for (auto* p : pendingAddPrimitives) {
+            p->load();
+      }
+      pendingAddPrimitives.clear();
+}
+
 void RenderWorker::initialize() {
       qDebug() << "RenderWorker Thread:" << QThread::currentThread();
       m_context = new QOpenGLContext();
@@ -140,6 +147,8 @@ void RenderWorker::initialize() {
       taa->setUniformF("windowSize", _canvas->width(), _canvas->height());
       err = glGetError();
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
+      // load primitives, including mesh and material
+      glLoadPrimitive();
 }
 
 void RenderWorker::configPBRShader(Shader* shader) {
@@ -288,16 +297,15 @@ void RenderWorker::renderLoop() {
                         curr_primitive->obj2world().update();
                   }
             }*/
-            // add/remove pending primitives
-            if (primitiveQueue.readAll(pendingAddPrimitives, pendingDelPrimitives)) {
+            if (loadObjectMutex.try_lock()) {
+                  // add/remove pending primitives
                   for (auto* d : pendingDelPrimitives) {
-
+                        ;
                   }
-                  // loading
                   for (auto* o : pendingAddPrimitives) {
                         // o is primitive now
                         o->load();
-                        if(!o->isInstanced())
+                        if (!o->isInstanced())
                               primitives.push_back(o);
                         else {
                               static_cast<InstancedPrimitive*>(o)->GenInstancedArray();
@@ -306,10 +314,8 @@ void RenderWorker::renderLoop() {
                   }
                   pendingAddPrimitives.clear();
                   pendingDelPrimitives.clear();
-            }
-            // add/remove pending lights
-            
-            if (lightQueue.readAll(pendingLights, pendingDelLights)) {
+
+                  // add/remove pending lights
                   for (auto* d : pendingDelLights) {
                         auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
                         if (it != _pointLights.end()) {
@@ -325,7 +331,10 @@ void RenderWorker::renderLoop() {
                   }
                   pendingLights.clear();
                   pendingDelLights.clear();
+
+                  loadObjectMutex.unlock();
             }
+            
             GLuint err = glGetError();
             // shadow map
             if (enableShadowMap && _pointLights.size() > 0) {
@@ -470,14 +479,19 @@ void RenderWorker::renderLoop() {
 
 void RenderWorker::loadObject(Primitive* p)
 {
-      while (!primitiveQueue.addElement(p));
+      std::lock_guard<std::mutex> lck(loadObjectMutex);
+      pendingAddPrimitives.push_back(p);
+      //while (!primitiveQueue.addElement(p));
 }
 
 void RenderWorker::loadPointLight(PointLight * l)
 {
-      while (!lightQueue.addElement(l));
+      std::lock_guard<std::mutex> lck(loadObjectMutex);
+      pendingLights.push_back(l);
+      //while (!lightQueue.addElement(l));
 }
 
 void RenderWorker::removePointLight(PointLight* l) {
-      while (!lightQueue.addDeleteElement(l));
+      std::lock_guard<std::mutex> lck(loadObjectMutex);
+      pendingDelLights.push_back(l);
 }

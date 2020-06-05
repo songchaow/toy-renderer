@@ -25,6 +25,7 @@ enum ShaderType {
       DEPTH_CUBE_MAP_INSTANCED,
       CASCADED_DEPTH_MAP,
       TAA,
+      CHAR_2D,
       NUM_SHADER_TYPE,
 };
 

@@ -211,7 +211,7 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
 }
 
 void PBRMaterial::load() {
-      // TODO: use a const texture as the fallback if there're null pointers
+      // TODO: don't load here, load all textures in advance before render loop
       if(albedo_map.ready2Load())
             albedo_map.load();
       if (metallicRoughnessMap.ready2Load())
@@ -222,6 +222,7 @@ void PBRMaterial::load() {
             emissive_map.load();
 }
 
+// should call glTexSubImage.... tbo not changed.
 void PBRMaterial::update() {
       if (albedo_map.ready2Load())
             albedo_map.update();

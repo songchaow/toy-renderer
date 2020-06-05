@@ -11,6 +11,7 @@ class Primitive : public Shapeable
 {
 private:
       Material* material = nullptr;
+      bool loaded = false;
       // TODO: don't use pointer, or modify the dctor
       std::vector<PBRMaterial> rt_m;
       RGBTexture2D* reflection; // currently not used
@@ -24,6 +25,7 @@ public:
       Material* getMaterial() const { return material; }
       std::vector<PBRMaterial>& getPBRMaterial() { return rt_m; }
       //void setPBRMaterial(PBRMaterial m) { rt_m = m; }
+      bool isLoad() const { return loaded; }
       void load();
       void draw(Shader* shader);
       // Do not bind textures and material properties
@@ -55,4 +57,11 @@ public:
       void GenInstancedArray();
       void draw(Shader* s);
       bool isInstanced() const override { return true; }
+};
+
+class Primitive2D {
+      Point3f posWorld;
+      Point2f size;
+      GLuint image;
+      void draw();
 };
