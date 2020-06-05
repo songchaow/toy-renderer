@@ -17,7 +17,7 @@ struct ShapeTableEntry {
 };
 
 static void fromShapeFunc(std::function<Shape*(void)> shapeFunc) {
-      Primitive* p = new Primitive(shapeFunc(), defaultMaterial);
+      Primitive3D* p = new Primitive3D(shapeFunc(), defaultMaterial);
       p->GenMeshes();
       ResourceManager::getInstance()->addPrimitive(p);
       MainWindow::getInstance()->refreshResource();

@@ -12,8 +12,8 @@
 struct SurfaceBoundary
 {
     // when traced, light goes from out_p into in_p!
-    Primitive* out_p;
-    Primitive* in_p;
+    Primitive3D* out_p;
+    Primitive3D* in_p;
     Point3f p;
     Normal3f n;
     // TODO: texture coordinates may be needed.

@@ -5,8 +5,8 @@
 #include <QGroupBox>
 #include "main/renderworker.h"
 
-Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
-      Primitive* p = new Primitive(nullptr, nullptr);
+Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
+      Primitive3D* p = new Primitive3D(nullptr, nullptr);
       //p->setMesh(mesh);
       return p;
 }
@@ -20,7 +20,7 @@ Primitive* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
 //       return p;
 // }
 
-void Primitive::load() {
+void Primitive3D::load() {
       for (auto* mesh : _meshes) {
             mesh->load();
       }
@@ -30,7 +30,7 @@ void Primitive::load() {
       loaded = true;
 }
 
-void Primitive::drawPrepare(Shader* shader, int meshIndex) {
+void Primitive3D::drawPrepare(Shader* shader, int meshIndex) {
       PBRMaterial& mtl = rt_m[meshIndex];
       shader->setUniformF("globalEmission", mtl.globalEmission()[0], mtl.globalEmission()[1], mtl.globalEmission()[2]);
       if (mtl.albedo_map.isLoad()) {
@@ -52,7 +52,7 @@ void Primitive::drawPrepare(Shader* shader, int meshIndex) {
       auto& m = _meshes[meshIndex];
       glBindVertexArray(m->vao());
 }
-void Primitive::draw(Shader* shader) {
+void Primitive3D::draw(Shader* shader) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.
       for (int i = 0; i < _meshes.size(); i++) {
@@ -88,7 +88,7 @@ void Primitive::draw(Shader* shader) {
       glBindVertexArray(0);
 }
 
-void Primitive::drawSimple(Shader* shader) {
+void Primitive3D::drawSimple(Shader* shader) {
       for (int i = 0; i < _meshes.size(); i++) {
             auto& m = _meshes[i];
             glBindVertexArray(m->vao());
@@ -134,4 +134,21 @@ void InstancedPrimitive::draw(Shader* s) {
 void Primitive2D::draw()
 {
       static Shader* s = LoadShader(CHAR_2D, true);
+      s->use();
+      // might be vertex attributes
+      obj2world[0][3] = posWorld.x;
+      obj2world[1][3] = posWorld.y;
+      obj2world[2][3] = posWorld.z;
+      s->setUniformF("obj2world", &obj2world);
+      s->setUniformF("size", size.x, size.y);
+      // same for all 2d primitives
+      const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
+      const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
+      s->setUniformF("world2cam", &w2c);
+      s->setUniformF("cam2ndc", &c2ndc);
+}
+
+void Primitive2D::load() {
+      if (image.ready2Load())
+            image.load();
 }

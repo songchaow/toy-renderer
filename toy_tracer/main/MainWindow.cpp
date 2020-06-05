@@ -70,7 +70,7 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
       deleteContentCascaded(property_container);
       if (robj) {
             robj->addProperties(property_container);
-            if (robj->typeID() == RendererObject::TypeID::Primitive) {
+            if (robj->typeID() == RendererObject::TypeID::Primitive3D) {
                   // add to material panel
                   Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
                   RenderWorker::Instance()->curr_primitive = pUi->m();
@@ -119,7 +119,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
             o->setLoad(toggled);
             switch (o->typeID())
             {
-            case RendererObject::TypeID::Primitive:
+            case RendererObject::TypeID::Primitive3D:
             {
                   Primitive_Ui * pUi = static_cast<Primitive_Ui*>(o);
                   if (toggled) {

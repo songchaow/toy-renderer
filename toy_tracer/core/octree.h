@@ -2,7 +2,7 @@
 #include "core/primitive.h"
 
 struct MeshInstance {
-      Primitive* p;
+      Primitive3D* p;
       PBRMaterial* material;
       TriangleMesh* mesh;
       mutable AABB localAABB;

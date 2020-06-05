@@ -52,13 +52,13 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadPointLight(pl_left);
       RenderWorker::Instance()->loadPointLight(pl_right);
       // draw ball
-      Primitive* ball = new Primitive(new Sphere(), m);
+      Primitive3D* ball = new Primitive3D(new Sphere(), m);
       ball->GenMeshes();
       Point3f startPoint(-(BALL_LEN - 1)*BALL_DISTANCE / 2, -(BALL_LEN - 1)*BALL_DISTANCE / 2, -(BALL_LEN - 1)*BALL_DISTANCE / 2);
       for (int i = 0; i < BALL_LEN; i++) {
             for (int j = 0; j < BALL_LEN; j++) {
                   for (int k = 0; k < BALL_LEN; k++) {
-                        Primitive* ledUnit = new Primitive(*ball);
+                        Primitive3D* ledUnit = new Primitive3D(*ball);
                         ledUnit->obj2world() = SRT::fromTranslation(startPoint.x + i*BALL_DISTANCE, startPoint.y + j*BALL_DISTANCE, startPoint.z + k*BALL_DISTANCE);
                         RenderWorker::Instance()->loadObject(ledUnit);
                         if (i + j + k == 15)

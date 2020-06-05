@@ -27,6 +27,7 @@ void RenderWorker::start() {
 void RenderWorker::glLoadPrimitive() {
       for (auto* p : pendingAddPrimitives) {
             p->load();
+            primitives.push_back(p);
       }
       pendingAddPrimitives.clear();
 }
@@ -115,8 +116,8 @@ void RenderWorker::initialize() {
       glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, pp_depth);
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      // Shader initialization
-
+      // Shader uniform initialization
+      // PBR
       csm.setCameraView(cam->cameraView());
       Shader* pbr = LoadShader(PBR, true);
       pbr->use();
@@ -125,12 +126,10 @@ void RenderWorker::initialize() {
             pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
       }
       punctualLightLocations_pbr.queryLocation(pbr);
-      // lut and env map
       glActiveTexture(GL_TEXTURE6);
       glBindTexture(GL_TEXTURE_2D, PBRMaterial::lut.tbo());
       glActiveTexture(GL_TEXTURE7);
       glBindTexture(GL_TEXTURE_CUBE_MAP, sky.specularMaptbo());
-      // textures
       pbr->setUniformI("albedoSampler", 0);
       pbr->setUniformI("mrSampler", 1);
       pbr->setUniformI("normalSampler", 2);
@@ -139,6 +138,7 @@ void RenderWorker::initialize() {
       pbr->setUniformI("depthSampler", 5);
       pbr->setUniformI("lut", 6);
       pbr->setUniformI("envSpecular", 7);
+      // TAA
       Shader* taa = LoadShader(TAA, true);
       taa->use();
       taa->setUniformI("currentColor", 0);
@@ -146,6 +146,10 @@ void RenderWorker::initialize() {
       taa->setUniformI("motionVector", 2);
       taa->setUniformF("windowSize", _canvas->width(), _canvas->height());
       err = glGetError();
+      // 2DCHAR
+      Shader* char2d = LoadShader(CHAR_2D, true);
+      char2d->use();
+      char2d->setUniformI("albedoSampler", 0);
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
       // load primitives, including mesh and material
       glLoadPrimitive();
@@ -477,7 +481,7 @@ void RenderWorker::renderLoop() {
       }
 }
 
-void RenderWorker::loadObject(Primitive* p)
+void RenderWorker::loadObject(Primitive3D* p)
 {
       std::lock_guard<std::mutex> lck(loadObjectMutex);
       pendingAddPrimitives.push_back(p);

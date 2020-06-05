@@ -22,7 +22,7 @@ int renderTest() {
       Dielectric* d = new Dielectric();
       FlatSurface* glass_surface = new FlatSurface(d);
       SimpleMaterial* glass_material = new SimpleMaterial(glass_surface);
-      Primitive* sphere_primitive = new Primitive(sphere_shape, glass_material);
+      Primitive3D* sphere_primitive = new Primitive3D(sphere_shape, glass_material);
       // Tracer
       Scene* scene = new Scene();
       scene->setSkybox(skybox);

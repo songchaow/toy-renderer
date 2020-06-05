@@ -50,5 +50,5 @@ struct glTFMaterial {
 
 };
 
-std::vector<Primitive*> LoadGLTF(std::string path);
+std::vector<Primitive3D*> LoadGLTF(std::string path);
 

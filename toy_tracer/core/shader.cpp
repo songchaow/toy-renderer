@@ -21,7 +21,8 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/vertexInstance.vs",        "",                     "shader/pbr_pixel.glsl"},           // PBR_INSTANCED
       {"shader/vertexInstanceShadow.vs",  "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP_INSTANCED
       {"shader/vertex2World.glsl",        "shader/csm.gs",        "shader/depthGS.fs"},               // CASCADED_DEPTH_MAP
-      {"shader/fullscreen.vs",            "",                     "shader/taa.fs"}                    // TAA
+      {"shader/fullscreen.vs",            "",                     "shader/taa.fs"},                   // TAA
+      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dchar.fs"}
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -120,12 +121,26 @@ Shader& Shader::operator=(const Shader& i) {
       return *this;
 }
 
+inline static void addGeometryFlag(std::string& shader_code) {
+      // skip the first line if it's '# version..."
+      uint32_t insertLoc = 0;
+      if (shader_code[0] == '#') {
+            while (shader_code[insertLoc] != '\n') ++insertLoc;
+            ;
+      }
+      std::string prefix = shader_code.substr(0, insertLoc + 1);
+      std::string suffix = shader_code.substr(insertLoc + 1);
+      shader_code = prefix + "#define WITH_GEOMETRY\n" + suffix;
+}
+
 void Shader::compileAndLink() {
       char infoLog[1024];
       int success = 0;
       int len = 0;
       unsigned int vertex = 0, fragment = 0, geometry = 0;
       if(vertex_shader_code.size()>0) {
+            if (geo_shader_code.size() > 0)
+                  addGeometryFlag(vertex_shader_code);
             const char* v_shader_str_ptr = vertex_shader_code.c_str();
             vertex = glCreateShader(GL_VERTEX_SHADER);
             glShaderSource(vertex, 1, &v_shader_str_ptr, NULL);
@@ -142,6 +157,8 @@ void Shader::compileAndLink() {
             return;
       }
       if (geo_shader_code.size() > 0) {
+            if (geo_shader_code.size() > 0)
+                  addGeometryFlag(geo_shader_code);
             geometry = glCreateShader(GL_GEOMETRY_SHADER);
             const char* p_str = geo_shader_code.c_str();
             glShaderSource(geometry, 1, &p_str, NULL);
@@ -154,6 +171,8 @@ void Shader::compileAndLink() {
             }
       }
       if(fragment_shader_code.size()>0) {
+            if (geo_shader_code.size() > 0)
+                  addGeometryFlag(fragment_shader_code);
             fragment = glCreateShader(GL_FRAGMENT_SHADER);
             const char* f_shader_str_ptr = fragment_shader_code.c_str();
             glShaderSource(fragment, 1, &f_shader_str_ptr, NULL);

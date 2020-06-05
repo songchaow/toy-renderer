@@ -26,7 +26,7 @@ private slots:
 public:
       enum class TypeID {
             Camera,
-            Primitive,
+            Primitive3D,
             Light, // and other lights
             Shape,
             Image,

@@ -129,7 +129,7 @@ void Matrix4fromColMajorArray(const Value& node, Matrix4& m) {
 }
 
 void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<char*> &buffer_array, const std::vector<PBRMaterial>& materials,
-      const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive*>& primitives) {
+      const Value& node_pool, const Value& mesh_pool, const Value& accessor_pool, const Value& bufferView_pool, std::vector<Primitive3D*>& primitives) {
       // transform
       Matrix4 new_mesh2obj;
       auto it = node.FindMember("matrix");
@@ -197,7 +197,7 @@ void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<ch
                   char* vertex_data = collectVertexAttributes(mesh["attributes"], accessor_pool, bufferView_pool, buffer_array, vbLayout, vertexNum);
                   meshes.push_back(new TriangleMesh(vertex_data, vbLayout, vertexNum, index_data, indexNum / 3, indexElementT, Transform::Identity(), primitive_mode));
             }
-            Primitive* p = new Primitive(rtms, meshes, Transform(curr_mesh2obj));
+            Primitive3D* p = new Primitive3D(rtms, meshes, Transform(curr_mesh2obj));
             primitives.push_back(p);
       }
       
@@ -214,7 +214,7 @@ void AddPrimitive(const Value& node, Matrix4 curr_mesh2obj, const std::vector<ch
 
 }
 
-std::vector<Primitive*> LoadGLTF(std::string path) {
+std::vector<Primitive3D*> LoadGLTF(std::string path) {
       std::string dir;
       int dirStart = path.find_last_of('/');
       if (dirStart != std::string::npos && dirStart < path.size() - 1)
@@ -341,7 +341,7 @@ std::vector<Primitive*> LoadGLTF(std::string path) {
       const Value& mesh_pool = d["meshes"];
       const Value& accessor_pool = d["accessors"];
       const Value& bufferview_pool = d["bufferViews"];
-      std::vector<Primitive*> primitives;
+      std::vector<Primitive3D*> primitives;
       for (int i = 0; i < nodes_array.Size(); i++) {
             // each node contains multiple meshes, so here treated as a primitive
             uint32_t node_idx = nodes_array[i].GetUint();

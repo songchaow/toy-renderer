@@ -99,20 +99,20 @@ public slots:
 };
 
 class Primitive_Ui : public RendererObject {
-      Primitive* _m = nullptr;
+      Primitive3D* _m = nullptr;
       // Child UI
       mutable PBRMaterial_Ui _materialUi;
       mutable Shape_Ui shape;
 public:
-      Primitive_Ui(Primitive* p) : _m(p), shape(p->shape()), RendererObject(TypeID::Primitive) {}
+      Primitive_Ui(Primitive3D* p) : _m(p), shape(p->shape()), RendererObject(TypeID::Primitive3D) {}
       void addProperties(QWidget * parent) const override;
-      void reset(Primitive* _mIn) { _m = _mIn; }
+      void reset(Primitive3D* _mIn) { _m = _mIn; }
       PBRMaterial_Ui& materialUi() { return  _materialUi; }
       void setMaterialUi(PBRMaterial* pbr_m) const { _materialUi.reset(pbr_m); }
       const PBRMaterial_Ui& materialUi() const { return _materialUi; }
       const Shape_Ui& shapeUi() const { return shape; }
       void setShapeUi(const Shape* s) { shape.reset(s); }
-      Primitive* m() const { return _m; }
+      Primitive3D* m() const { return _m; }
       bool isValid() const { return _m != nullptr; }
 };
 

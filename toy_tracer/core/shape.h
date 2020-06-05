@@ -70,22 +70,20 @@ class TriangleMesh;
 class Shapeable {
 public:
       enum ShapeID {
-            Primitive,
+            Primitive3D,
             Light
       };
 protected:
       Shape* _shape; // nullptr means it's contructed directly by mesh
       ShapeID s_id;
       std::vector<TriangleMesh*> _meshes;
-      AnimatedTransform _obj2world;
+      
 public:
-      Shapeable(Shape* shape, ShapeID s_id, Transform t) : _shape(shape), s_id(s_id), _obj2world(t) {};
-      Shapeable(const std::vector<TriangleMesh*>& meshes, const Transform& t) : _meshes(meshes), _shape(nullptr), _obj2world(t) {}
-      Shapeable(const std::vector<TriangleMesh*>& meshes) : Shapeable(meshes, Transform::Identity()) {}
-      Shapeable(Shape* shape, ShapeID s_id) : Shapeable(shape, s_id, Transform::Identity()) {}
+      Shapeable(Shape* shape, ShapeID s_id) : _shape(shape), s_id(s_id) {};
+      Shapeable(const std::vector<TriangleMesh*>& meshes) : _meshes(meshes), _shape(nullptr) {}
       Float Area() const { return _shape->Area(); }
       std::string getShapeName() const { return _shape->shapeName(); }
-      bool isPrimitive() const { return s_id == Primitive; }
+      bool isPrimitive() const { return s_id == Primitive3D; }
       bool isLight() const { return s_id == Light; }
       bool Intercept(const Ray& r, Interaction& i) const { return _shape->Intercept(r, i); }
       bool InterceptP(const Ray& r, Interaction* i) const { return _shape->InterceptP(r, i); }
@@ -95,5 +93,5 @@ public:
       const std::vector<TriangleMesh*>& meshes() { return _meshes; }
       const Shape* shape() const { return _shape; }
       void GenMeshes() { if (_shape) _meshes = _shape->GenMesh(); }
-      AnimatedTransform& obj2world() { return _obj2world; }
+      
 };

@@ -11,7 +11,7 @@
 
 const std::map<RendererObject::TypeID, QString> RendererObject::TypeIDMap = {
       GEN_VERBOSE_STRING_MAP(TypeID::Camera),
-      GEN_VERBOSE_STRING_MAP(TypeID::Primitive),
+      GEN_VERBOSE_STRING_MAP(TypeID::Primitive3D),
       GEN_VERBOSE_STRING_MAP(TypeID::Light),
       GEN_VERBOSE_STRING_MAP(TypeID::Camera),
       GEN_VERBOSE_STRING_MAP(TypeID::Shape),

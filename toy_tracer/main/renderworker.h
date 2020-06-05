@@ -18,13 +18,16 @@ Camera* CreateRTCamera(const Point2i& screen_size);
 
 class RenderWorker {
       QOpenGLContext* m_context;
-      TwoThreadQueue<Primitive*> primitiveQueue;
+      TwoThreadQueue<Primitive3D*> primitiveQueue;
       TwoThreadQueue<PointLight*> lightQueue;
-      std::vector<Primitive*> primitives;
+      std::vector<Primitive3D*> primitives;
+      std::vector<Primitive2D*> primitives2D;
       std::vector<InstancedPrimitive*> instancedPrimitives;
       std::vector<PointLight*> _pointLights;
+      // intermediate storage
       std::vector<PointLight*> pendingLights, pendingDelLights;
-      std::vector<Primitive*> pendingAddPrimitives, pendingDelPrimitives;
+      std::vector<Primitive3D*> pendingAddPrimitives, pendingDelPrimitives;
+
       static Camera* cam;
       Canvas* _canvas = nullptr;
       Point2i _resolution;
@@ -64,7 +67,7 @@ class RenderWorker {
 
 public:
       // attributes
-      Primitive* curr_primitive;
+      Primitive3D* curr_primitive;
       bool renderPointLight = true;
       bool enableShadowMap = false;
       bool csm_fixedLightFrustum = true;
@@ -86,7 +89,7 @@ public:
       RenderWorker(Camera* c) { cam = c; }
       void start();
       // thread-safe using mutex
-      void loadObject(Primitive* p);
+      void loadObject(Primitive3D* p);
       void loadPointLight(PointLight* l);
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }

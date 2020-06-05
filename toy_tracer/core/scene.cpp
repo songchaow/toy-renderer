@@ -37,7 +37,7 @@ bool Scene::Visible(Interaction & i, const Vector3f& wi, Light* l) const
 Spectrum Scene::SampleDirectLight(Interaction & i) const
 {
       assert(i.pTo->isPrimitive());
-      Primitive* p = static_cast<Primitive*>(i.pTo);
+      Primitive3D* p = static_cast<Primitive3D*>(i.pTo);
       // material must be gloss
       if (p->getMaterial()->isFlat()) {
             return 0;

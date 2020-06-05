@@ -13,7 +13,7 @@ ResourceManager* ResourceManager::getInstance() {
 
 void ResourceManager::loadFile(QString path) {
       if (path.endsWith("gltf", Qt::CaseInsensitive)) {
-            std::vector<Primitive*> ps = LoadGLTF(path.toStdString());
+            std::vector<Primitive3D*> ps = LoadGLTF(path.toStdString());
             for (auto& p : ps) {
                   Primitive_Ui* p_ui = new Primitive_Ui(p);
                   _loadList.emplace_back(p_ui);
@@ -21,7 +21,7 @@ void ResourceManager::loadFile(QString path) {
       }
 }
 
-void ResourceManager::addPrimitive(Primitive* p) {
+void ResourceManager::addPrimitive(Primitive3D* p) {
       Primitive_Ui* p_ui = new Primitive_Ui(p);
       _loadList.emplace_back(p_ui);
 }

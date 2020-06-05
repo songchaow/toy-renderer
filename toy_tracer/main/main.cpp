@@ -58,13 +58,15 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadObject(cubes);
       //RenderWorker::Instance()->loadPointLight(l);
 #else
-      std::vector<Primitive*> glTFPrimitives;
+      std::vector<Primitive3D*> glTFPrimitives;
       //glTFPrimitives = LoadGLTF("model/DamagedHelmet/glTF/DamagedHelmet.gltf");
       //glTFPrimitives = LoadGLTF("model/Sponza/glTF/Sponza.gltf");
       //glTFPrimitives = LoadGLTF("model/pbrspheres/MetalRoughSpheres.gltf");
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/FlightHelmet/FlightHelmet.gltf");
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/player/scene.gltf");
       glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/playerSmall/player.gltf");
+      ImageTexture char2dAlbedo("texture/character/char2d.png");
+      Primitive2D* char2d = new Primitive2D(Point3f(0, 0, 0), Point2f(0.5, 1), char2dAlbedo);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)

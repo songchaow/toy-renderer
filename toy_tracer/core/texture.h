@@ -47,10 +47,16 @@ private:
             if (*_tbo > 0) {
                   // free the texture
                   // free tbo int
+                  glDeleteTextures(1, _tbo);
+                  delete _tbo;
             }
             // free the image(if)
+            if (_image)
+                  delete _image;
             // free the ref int
+            delete _ref;
             // free the resolution
+            delete resolution;
       }
 public:
       ImageTexture(std::string img_path, WrapMode mode = LOOP) : _image(new Image(img_path)) {
@@ -58,12 +64,12 @@ public:
             _ref = new unsigned int(1);
             resolution = new Point2f(_image->resolution());
       }
-      ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image), _ref(0) {
+      ImageTexture(Image* image, WrapMode mode = LOOP) : _image(image) {
             _tbo = new GLuint();
             _ref = new unsigned int(1);
             resolution = new Point2f(_image->resolution());
       }
-      ImageTexture() : _ref(0), _image(nullptr) {
+      ImageTexture() : _image(nullptr) {
             _tbo = new GLuint();
             _ref = new unsigned int(1);
             resolution = new Point2f();

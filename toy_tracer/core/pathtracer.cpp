@@ -21,7 +21,7 @@ Spectrum PathTracer::Li(Ray& ro) {
                         break; // TODO: should be return?
                   }
                   else {
-                        Primitive* p = static_cast<Primitive*>(i.pTo);
+                        Primitive3D* p = static_cast<Primitive3D*>(i.pTo);
                         Material* material = p->getMaterial();
                         Float pdf;
                         Spectrum fr = material->sample_f(i, sampler.Sample2D(), &pdf);
