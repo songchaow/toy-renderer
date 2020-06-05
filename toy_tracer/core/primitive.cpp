@@ -136,10 +136,10 @@ void Primitive2D::draw()
       static Shader* s = LoadShader(CHAR_2D, true);
       s->use();
       // might be vertex attributes
-      obj2world[0][3] = posWorld.x;
-      obj2world[1][3] = posWorld.y;
-      obj2world[2][3] = posWorld.z;
-      s->setUniformF("obj2world", &obj2world);
+      _obj2world.m[0][3] = posWorld.x;
+      _obj2world.m[1][3] = posWorld.y;
+      _obj2world.m[2][3] = posWorld.z;
+      s->setUniformF("obj2world", &_obj2world.m);
       s->setUniformF("size", size.x, size.y);
       // same for all 2d primitives
       const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
