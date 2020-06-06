@@ -134,6 +134,6 @@ void main() {
       float brightness =  dot(hdrColor.rgb, vec3(0.2126, 0.7152, 0.0722));
       if(brightness > bloomThreashold) {
             bloomColor = hdrColor.rgb;
-            bloomColor = vec3(0);
+            //bloomColor = vec3(0);
       }
 }

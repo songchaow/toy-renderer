@@ -366,7 +366,12 @@ void RenderWorker::renderLoop() {
             loopN++;
             err = glGetError();
             glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
+            if (firstFrame || !enableTAA) {
+                  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
+                  firstFrame = false;
+            }
+            else
+                  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_motion, 0);
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClearDepth(1.0f);
@@ -381,7 +386,6 @@ void RenderWorker::renderLoop() {
             // taa
             unsigned char historyTAAIdx = (currTAAIdx + 1) % numTAABuffer;
             // if first frame, just copy to current taa result buffer
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
             if (firstFrame || !enableTAA) {
 #if 0
                   // another method using glCopyTexSubImage2D
@@ -392,6 +396,7 @@ void RenderWorker::renderLoop() {
                   glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, _canvas->width(), _canvas->height());
                   err = glGetError();
 #endif
+#if 0
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, hdr_color);
@@ -400,8 +405,10 @@ void RenderWorker::renderLoop() {
                   //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
                   glDrawArrays(GL_TRIANGLES, 0, 3);
                   firstFrame = false;
+#endif
             }
             else {
+                  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_emissive[0], 0);
                   // do blending between taa_results[historyTAAIdx] and hdr_color
                   // output to taa_results[currTAAIdx]
                   err = glGetError();
@@ -417,7 +424,12 @@ void RenderWorker::renderLoop() {
                   glBindTexture(GL_TEXTURE_2D, hdr_motion);
                   TriangleMesh::screenMesh.glUse();
                   //glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+                  // disable depth writing
+                  //glDisable(GL_DEPTH_TEST);
+                  glDepthMask(GL_FALSE);
                   glDrawArrays(GL_TRIANGLES, 0, 3);
+                  glDepthMask(GL_TRUE);
+                  //glEnable(GL_DEPTH_TEST);
             }
             err = glGetError();
             // blit to hdr frame buffer
