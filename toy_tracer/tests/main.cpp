@@ -1,5 +1,5 @@
 #include <iostream>
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 #include "core/common.h"
 int main()
 {

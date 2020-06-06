@@ -1,4 +1,4 @@
-#include "core/microfacet.h"
+#include "tracer/microfacet.h"
 
 Float BeckmannDistribution::D(const Vector3f &wh) const {
       Float tan2Theta = Tan2Theta(wh);

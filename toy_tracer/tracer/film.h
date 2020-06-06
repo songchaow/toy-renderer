@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include "core/spectrum.h"
-#include "core/filter.h"
+#include "tracer/spectrum.h"
+#include "tracer/filter.h"
 #include "core/geometry.h"
 #include "core/sampler.h"
 #include <cassert>

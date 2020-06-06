@@ -1,6 +1,6 @@
 #pragma once
 #include "core/common.h"
-#include "core/ray.h"
+#include "tracer/ray.h"
 struct Matrix4;
 struct Matrix3 {
       Float m_matrix[3][3];

@@ -2,7 +2,7 @@
 #include <string>
 #include <memory>
 #include <core/geometry.h>
-#include <core/spectrum.h>
+#include <tracer/spectrum.h>
 #include <glad/glad.h>
 
 class Image {

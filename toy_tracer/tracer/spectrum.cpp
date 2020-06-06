@@ -2,7 +2,7 @@
 #include <cassert>
 #include <utility>
 #include <algorithm>
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 #include "utils/utils.h"
 
 // CIE X,Y,Z matching functions

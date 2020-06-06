@@ -1,4 +1,4 @@
-#include "core/interaction.h"
+#include "tracer/interaction.h"
 #include "core/material.h"
 #include "core/texture.h"
 #include "core/primitive.h"

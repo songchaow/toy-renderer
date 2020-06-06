@@ -1,6 +1,6 @@
 #include "core/material.h"
 #include "core/geometry.h"
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 #include <cassert>
 #include <algorithm>
 #include "core/common.h"
@@ -211,7 +211,6 @@ Spectrum FlatSurface::f(const Vector3f& wo, const Vector3f& wi, const Vector3f& 
 }
 
 void PBRMaterial::load() {
-      // TODO: don't load here, load all textures in advance before render loop
       if(albedo_map.ready2Load())
             albedo_map.load();
       if (metallicRoughnessMap.ready2Load())

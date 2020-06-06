@@ -1,7 +1,7 @@
 #pragma once
-#include "core/ray.h"
-#include "core/spectrum.h"
-#include "core/interaction.h"
+#include "tracer/ray.h"
+#include "tracer/spectrum.h"
+#include "tracer/interaction.h"
 #include "core/geometry.h"
 #include "core/primitive.h"
 

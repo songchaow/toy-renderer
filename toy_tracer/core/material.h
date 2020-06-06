@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <vector>
 #include <QLineEdit>
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 #include "core/texture.h"
-#include "core/interaction.h"
+#include "tracer/interaction.h"
 #include "core/sampler.h"
 #include "core/shader.h"
 

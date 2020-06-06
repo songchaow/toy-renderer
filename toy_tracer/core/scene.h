@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "core/primitive.h"
-#include "core/interaction.h"
+#include "tracer/interaction.h"
 #include "light/skybox.h"
 #include "light/area.h"
 class Scene {

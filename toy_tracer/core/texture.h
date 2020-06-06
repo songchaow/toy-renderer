@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include "core/common.h"
 #include "core/geometry.h"
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 #include "core/image.h"
 
 template <typename Element>

@@ -2,7 +2,7 @@
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/transform.h"
-#include "core/interaction.h"
+#include "tracer/interaction.h"
 #include "main/scene_object.h"
 
 #include <vector>

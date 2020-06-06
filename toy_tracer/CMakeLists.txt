@@ -54,6 +54,7 @@ qt5_wrap_ui(ui_headers main/mainwindow.ui)
 file(GLOB TRACER_LIB 
 *.cpp *.h *.hpp
 core/*.cpp
+tracer/*.cpp
 light/*.cpp
 utils/*.cpp
 texture/*.cpp

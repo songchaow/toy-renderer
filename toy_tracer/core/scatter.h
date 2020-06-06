@@ -4,7 +4,7 @@
 #include "core/common.h"
 #include "core/geometry.h"
 #include "core/primitive.h"
-#include "core/spectrum.h"
+#include "tracer/spectrum.h"
 
 /*  SurfaceBoundary
     Created by intersection method

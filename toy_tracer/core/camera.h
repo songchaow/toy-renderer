@@ -1,8 +1,8 @@
 #pragma once
 #include "core/geometry.h"
-#include "core/film.h"
+#include "tracer/film.h"
 #include "core/scene.h"
-#include "core/ray.h"
+#include "tracer/ray.h"
 #include "core/transform.h"
 #include "core/renderoption.h"
 #include "core/tracer.h"
