@@ -2,6 +2,7 @@
 #include "main/renderworker.h"
 #include "main/MainWindow.h"
 #include "main/uiwrapper.h"
+#include "engine/controller.h"
 
 
 Canvas::Canvas(int width, int height) {
@@ -77,18 +78,26 @@ void Canvas::mouseMoveEvent(QMouseEvent *ev) {
 void Canvas::keyPressEvent(QKeyEvent *ev) {
       switch (ev->key()) {
       case Qt::Key_Up:
+            Controller::setKeyState(UP, true);
+            break;
       case Qt::Key_W:
             _keyStatuses[0] = true;
             break;
       case Qt::Key_Down:
+            Controller::setKeyState(DOWN, true);
+            break;
       case Qt::Key_S:
             _keyStatuses[1] = true;
             break;
       case Qt::Key_Left:
+            Controller::setKeyState(LEFT, true);
+            break;
       case Qt::Key_A:
             _keyStatuses[2] = true;
             break;
       case Qt::Key_Right:
+            Controller::setKeyState(RIGHT, true);
+            break;
       case Qt::Key_D:
             _keyStatuses[3] = true;
       }
@@ -98,18 +107,26 @@ void Canvas::keyPressEvent(QKeyEvent *ev) {
 void Canvas::keyReleaseEvent(QKeyEvent *ev) {
       switch (ev->key()) {
       case Qt::Key_Up:
+            Controller::setKeyState(UP, false);
+            break;
       case Qt::Key_W:
             _keyStatuses[0] = false;
             break;
       case Qt::Key_Down:
+            Controller::setKeyState(DOWN, false);
+            break;
       case Qt::Key_S:
             _keyStatuses[1] = false;
             break;
       case Qt::Key_Left:
+            Controller::setKeyState(LEFT, false);
+            break;
       case Qt::Key_A:
             _keyStatuses[2] = false;
             break;
       case Qt::Key_Right:
+            Controller::setKeyState(RIGHT, false);
+            break;
       case Qt::Key_D:
             _keyStatuses[3] = false;
       }

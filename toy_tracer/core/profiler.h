@@ -19,4 +19,5 @@ public:
       void setPhaseNames(const std::vector<std::string>& names);
       void PrintProfile();
       void PrintWorstProfile();
+      Float durationSecond() { return (Float)frame_duration.count() / 1000000.f; }
 };

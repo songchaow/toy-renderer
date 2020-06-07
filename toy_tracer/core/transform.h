@@ -119,6 +119,16 @@ struct AnimatedTransform : public Transform {
             m = srt.toMatrix4();
             mInv = ::Inverse(m);
       }
+      void move(Vector3f offset) {
+            srt.translation.x += offset.x; srt.translation.y += offset.y; srt.translation.z += offset.z;
+            m = srt.toMatrix4();
+            mInv = ::Inverse(m);
+      }
+      void moveTo(Float x, Float y, Float z) {
+            srt.translation.x = x; srt.translation.y = y; srt.translation.z = z;
+            m = srt.toMatrix4();
+            mInv = ::Inverse(m);
+      }
       void update() { m = srt.toMatrix4(); mInv = ::Inverse(m); }
       Point3f& translation() { return srt.translation; }
 };

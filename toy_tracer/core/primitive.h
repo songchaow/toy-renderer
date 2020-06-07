@@ -11,13 +11,35 @@ class PrimitiveBase {
 protected:
       // loaded and ready to render
       bool loaded = false;
+      Vector3f localOrientation = { 0,0,1 };
       AnimatedTransform _obj2world;
 public:
+      Vector3f orientation() {
+            return RotateM(_obj2world.srt.rotationX, _obj2world.srt.rotationY, _obj2world.srt.rotationZ)(localOrientation);
+      }
       PrimitiveBase(const Transform& obj2world) : _obj2world(obj2world) {}
       PrimitiveBase() = default;
       bool isLoad() const { return loaded; }
       virtual bool is3D() const = 0;
       virtual void load() = 0;
+      // dir is normalized!
+      void moveAlong(const Vector3f& dir, Float distance) {
+            _obj2world.move(dir.x*distance, dir.y*distance, dir.z*distance);
+      }
+      void moveForwardTick(Float scale) {
+            _obj2world.move(orientation()*scale);
+      }
+      void moveBackwardTick(Float scale) {
+            _obj2world.move(-orientation()*scale);
+      }
+      void moveLeftTick(Float scale) {
+            Vector3f right = Normalize(Cross(orientation(), Vector3f(0, 1, 0)));
+            _obj2world.move(right * scale);
+      }
+      void moveRightTick(Float scale) {
+            Vector3f left = Normalize(Cross(Vector3f(0, 1, 0), orientation()));
+            _obj2world.move(left * scale);
+      }
 };
 
 class Primitive3D : public PrimitiveBase

@@ -55,6 +55,8 @@ file(GLOB TRACER_LIB
 *.cpp *.h *.hpp
 core/*.cpp
 tracer/*.cpp
+renderer/*.cpp
+engine/*.cpp
 light/*.cpp
 utils/*.cpp
 texture/*.cpp

@@ -138,9 +138,10 @@ void Primitive2D::draw()
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, image.tbo());
       // might be vertex attributes
-      _obj2world.m[0][3] = posWorld.x;
+      //_obj2world.moveTo(posWorld.x, posWorld.y, posWorld.z);
+      /*_obj2world.m[0][3] = posWorld.x;
       _obj2world.m[1][3] = posWorld.y;
-      _obj2world.m[2][3] = posWorld.z;
+      _obj2world.m[2][3] = posWorld.z;*/
       s->setUniformF("obj2world", _obj2world.getRowMajorData());
       s->setUniformF("size", size.x, size.y);
       // same for all 2d primitives

@@ -4,6 +4,7 @@
 #include "core/cubemap.h"
 #include "core/rendertext.h"
 #include "core/profiler.h"
+#include "engine/controller.h"
 #include <glad/glad.h>
 #include <QWindow>
 #include <QThread>
@@ -306,15 +307,8 @@ void RenderWorker::renderLoop() {
             }
             // update the camera's orientation
             cam->Tick();
-            /*if (RenderWorker::cam->rotationTrigger()) {
-                  cam->applyRotation();
-            }*/
-            /*if (_canvas->keyPressed()) {
-                  if (!_canvas->CameraorObject()) {
-                        applyTranslation(curr_primitive->obj2world().translation(), _canvas->keyStatuses(), 0.01f, Vector3f(1.f, 0.f, 0.f), Vector3f(0.f, 0.f, 1.f));
-                        curr_primitive->obj2world().update();
-                  }
-            }*/
+            // update keyboard
+            Controller::Instance()->Tick(profiler.durationSecond());
             if (loadObjectMutex.try_lock()) {
                   // add pending primitives
                   glLoadPrimitive();

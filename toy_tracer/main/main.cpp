@@ -7,6 +7,7 @@
 #include "main/renderworker.h"
 #include "main/ResourceManager.h"
 #include "core/glTFLoader.h"
+#include "engine/controller.h"
 #include <thread>
 using namespace std;
 
@@ -68,6 +69,10 @@ int main(int argc, char *argv[])
       glTFPrimitives = LoadGLTF("model/playerSmall/player.gltf");
       ImageTexture char2dAlbedo("texture/character/char2d.png");
       Primitive2D* char2d = new Primitive2D(Point3f(0, 0, 0), Point2f(0.5, 1), char2dAlbedo);
+      auto movePrimitive = [](PrimitiveBase* b) {
+            
+      };
+      addKeyboardMoveControl(char2d, UP, DOWN, LEFT, RIGHT);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       for (auto* p : glTFPrimitives)
