@@ -131,6 +131,7 @@ struct AnimatedTransform : public Transform {
       }
       void update() { m = srt.toMatrix4(); mInv = ::Inverse(m); }
       Point3f& translation() { return srt.translation; }
+      Point3f pos() { return srt.translation; }
 };
 
 struct Quaternion {

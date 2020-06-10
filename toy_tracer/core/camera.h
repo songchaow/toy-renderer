@@ -51,6 +51,7 @@ public:
       // Generate OpenGL transform, row major order
       const Matrix4& Cam2NDC() const;
       void LookAt();
+      void LookAt(const Point3f& pos, const Vector3f& viewDir, const Vector3f& upVec = { 0.f, 1.f, 0.f });
       // Getters
       const Matrix4& world2cam() const { return _view.world2view; }
       const Matrix4& world2camPrev() const { return world2view_prev; }

@@ -40,6 +40,7 @@ public:
             Vector3f left = Normalize(Cross(Vector3f(0, 1, 0), orientation()));
             _obj2world.move(left * scale);
       }
+      Point3f pos() { return _obj2world.pos(); }
 };
 
 class Primitive3D : public PrimitiveBase

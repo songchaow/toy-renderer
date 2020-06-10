@@ -69,9 +69,8 @@ int main(int argc, char *argv[])
       glTFPrimitives = LoadGLTF("model/playerSmall/player.gltf");
       ImageTexture char2dAlbedo("texture/character/char2d.png");
       Primitive2D* char2d = new Primitive2D(Point3f(0, 0, 0), Point2f(0.5, 1), char2dAlbedo);
-      auto movePrimitive = [](PrimitiveBase* b) {
-            
-      };
+      cam->LookAt(char2d->pos() + Vector3f(2,2,2), Vector3f(-1,-1,-1));
+
       addKeyboardMoveControl(char2d, UP, DOWN, LEFT, RIGHT);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
