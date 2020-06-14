@@ -25,6 +25,38 @@ void RenderWorker::start() {
       renderLoop();
 }
 
+void RenderWorker::processLoad() {
+      if (loadObjectMutex.try_lock()) {
+            // add pending primitives
+            glLoadPrimitive();
+
+            // remove ...
+            for (auto* d : pendingDelPrimitives) {
+                  ;
+            }
+            pendingDelPrimitives.clear();
+
+            // add/remove pending lights
+            for (auto* d : pendingDelLights) {
+                  auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
+                  if (it != _pointLights.end()) {
+                        _pointLights.erase(it);
+                        // TODO: delete primitive if there is one, or add to pendingDelPrimitives
+                  }
+            }
+            for (auto* l : pendingLights) {
+                  _pointLights.push_back(l);
+                  if (l->primitive()) {
+                        primitives.push_back(l->primitive());
+                  }
+            }
+            pendingLights.clear();
+            pendingDelLights.clear();
+
+            loadObjectMutex.unlock();
+      }
+}
+
 void RenderWorker::glLoadPrimitive() {
       for (auto* o : pendingAddPrimitives) {
             // o is primitive now
@@ -92,27 +124,42 @@ void RenderWorker::initialize() {
             LOG(INFO) << "ms hdr complete framebuffer";
       else
             LOG(INFO) << "ms hdr incomplete";*/
-      // HDR fbo (from ms), receive rendered results/ main rendering and do post processing
+
+      // HDR fbo, receive rendered results/ main rendering and do post processing
       // 3 color buffers: 2 for blooms
       glGenFramebuffers(1, &hdr_fbo);
       glBindFramebuffer(GL_FRAMEBUFFER, hdr_fbo);
-      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-      glDrawBuffers(2, draw_bufs);
+      GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+      //GLenum draw_bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+      glDrawBuffers(3, draw_bufs);
       glGenTextures(1, &hdr_color);
       glBindTexture(GL_TEXTURE_2D, hdr_color);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, _canvas->width(), _canvas->height(), 0, GL_RGBA, GL_FLOAT, nullptr);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      // HDR motion buffer
+      // HDR fbo: motion buffer
       glGenTextures(1, &hdr_motion);
       glBindTexture(GL_TEXTURE_2D, hdr_motion);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, _canvas->width(), _canvas->height(), 0, GL_RG, GL_FLOAT, nullptr);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      // HDR fbo depth buffer
-      glGenRenderbuffers(1, &pp_depth);
+      // object id buffer
+      glGenTextures(1, &object_id_buffer);
+      glBindTexture(GL_TEXTURE_2D, object_id_buffer);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, _canvas->width(), _canvas->height(), 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, nullptr);
+      //err = glGetError();
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+      // HDR fbo: depth buffer
+      glGenTextures(1, &pp_depth);
+      glBindTexture(GL_TEXTURE_2D, pp_depth);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, _canvas->width(), _canvas->height(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      /*glGenRenderbuffers(1, &pp_depth);
       glBindRenderbuffer(GL_RENDERBUFFER, pp_depth);
-      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());
+      glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, _canvas->width(), _canvas->height());*/
       glGenTextures(2, hdr_emissive);
       glGenTextures(2, taa_results);
       for (int i = 0; i < 2; i++) {
@@ -126,11 +173,40 @@ void RenderWorker::initialize() {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
       }
-      // attachment 1 is fixed
+      // attachment 1,2 are fixed
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_motion, 0);
-      glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, pp_depth);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, object_id_buffer, 0);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, pp_depth, 0);
       
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      // char2d prepass fbo
+      glGenFramebuffers(1, &char2d_prepass_fbo);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_prepass_fbo);
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, pp_depth, 0);
+
+      // char2d fbo
+      glGenFramebuffers(1, &char2d_fbo);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_fbo);
+      glDrawBuffers(1, draw_bufs);
+      glReadBuffer(GL_NONE);
+      glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0); // CHANGING
+      //glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, object_id_buffer, 0); // FIXED
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, pp_depth, 0);
+      // ssbo
+      glGenBuffers(1, &occlusion_ssbo);
+      glBindBuffer(GL_SHADER_STORAGE_BUFFER, occlusion_ssbo);
+      // data
+      glBufferData(GL_SHADER_STORAGE_BUFFER, 2*sizeof(GLfloat)*4*NUM_2DOBJ*NUM_OBJID, nullptr, GL_DYNAMIC_DRAW);
+      glClearBufferData(GL_SHADER_STORAGE_BUFFER, GL_R16UI, GL_RED_INTEGER, GL_BYTE, nullptr);
+      glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, occlusion_ssbo);
+
+      // bloom fbo
+      glGenFramebuffers(1, &bloom_fbo);
+      glBindFramebuffer(GL_DRAW_FRAMEBUFFER, bloom_fbo);
+
+
       // Shader uniform initialization
       // PBR
       csm.setCameraView(cam->cameraView());
@@ -161,10 +237,18 @@ void RenderWorker::initialize() {
       taa->setUniformI("motionVector", 2);
       taa->setUniformF("windowSize", _canvas->width(), _canvas->height());
       err = glGetError();
-      // 2DCHAR
+      // CHAR_2D_PREPASS
+      Shader* char2d_pre = LoadShader(CHAR_2D_PREPASS, true);
+      char2d_pre->use();
+      char2d_pre->setUniformI("albedoSampler", 0);
+      char2d_pre->setUniformI("objectID", 1);
+      char2d_pre->setUniformI("depth3D", 2);
+
+      // CHAR_2D
       Shader* char2d = LoadShader(CHAR_2D, true);
       char2d->use();
       char2d->setUniformI("albedoSampler", 0);
+      char2d->setUniformI("objectID", 1);
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
       // load primitives, including mesh and material
       glLoadPrimitive();
@@ -309,36 +393,7 @@ void RenderWorker::renderLoop() {
             cam->Tick();
             // update keyboard
             Controller::Instance()->Tick(profiler.durationSecond());
-            if (loadObjectMutex.try_lock()) {
-                  // add pending primitives
-                  glLoadPrimitive();
-
-                  // remove ...
-                  for (auto* d : pendingDelPrimitives) {
-                        ;
-                  }
-                  pendingDelPrimitives.clear();
-
-                  // add/remove pending lights
-                  for (auto* d : pendingDelLights) {
-                        auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
-                        if (it != _pointLights.end()) {
-                              _pointLights.erase(it);
-                              // TODO: delete primitive if there is one, or add to pendingDelPrimitives
-                        }
-                  }
-                  for (auto* l : pendingLights) {
-                        _pointLights.push_back(l);
-                        if (l->primitive()) {
-                              primitives.push_back(l->primitive());
-                        }
-                  }
-                  pendingLights.clear();
-                  pendingDelLights.clear();
-
-                  loadObjectMutex.unlock();
-            }
-            
+            processLoad();
             GLuint err = glGetError();
             // shadow map
             if (enableShadowMap && _pointLights.size() > 0) {
@@ -366,13 +421,16 @@ void RenderWorker::renderLoop() {
             }
             else
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_color, 0);
+            err = glGetError();
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, hdr_motion, 0);
+            err = glGetError();
             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
             glClearDepth(1.0f);
+            err = glGetError();
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
             err = glGetError();
-            if (drawSkybox)
-                  sky.draw();
+            //if (drawSkybox)
+                  //sky.draw();
             renderPassPBR();
             
             err = glGetError();
@@ -426,6 +484,7 @@ void RenderWorker::renderLoop() {
                   //glEnable(GL_DEPTH_TEST);
             }
             err = glGetError();
+            
             // blit to hdr frame buffer
             // hdr_color, hdr_emissive[0]
 #if 0
@@ -442,9 +501,37 @@ void RenderWorker::renderLoop() {
                   _canvas->height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
 #endif
             profiler.AddTimeStamp();
-            // 2D character
-            primitives2D[0]->draw();
+#define RENDER_2DCHAR
+#ifdef RENDER_2DCHAR
+            // 2D character prepass
+            glDepthMask(GL_FALSE);
+            glDisable(GL_DEPTH_TEST);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_prepass_fbo);
+            //glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
+            Shader* char2d_prepass = LoadShader(CHAR_2D_PREPASS, true);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, object_id_buffer);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, pp_depth);
+            primitives2D[0]->draw(char2d_prepass);
+            // barrier
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            // 2D character render
+            // write depth, but no depth test
+            glDepthMask(GL_TRUE);
+            glDisable(GL_DEPTH_TEST);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_fbo);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
+            Shader* char2d = LoadShader(CHAR_2D, true);
+            glActiveTexture(GL_TEXTURE0);
+
+            primitives2D[0]->draw(char2d);
+            glEnable(GL_DEPTH_TEST);
+            // clear SSBO
+            glClearBufferData(GL_SHADER_STORAGE_BUFFER, GL_R16UI, GL_RED, GL_BYTE, nullptr);
+#endif
             // Bloom
+            glBindFramebuffer(GL_FRAMEBUFFER, bloom_fbo);
             TriangleMesh::screenMesh.glUse(); // now already using
             if (enableBloom) {
                   glActiveTexture(GL_TEXTURE0);

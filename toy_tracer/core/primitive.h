@@ -9,6 +9,7 @@
 
 class PrimitiveBase {
 protected:
+      uint16_t pID;
       // loaded and ready to render
       bool loaded = false;
       Vector3f localOrientation = { 0,0,1 };
@@ -17,8 +18,8 @@ public:
       Vector3f orientation() {
             return RotateM(_obj2world.srt.rotationX, _obj2world.srt.rotationY, _obj2world.srt.rotationZ)(localOrientation);
       }
-      PrimitiveBase(const Transform& obj2world) : _obj2world(obj2world) {}
-      PrimitiveBase() = default;
+      PrimitiveBase(const Transform& obj2world);
+      PrimitiveBase();
       bool isLoad() const { return loaded; }
       virtual bool is3D() const = 0;
       virtual void load() = 0;
@@ -113,7 +114,7 @@ class Primitive2D : public PrimitiveBase {
       ImageTexture image;
 public:
       void load() override;
-      void draw();
+      void draw(Shader* s);
       Primitive2D(Point3f pos, Point2f size, ImageTexture i) : posWorld(pos), size(size), image(i) {}
       bool is3D() const { return false; }
 };

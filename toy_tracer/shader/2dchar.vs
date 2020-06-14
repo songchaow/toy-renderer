@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 // vertex data: 2 fixed size triangles, in xy plane. z = 0
 //layout (location = 0) in vec3 posLocal;

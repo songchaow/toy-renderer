@@ -5,6 +5,16 @@
 #include <QGroupBox>
 #include "main/renderworker.h"
 
+static uint16_t pID_counter = 0;
+
+PrimitiveBase::PrimitiveBase(const Transform& obj2world) : _obj2world(obj2world) {
+      pID = ++pID_counter;
+}
+
+PrimitiveBase::PrimitiveBase()  {
+      pID = ++pID_counter;
+}
+
 Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
       Primitive3D* p = new Primitive3D(nullptr, nullptr);
       //p->setMesh(mesh);
@@ -62,6 +72,7 @@ void Primitive3D::draw(Shader* shader) {
             shader->setUniformF("emissiveFactor", mtl.emissiveFactor.rgb[0], mtl.emissiveFactor.rgb[1], mtl.emissiveFactor.rgb[2]);
             shader->setUniformF("metallicFactor", mtl.metallicFactor);
             shader->setUniformF("roughFactor", mtl.roughFactor);
+            shader->setUniformUI("primitiveID", pID);
             if (mtl.albedo_map.isLoad()) {
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, mtl.albedo_map.tbo());
@@ -131,9 +142,9 @@ void InstancedPrimitive::draw(Shader* s) {
       }
 }
 
-void Primitive2D::draw()
+void Primitive2D::draw(Shader* s)
 {
-      Shader* s = LoadShader(CHAR_2D, true);
+      //s = LoadShader(CHAR_2D, true);
       s->use();
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, image.tbo());

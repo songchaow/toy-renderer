@@ -26,10 +26,13 @@ enum ShaderType {
       CASCADED_DEPTH_MAP,
       TAA,
       CHAR_2D,
+      CHAR_2D_PREPASS,
       NUM_SHADER_TYPE,
 };
 
 constexpr unsigned char POINT_LIGHT_MAX_NUM = 4;
+constexpr uint16_t NUM_OBJID = 16;
+constexpr uint16_t NUM_2DOBJ = 1;
 
 class Shader {
       ShaderPath path;
@@ -74,8 +77,9 @@ public:
       void setUniformI(const std::string& name, const int val);
       void setUniformI(unsigned int loc, const int val);
       void setUniformI(const std::string& name, const int val1, const int val2);
+      void setUniformUI(const std::string& name, const int val);
       unsigned int getUniformLocation(const std::string& name) { return glGetUniformLocation(program_id, name.c_str()); }
-      
+      void GenUniformInterfaceBuffer(const std::string& interfaceName);
 };
 
 struct PunctualLightLoc {

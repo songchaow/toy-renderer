@@ -22,7 +22,8 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/vertexInstanceShadow.vs",  "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP_INSTANCED
       {"shader/vertex2World.glsl",        "shader/csm.gs",        "shader/depthGS.fs"},               // CASCADED_DEPTH_MAP
       {"shader/fullscreen.vs",            "",                     "shader/taa.fs"},                   // TAA
-      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dchar.fs"}
+      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dchar.fs"},                // CHAR_2D
+      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dcharprepass.fs"}          // CHAR_2D_PREPASS
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -299,6 +300,16 @@ void Shader::setUniformI(const std::string& name, const int val)
 void Shader::setUniformI(const std::string& name, const int val1, const int val2) {
       int loc = glGetUniformLocation(program_id, name.c_str());
       glUniform2i(loc, val1, val2);
+}
+
+void Shader::setUniformUI(const std::string& name, const int val) {
+      int loc = glGetUniformLocation(program_id, name.c_str());
+      glUniform1ui(loc, val);
+}
+
+void Shader::GenUniformInterfaceBuffer(const std::string & interfaceName)
+{
+
 }
 
 

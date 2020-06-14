@@ -48,17 +48,21 @@ class RenderWorker {
       bool alreadyClear = false;
       GLuint depth_fbo = 0;
       // HDR Framebuffer
-      GLuint ms_hdr_fbo = 0;
-      GLuint ms_hdr_color = 0;
-      GLuint ms_hdr_emissive = 0;
-      GLuint ms_hdr_depth = 0;
+      GLuint char2d_fbo; // unimplemented
+      GLuint char2d_prepass_fbo;
+      GLuint object_id_buffer = 0;
+      GLuint occlusion_ssbo = 0;
+
       GLuint hdr_fbo;
       GLuint hdr_color;
       GLuint hdr_motion;
+      GLuint taa_fbo; // unimplemented
       GLuint pp_depth;
+
+      GLuint bloom_fbo;
       GLuint hdr_emissive[2];
+      
       unsigned char currTAAIdx = 0;
-      GLuint taa_fbo = 0;
       static const unsigned char numTAABuffer = 2;
       GLuint taa_results[numTAABuffer];
       Skybox sky;
@@ -84,6 +88,7 @@ private:
       void configPBRShader(Shader* shader);
       void GenCSM();
       void glLoadPrimitive();
+      void processLoad();
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }

@@ -1,6 +1,7 @@
 #version 330 core
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec2 Motion;
+layout (location = 2) out uint ObjID;
 in vec2 TexCoord;
 in vec3 posWorld;
 in vec3 normalWorld;
@@ -52,6 +53,7 @@ uniform mat4 world2lightndc[NUM_CASCADE_SHADOW];
 uniform vec3 lightfrustumSize[NUM_CASCADE_SHADOW]; // width, height, length
 //uniform mat4 world2lightview[NUM_CASCADE_SHADOW];
 uniform vec3 camPos;
+uniform uint primitiveID;
 
 const float PI = 3.14159265359;
 uniform vec2 PossionDistribution[16] = vec2[](
@@ -313,6 +315,7 @@ void main()
     vec2 mmm = lastNDCPosition.xy/lastNDCPosition.w - currNDCPosition.xy/currNDCPosition.w;
     mmm *= 0.5;
     Motion = mmm;
+    ObjID = primitiveID;
     //FragColor = vec4(pointLights[0].irradiance, 0);
     //FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }

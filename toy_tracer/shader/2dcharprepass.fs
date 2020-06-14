@@ -1,8 +1,8 @@
 #version 430 core
-layout (location = 0) out vec4 FragColor;
-
+//layout (location = 0) out vec4 FragColor;
 uniform sampler2D albedoSampler;
 uniform usampler2D objectID;
+uniform sampler2D depth3D;
 
 #define NUM_2DOBJ 1
 #define NUM_OBJID 16
@@ -33,12 +33,17 @@ void main() {
     if(albedoAlpha.a==0.0)
         discard;
     uint id = uint(texture(objectID, VOutput.screenUV).r);
-    // totally occluded
-    if(occlusionInfo.hasOccluded[id] && !occlusionInfo.hasUnoccluded[id])
-        discard;
-    // if(occlusionInfo.hasUnoccluded[id])
-    //     gl_FragDepth = float(occlusionInfo.near[id]-1) / 0xffffffff;
-    // else
-    //     gl_FragDepth = float(occlusionInfo.far[id]+1) / 0xffffffff;
-    FragColor = albedoAlpha;
+    float depth3dObj = texture(depth3D, VOutput.screenUV).r;
+    uint depth3dInt = uint(depth3dObj * 0xffffffff);
+    //atomicMax(occlusionInfo.far[id], depth3dInt);
+    //atomicMin(occlusionInfo.near[id], depth3dInt);
+    if(gl_FragCoord.z >  depth3dObj) {
+        occlusionInfo.hasOccluded[id] = true;
+        //FragColor = vec4(depth3dObj,0,0,1);
+    }
+    else {
+        occlusionInfo.hasUnoccluded[id] = true;
+        //FragColor = vec4(0,1,0,1);
+    }
+
 }
