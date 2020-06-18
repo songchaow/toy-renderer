@@ -210,25 +210,28 @@ void RenderWorker::initialize() {
       // Shader uniform initialization
       // PBR
       csm.setCameraView(cam->cameraView());
-      Shader* pbr = LoadShader(PBR, true);
-      pbr->use();
-      uint32_t uniform_loc = pbr->getUniformLocation("zpartition[0]");
-      for (int i = 0; i < NUM_CASCADED_SHADOW -1; i++) {
-            pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
+      for(auto en : {ShaderType::PBR, ShaderType::PBR_FLATTEN}) {
+            Shader* pbr = LoadShader(en, true);
+            pbr->use();
+            uint32_t uniform_loc = pbr->getUniformLocation("zpartition[0]");
+            for (int i = 0; i < NUM_CASCADED_SHADOW -1; i++) {
+                  pbr->setUniformF(uniform_loc + i, csm.zPartition()[i]);
+            }
+            punctualLightLocations_pbr.queryLocation(pbr);
+            glActiveTexture(GL_TEXTURE6);
+            glBindTexture(GL_TEXTURE_2D, PBRMaterial::lut.tbo());
+            glActiveTexture(GL_TEXTURE7);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, sky.specularMaptbo());
+            pbr->setUniformI("albedoSampler", 0);
+            pbr->setUniformI("mrSampler", 1);
+            pbr->setUniformI("normalSampler", 2);
+            pbr->setUniformI("emissionSampler", 3);
+            pbr->setUniformI("aoSampler", 4);
+            pbr->setUniformI("depthSampler", 5);
+            pbr->setUniformI("lut", 6);
+            pbr->setUniformI("envSpecular", 7);
       }
-      punctualLightLocations_pbr.queryLocation(pbr);
-      glActiveTexture(GL_TEXTURE6);
-      glBindTexture(GL_TEXTURE_2D, PBRMaterial::lut.tbo());
-      glActiveTexture(GL_TEXTURE7);
-      glBindTexture(GL_TEXTURE_CUBE_MAP, sky.specularMaptbo());
-      pbr->setUniformI("albedoSampler", 0);
-      pbr->setUniformI("mrSampler", 1);
-      pbr->setUniformI("normalSampler", 2);
-      pbr->setUniformI("emissionSampler", 3);
-      pbr->setUniformI("aoSampler", 4);
-      pbr->setUniformI("depthSampler", 5);
-      pbr->setUniformI("lut", 6);
-      pbr->setUniformI("envSpecular", 7);
+      
       // TAA
       Shader* taa = LoadShader(TAA, true);
       taa->use();
@@ -336,7 +339,7 @@ void RenderWorker::GenCSM()
 }
 
 void RenderWorker::renderPassPBR() {
-      Shader* monoShader = LoadShader(PBR, true);
+      Shader* monoShader = LoadShader(PBR_FLATTEN, true);
       Shader* instanceShader = LoadShader(PBR_INSTANCED, true);
       if (primitives.size() > 0) {
             monoShader->use();
@@ -519,7 +522,7 @@ void RenderWorker::renderLoop() {
             // 2D character render
             // write depth, but no depth test
             glDepthMask(GL_TRUE);
-            glDisable(GL_DEPTH_TEST);
+            glEnable(GL_DEPTH_TEST);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_fbo);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
             Shader* char2d = LoadShader(CHAR_2D, true);
