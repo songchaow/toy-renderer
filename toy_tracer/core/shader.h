@@ -12,6 +12,7 @@ struct ShaderPath {
 
 enum ShaderType {
       PBR,
+      PBR_FLATTEN,
       DEPTH_MAP,
       DEPTH_CUBE_MAP,
       SKY_BOX,

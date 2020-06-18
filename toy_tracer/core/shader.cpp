@@ -9,6 +9,7 @@ Shader shaderStore[NUM_SHADER_TYPE];
 ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
 //    Vertex                        Geometry                Fragment
       {"shader/vertex.glsl",              "",                     "shader/pbr_pixel.glsl"},           // PBR
+      {"shader/vertexLocalFlatten.vs",    "",                     "shader/pbr_pixel.glsl"},           // PBR_FLATTEN
       {"shader/vertex.glsl",              "",                     "shader/depth.fs"},                 // DEPTH_MAP
       {"shader/vertex2World.glsl",        "shader/cubemap.gs",    "shader/depthCubeGS.fs"},           // DEPTH_CUBE_MAP
       {"shader/skybox.vs",                "",                     "shader/skybox.fs"},                // SKY_BOX
