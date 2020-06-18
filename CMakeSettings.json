@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "name": "x64-Debug",
+      "name": "x64-Debug-2017",
       "generator": "Visual Studio 15 2017 Win64",
       "configurationType": "Debug",
       "inheritEnvironments": [
@@ -14,8 +14,34 @@
       "ctestCommandArgs": ""
     },
     {
-      "name": "x64-Release",
+      "name": "x64-Debug-2019",
+      "generator": "Visual Studio 16 2019 Win64",
+      "configurationType": "Debug",
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "buildRoot": "${workspaceRoot}\\build_debug",
+      "installRoot": "${workspaceRoot}\\install",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": ""
+    },
+    {
+      "name": "x64-Release-2017",
       "generator": "Visual Studio 15 2017 Win64",
+      "configurationType": "Release",
+      "inheritEnvironments": [
+        "msvc_x64"
+      ],
+      "buildRoot": "${workspaceRoot}\\build_release",
+      "installRoot": "${workspaceRoot}\\install",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": ""
+    },
+    {
+      "name": "x64-Release-2019",
+      "generator": "Visual Studio 16 2019 Win64",
       "configurationType": "Release",
       "inheritEnvironments": [
         "msvc_x64"

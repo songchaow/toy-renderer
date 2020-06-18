@@ -1,4 +1,4 @@
-#include "core/film.h"
+#include "tracer/film.h"
 #include "ext/std_image/include/lodepng.h"
 #include <cassert>
 #include <memory>
