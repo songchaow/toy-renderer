@@ -77,6 +77,14 @@ void RenderWorker::glLoadPrimitive() {
             }
       }
       pendingAddPrimitives.clear();
+      for (auto* o : pendingChars) {
+            o->load();
+            if (o->is3D()) {
+                  Primitive3D* p3d = static_cast<Primitive3D*>(o);
+                  characters3D.push_back(p3d);
+            }
+      }
+      pendingChars.clear();
 }
 
 void RenderWorker::initialize() {
@@ -118,6 +126,7 @@ void RenderWorker::initialize() {
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
       glEnable(GL_DEPTH_TEST);
+      glEnable(GL_PROGRAM_POINT_SIZE);
       glDisable(GL_FRAMEBUFFER_SRGB);
       /*GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       if (res == GL_FRAMEBUFFER_COMPLETE)
@@ -233,7 +242,7 @@ void RenderWorker::initialize() {
       }
       
       // TAA
-      Shader* taa = LoadShader(TAA, true);
+      Shader* taa = LoadShader(ShaderType::TAA, true);
       taa->use();
       taa->setUniformI("currentColor", 0);
       taa->setUniformI("historyTAAResult", 1);
@@ -241,14 +250,14 @@ void RenderWorker::initialize() {
       taa->setUniformF("windowSize", _canvas->width(), _canvas->height());
       err = glGetError();
       // CHAR_2D_PREPASS
-      Shader* char2d_pre = LoadShader(CHAR_2D_PREPASS, true);
+      Shader* char2d_pre = LoadShader(ShaderType::CHAR_2D_PREPASS, true);
       char2d_pre->use();
       char2d_pre->setUniformI("albedoSampler", 0);
       char2d_pre->setUniformI("objectID", 1);
       char2d_pre->setUniformI("depth3D", 2);
 
       // CHAR_2D
-      Shader* char2d = LoadShader(CHAR_2D, true);
+      Shader* char2d = LoadShader(ShaderType::CHAR_2D, true);
       char2d->use();
       char2d->setUniformI("albedoSampler", 0);
       char2d->setUniformI("objectID", 1);
@@ -321,7 +330,7 @@ void RenderWorker::GenCSM()
       glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, csm.tbo(), 0);
       GLenum res = glCheckFramebufferStatus(GL_FRAMEBUFFER);
       glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-      Shader* csmShader = LoadShader(CASCADED_DEPTH_MAP, true);
+      Shader* csmShader = LoadShader(ShaderType::CASCADED_DEPTH_MAP, true);
       csmShader->use();
       csmShader->setUniformBool("directional", _pointLights[0]->isDirectionalLight());
       csmShader->setUniformI("albedoSampler", 0);
@@ -339,8 +348,8 @@ void RenderWorker::GenCSM()
 }
 
 void RenderWorker::renderPassPBR() {
-      Shader* monoShader = LoadShader(PBR_FLATTEN, true);
-      Shader* instanceShader = LoadShader(PBR_INSTANCED, true);
+      Shader* monoShader = LoadShader(ShaderType::PBR, true);
+      Shader* instanceShader = LoadShader(ShaderType::PBR_INSTANCED, true);
       if (primitives.size() > 0) {
             monoShader->use();
             configPBRShader(monoShader);
@@ -363,9 +372,22 @@ void RenderWorker::renderPassPBR() {
       }
 }
 
+void RenderWorker::renderPassFlattenCharPBR()
+{
+      Shader* monoShader = flattenCharacter ? LoadShader(ShaderType::PBR_FLATTEN, true) : LoadShader(ShaderType::PBR, true);
+      if (characters3D.size() > 0) {
+            monoShader->use();
+            configPBRShader(monoShader);
+            for (auto& p : characters3D) {
+                  p->draw(monoShader);
+
+            }
+      }
+}
+
 void RenderWorker::renderPassCubeMapDepth() {
-      Shader* shader = LoadShader(DEPTH_CUBE_MAP, true);
-      Shader* shaderInstance = LoadShader(DEPTH_CUBE_MAP_INSTANCED, true);
+      Shader* shader = LoadShader(ShaderType::DEPTH_CUBE_MAP, true);
+      Shader* shaderInstance = LoadShader(ShaderType::DEPTH_CUBE_MAP_INSTANCED, true);
       //shader->setUniformF("camPos", RenderWorker::getCamera()->pos().x, RenderWorker::getCamera()->pos().y, RenderWorker::getCamera()->pos().z);
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
@@ -435,7 +457,7 @@ void RenderWorker::renderLoop() {
             //if (drawSkybox)
                   //sky.draw();
             renderPassPBR();
-            
+            renderPassFlattenCharPBR();
             err = glGetError();
             profiler.AddTimeStamp();
             // taa
@@ -468,7 +490,7 @@ void RenderWorker::renderLoop() {
                   // output to taa_results[currTAAIdx]
                   err = glGetError();
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
-                  Shader* taa_shader = LoadShader(TAA, true);
+                  Shader* taa_shader = LoadShader(ShaderType::TAA, true);
                   taa_shader->use();
                   taa_shader->setUniformBool("disableClampWhenStatic", disableClampWhenStatic);
                   glActiveTexture(GL_TEXTURE0);
@@ -511,7 +533,7 @@ void RenderWorker::renderLoop() {
             glDisable(GL_DEPTH_TEST);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_prepass_fbo);
             //glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
-            Shader* char2d_prepass = LoadShader(CHAR_2D_PREPASS, true);
+            Shader* char2d_prepass = LoadShader(ShaderType::CHAR_2D_PREPASS, true);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, object_id_buffer);
             glActiveTexture(GL_TEXTURE2);
@@ -525,7 +547,7 @@ void RenderWorker::renderLoop() {
             glEnable(GL_DEPTH_TEST);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_fbo);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
-            Shader* char2d = LoadShader(CHAR_2D, true);
+            Shader* char2d = LoadShader(ShaderType::CHAR_2D, true);
             glActiveTexture(GL_TEXTURE0);
 
             primitives2D[0]->draw(char2d);
@@ -540,13 +562,13 @@ void RenderWorker::renderLoop() {
                   glActiveTexture(GL_TEXTURE0);
                   glBindTexture(GL_TEXTURE_2D, hdr_emissive[0]);
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[1], 0);
-                  Shader* blur = LoadShader(GAUSSIAN_BLUR_H, true);
+                  Shader* blur = LoadShader(ShaderType::GAUSSIAN_BLUR_H, true);
                   blur->use();
                   blur->setUniformI("color", 0);
                   glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
                   glBindTexture(GL_TEXTURE_2D, hdr_emissive[1]);
                   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdr_emissive[0], 0);
-                  blur = LoadShader(GAUSSIAN_BLUR_V, true);
+                  blur = LoadShader(ShaderType::GAUSSIAN_BLUR_V, true);
                   blur->use();
                   blur->setUniformI("color", 0);
                   glDrawElements(GL_TRIANGLES, TriangleMesh::screenMesh.face_count() * 3, GL_UNSIGNED_INT, nullptr);
@@ -557,7 +579,7 @@ void RenderWorker::renderLoop() {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             //glClearDepth(1.0f);
             //glClear(GL_DEPTH_BUFFER_BIT);
-            Shader* hdr = LoadShader(HDR_TONE_MAP, true);
+            Shader* hdr = LoadShader(ShaderType::HDR_TONE_MAP, true);
             hdr->use();
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, taa_results[currTAAIdx]);
@@ -591,6 +613,13 @@ void RenderWorker::loadObject(PrimitiveBase* p)
       std::lock_guard<std::mutex> lck(loadObjectMutex);
       pendingAddPrimitives.push_back(p);
       //while (!primitiveQueue.addElement(p));
+}
+
+void RenderWorker::loadCharacter(PrimitiveBase* p)
+{
+      std::lock_guard<std::mutex> lck(loadObjectMutex);
+      pendingChars.push_back(p);
+
 }
 
 void RenderWorker::loadPointLight(PointLight * l)

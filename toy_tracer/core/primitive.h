@@ -14,6 +14,7 @@ protected:
       bool loaded = false;
       Vector3f localOrientation = { 0,0,1 };
       AnimatedTransform _obj2world;
+      bool drawReferencePoint = true;
 public:
       Vector3f orientation() {
             return RotateM(_obj2world.srt.rotationX, _obj2world.srt.rotationY, _obj2world.srt.rotationZ)(localOrientation);
@@ -42,6 +43,7 @@ public:
             _obj2world.move(left * scale);
       }
       Point3f pos() { return _obj2world.pos(); }
+      void drawReference();
 };
 
 class Primitive3D : public PrimitiveBase

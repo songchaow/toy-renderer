@@ -5,8 +5,8 @@
 #include <map>
 
 //static std::map<std::string, Shader> shaderStore;
-Shader shaderStore[NUM_SHADER_TYPE];
-ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
+Shader shaderStore[ShaderType::NUM_SHADER_TYPE];
+ShaderPath shaderConfig[ShaderType::NUM_SHADER_TYPE] = {
 //    Vertex                        Geometry                Fragment
       {"shader/vertex.glsl",              "",                     "shader/pbr_pixel.glsl"},           // PBR
       {"shader/vertexLocalFlatten.vs",    "",                     "shader/pbr_pixel.glsl"},           // PBR_FLATTEN
@@ -24,7 +24,8 @@ ShaderPath shaderConfig[NUM_SHADER_TYPE] = {
       {"shader/vertex2World.glsl",        "shader/csm.gs",        "shader/depthGS.fs"},               // CASCADED_DEPTH_MAP
       {"shader/fullscreen.vs",            "",                     "shader/taa.fs"},                   // TAA
       {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dchar.fs"},                // CHAR_2D
-      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dcharprepass.fs"}          // CHAR_2D_PREPASS
+      {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dcharprepass.fs"},         // CHAR_2D_PREPASS
+      {"shader/point.vs",                 "",                     "shader/point.fs"}                  // POINT
 };
 
 Shader::Shader(const ShaderPath & path) : path(path) {
@@ -337,17 +338,18 @@ Shader* LoadShader(const std::string& vertex_path, const std::string& fragment_p
 #endif
 
 Shader* LoadShader(ShaderType t, bool compile) {
-      assert(t < NUM_SHADER_TYPE);
-      if (shaderStore[t].loaded())
-            return &shaderStore[t];
+      assert(t < ShaderType::NUM_SHADER_TYPE);
+      uint32_t tIdx = static_cast<uint32_t>(t);
+      if (shaderStore[tIdx].loaded())
+            return &shaderStore[tIdx];
       else {
-            shaderStore[t] = Shader(shaderConfig[t]);
-            if (!shaderStore[t].complete())
+            shaderStore[tIdx] = Shader(shaderConfig[tIdx]);
+            if (!shaderStore[tIdx].complete())
                   return nullptr;
             if (compile)
-                  shaderStore[t].compileAndLink();
-            if (shaderStore[t].loaded()) {
-                  return &shaderStore[t];
+                  shaderStore[tIdx].compileAndLink();
+            if (shaderStore[tIdx].loaded()) {
+                  return &shaderStore[tIdx];
             }
             else
                   return nullptr;

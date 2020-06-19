@@ -306,8 +306,14 @@ void addDefaultProperties(QWidget* parent) {
       });
       QPushButton* refreshShader = new QPushButton("Refresh Shaders...");
       QObject::connect(bloom, &QPushButton::clicked, [](int state) {
-            for (int i = 0; i < ShaderType::NUM_SHADER_TYPE; i++) {
+            for (int i = 0; i < static_cast<uint32_t>(ShaderType::NUM_SHADER_TYPE); i++) {
                   ;
             }
       });
+      QCheckBox* enableFlattenChar = new QCheckBox("Flatten characters");
+      enableFlattenChar->setCheckState(RenderWorker::Instance()->flattenCharacter ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(enableFlattenChar);
+      QObject::connect(enableFlattenChar, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->flattenCharacter = state == Qt::Checked;
+            });
 }

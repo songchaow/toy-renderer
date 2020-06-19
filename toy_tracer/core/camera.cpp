@@ -235,7 +235,7 @@ Matrix4 Frustum::cam2ndc_Perspective() const
 {
       Float tanHalfFov_H = std::tan(fov_Horizontal / 2);
       Float tanHalfFov_V = tanHalfFov_H / aspectRatio;
-      Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0,
+      Matrix4 persp(1.f / tanHalfFov_H, 0, 0, 0, 
             0, 1.f / tanHalfFov_V, 0, 0,
             0, 0, -(Far + near) / (Far - near), -2 * Far * near / (Far - near),
             0, 0, -1, 0);

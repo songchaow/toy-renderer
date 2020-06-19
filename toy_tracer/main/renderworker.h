@@ -21,12 +21,14 @@ class RenderWorker {
       TwoThreadQueue<Primitive3D*> primitiveQueue;
       TwoThreadQueue<PointLight*> lightQueue;
       std::vector<Primitive3D*> primitives;
+      std::vector<Primitive3D*> characters3D;
       std::vector<Primitive2D*> primitives2D;
       std::vector<InstancedPrimitive*> instancedPrimitives;
       std::vector<PointLight*> _pointLights;
       // intermediate storage
       std::vector<PointLight*> pendingLights, pendingDelLights;
       std::vector<PrimitiveBase*> pendingAddPrimitives, pendingDelPrimitives;
+      std::vector<PrimitiveBase*> pendingChars;
 
       static Camera* cam;
       Canvas* _canvas = nullptr;
@@ -80,6 +82,7 @@ public:
       bool drawSkybox = true;
       bool disableClampWhenStatic = true;
       bool enableTAA = false;
+      bool flattenCharacter = true;
 public slots:
       void initialize();
       void renderLoop();
@@ -95,6 +98,7 @@ public:
       void start();
       // thread-safe using mutex
       void loadObject(PrimitiveBase* p);
+      void loadCharacter(PrimitiveBase* p);
       void loadPointLight(PointLight* l);
       void removePointLight(PointLight* l);
       static Camera* getCamera() { return cam; }
@@ -106,6 +110,7 @@ public:
       static inline RenderWorker* Instance() { return &_worker; }
       const std::vector<PointLight*>& pointLights() const { return _pointLights; }
       void renderPassPBR();
+      void renderPassFlattenCharPBR();
       void renderPassCubeMapDepth();
 };
 

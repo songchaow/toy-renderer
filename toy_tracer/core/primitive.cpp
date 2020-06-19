@@ -15,6 +15,19 @@ PrimitiveBase::PrimitiveBase()  {
       pID = ++pID_counter;
 }
 
+void PrimitiveBase::drawReference()
+{
+      glPointSize(3.0f);
+      Shader* pointShader = LoadShader(ShaderType::POINT, true);
+      pointShader->use();
+      pointShader->setUniformF("obj2world", _obj2world.getRowMajorData());
+      const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
+      const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
+      pointShader->setUniformF("world2cam", &w2c);
+      pointShader->setUniformF("cam2ndc", &c2ndc);
+      glDrawArrays(GL_POINTS, 0, 1);
+}
+
 Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
       Primitive3D* p = new Primitive3D(nullptr, nullptr);
       //p->setMesh(mesh);
@@ -96,6 +109,8 @@ void Primitive3D::draw(Shader* shader) {
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
       }
+      if (drawReferencePoint)
+            drawReference();
       glBindVertexArray(0);
 }
 
@@ -167,7 +182,8 @@ void Primitive2D::draw(Shader* s)
       glDrawArrays(GL_POINTS, 0, 1);
       e = glGetError();
       e = glGetError();
-
+      if (drawReferencePoint)
+            drawReference();
 }
 
 void Primitive2D::load() {

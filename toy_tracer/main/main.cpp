@@ -74,8 +74,9 @@ int main(int argc, char *argv[])
       addKeyboardMoveControl(char2d, UP, DOWN, LEFT, RIGHT);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
-      for (auto* p : glTFPrimitives)
-            RenderWorker::Instance()->loadObject(p);
+      
+      RenderWorker::Instance()->loadObject(glTFPrimitives[1]);
+      RenderWorker::Instance()->loadCharacter(glTFPrimitives[0]);
       RenderWorker::Instance()->loadObject(char2d);
       MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));

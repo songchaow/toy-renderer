@@ -10,7 +10,7 @@ struct ShaderPath {
       bool complete() const { return vertex.size() > 0; }
 };
 
-enum ShaderType {
+enum class ShaderType {
       PBR,
       PBR_FLATTEN,
       DEPTH_MAP,
@@ -28,6 +28,7 @@ enum ShaderType {
       TAA,
       CHAR_2D,
       CHAR_2D_PREPASS,
+      POINT,
       NUM_SHADER_TYPE,
 };
 

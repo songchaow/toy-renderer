@@ -109,7 +109,7 @@ void Skybox::draw()
       glActiveTexture(GL_TEXTURE0);
       map.glUse();
       cube.glUse();
-      Shader* s = LoadShader(SKY_BOX, true);
+      Shader* s = LoadShader(ShaderType::SKY_BOX, true);
       s->use();
       Matrix4 rotation = RenderWorker::getCamera()->world2cam();
       const Matrix4& cam2ndc = RenderWorker::getCamera()->Cam2NDC();

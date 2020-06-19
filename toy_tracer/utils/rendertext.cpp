@@ -68,7 +68,7 @@ void init() {
       //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       
       // shader
-      text_shader = LoadShader(TEXT, true);
+      text_shader = LoadShader(ShaderType::TEXT, true);
       text_shader->use();
       text_shader->setUniformI("screenSize", RenderWorker::Instance()->resolution().x, RenderWorker::Instance()->resolution().y);
       text_shader->setUniformI("text", 0);
@@ -99,7 +99,7 @@ void renderText(const std::string& txt, Point2f startPos, Float scale) {
       if (!ft_init) {
             init();
       }
-      LoadShader(TEXT, true)->use();
+      LoadShader(ShaderType::TEXT, true)->use();
       Float currPosx = startPos.x;
       Float currPosy = startPos.y;
       glDisable(GL_DEPTH_TEST);
