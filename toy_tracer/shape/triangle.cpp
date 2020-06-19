@@ -207,6 +207,20 @@ void TriangleMesh::fillTangent()
       }
 }
 
+void TriangleMesh::calcAABB()
+{
+      unsigned char* pVertexData = static_cast<unsigned char*>(vertex_data);
+      const LayoutItem* vertexPosLayout = _layout.getLayoutItem(ArrayType::ARRAY_VERTEX);
+      uint16_t vertexPosOffset = vertexPosLayout->offset;
+
+      _aabb = AABB();
+
+      for (int i = 0; i < vertex_num; i++) {
+            Point3f* pos = reinterpret_cast<Point3f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
+            _aabb.Add(*pos);
+      }
+}
+
 void TriangleMesh::calcLocalSphereBound() {
       unsigned char* pVertexData = static_cast<unsigned char*>(vertex_data);
       const LayoutItem* vertexPosLayout = _layout.getLayoutItem(ArrayType::ARRAY_VERTEX);
@@ -228,6 +242,26 @@ void TriangleMesh::calcLocalSphereBound() {
                   radius2 = currRadius2;
       }
       _sb.radius = std::sqrt(radius2);
+}
+
+void TriangleMesh::calcXZCircleBound()
+{
+      unsigned char* pVertexData = static_cast<unsigned char*>(vertex_data);
+      const LayoutItem* vertexPosLayout = _layout.getLayoutItem(ArrayType::ARRAY_VERTEX);
+      uint16_t vertexPosOffset = vertexPosLayout->offset;
+
+      calcAABB();
+      Point3f center3 = _aabb.center();
+      _cb.center = Point2f(center3.x, center3.y);
+      
+      Float radius2 = 0;
+      for (int i = 0; i < vertex_num; i++) {
+            Point2f* pos = reinterpret_cast<Point2f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
+            Float currRadius2 = (*pos - _cb.center).LengthSquared();
+            if (currRadius2 > radius2)
+                  radius2 = currRadius2;
+      }
+      _cb.size = std::sqrt(radius2);
 }
 
 const LayoutItem* Layout::getLayoutItem(ArrayType t) const {

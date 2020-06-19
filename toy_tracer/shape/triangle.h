@@ -114,6 +114,13 @@ class TriangleMesh {
       GLuint _ebo = 0; // element buffer object
       //  GLuint _normTexture = 0;  // normal buffer texture
       SphereBound _sb;
+public:
+      struct CircleBound {
+            Point2f center;
+            Float size;
+      };
+private:
+      CircleBound _cb;
       AABB _aabb;
       bool glLoaded = false;
 private:
@@ -172,7 +179,9 @@ public:
       GLenum indexElementT() const { return indexFormat; }
       GLenum primitiveMode() const { return _primitiveMode; }
       void fillTangent();
+      void calcAABB();
       void calcLocalSphereBound();
+      void calcXZCircleBound();
       ~TriangleMesh() { 
             if (vertex_data) delete[](char*)vertex_data; 
             if (index_data) delete[](char*)index_data;
@@ -181,6 +190,8 @@ public:
       const char* face_triangle(int faceIdx) const { return index_data + faceIdx * 3 * indexElementSize; }
       static TriangleMesh screenMesh;
       const AABB aabb() const { return _aabb; }
+      const CircleBound cb() const { return _cb; }
+      const SphereBound sb() const { return _sb; }
 };
 
 TriangleMesh CreateTriangleMesh(void* vbuffer, Layout l, uint32_t vertex_num, char* index_data, uint32_t faceNum, GLenum idxFormat, Transform obj2world, GLenum primMode);

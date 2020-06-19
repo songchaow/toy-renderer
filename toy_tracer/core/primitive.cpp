@@ -108,10 +108,20 @@ void Primitive3D::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
+            // TODO: calc actual z range (optimize: if the object moves)
+            Point2f centerLocal = m->cb().center;
+            
+            Point3f xzCam3 = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world(Point3f(centerLocal.x, centerLocal.y, 0)));
+            Point2f centerxzCam = Point2f(xzCam3.x, xzCam3.y);
+            centerxzCam[1] + m->cb().size * (1.0 - 1.0/flattenRatio);
+            zRange.center = centerxzCam;
+            zRange.axisX = m->cb().size;
+            zRange.axisY = m->cb().size / flattenRatio;
       }
       if (drawReferencePoint)
             drawReference();
       glBindVertexArray(0);
+
 }
 
 void Primitive3D::drawSimple(Shader* shader) {

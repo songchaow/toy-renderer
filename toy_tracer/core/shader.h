@@ -28,6 +28,7 @@ enum class ShaderType {
       TAA,
       CHAR_2D,
       CHAR_2D_PREPASS,
+      CHAR_2D_NEW,
       POINT,
       NUM_SHADER_TYPE,
 };

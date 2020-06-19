@@ -57,6 +57,15 @@ void RenderWorker::processLoad() {
       }
 }
 
+void RenderWorker::calcXZBounds()
+{
+      for (auto* p : characters3D) {
+            for (auto* m : p->meshes()) {
+                  m->calcXZCircleBound();
+            }
+      }
+}
+
 void RenderWorker::glLoadPrimitive() {
       for (auto* o : pendingAddPrimitives) {
             // o is primitive now
@@ -264,6 +273,7 @@ void RenderWorker::initialize() {
       profiler.setPhaseNames({ "Depth Map Gen", "PBR Pass", "Downsample(MSAA)", "PostProcess", "Tone Map" });
       // load primitives, including mesh and material
       glLoadPrimitive();
+      calcXZBounds();
 }
 
 void RenderWorker::configPBRShader(Shader* shader) {

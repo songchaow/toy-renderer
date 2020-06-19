@@ -77,6 +77,7 @@ public:
       void Tick();
       Point3f pos() const { return _pos; }
       Point3f& rpos() { return _pos; }
+      const Vector3f viewDir() const { return _viewDir; }
       
 };
 

@@ -7,7 +7,7 @@
 //static std::map<std::string, Shader> shaderStore;
 Shader shaderStore[ShaderType::NUM_SHADER_TYPE];
 ShaderPath shaderConfig[ShaderType::NUM_SHADER_TYPE] = {
-//    Vertex                        Geometry                Fragment
+//    Vertex                              Geometry                Fragment
       {"shader/vertex.glsl",              "",                     "shader/pbr_pixel.glsl"},           // PBR
       {"shader/vertexLocalFlatten.vs",    "",                     "shader/pbr_pixel.glsl"},           // PBR_FLATTEN
       {"shader/vertex.glsl",              "",                     "shader/depth.fs"},                 // DEPTH_MAP
@@ -25,6 +25,7 @@ ShaderPath shaderConfig[ShaderType::NUM_SHADER_TYPE] = {
       {"shader/fullscreen.vs",            "",                     "shader/taa.fs"},                   // TAA
       {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dchar.fs"},                // CHAR_2D
       {"shader/2dchar.vs",                "shader/2dchar.gs",     "shader/2dcharprepass.fs"},         // CHAR_2D_PREPASS
+      {"shader/2dcharControl.vs",         "shader/2dchar.gs",     "shader/2dcharSimple.fs"},          // CHAR_2D_NEW
       {"shader/point.vs",                 "",                     "shader/point.fs"}                  // POINT
 };
 

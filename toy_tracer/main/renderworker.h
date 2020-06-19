@@ -92,6 +92,7 @@ private:
       void GenCSM();
       void glLoadPrimitive();
       void processLoad();
+      void calcXZBounds();
 public:
       RenderWorker() = default;
       RenderWorker(Camera* c) { cam = c; }

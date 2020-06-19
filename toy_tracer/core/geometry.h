@@ -1151,3 +1151,9 @@ struct SphereBound {
       Point3f center;
       Float radius;
 };
+
+struct CamOrientedEllipse {
+      Float axisX;
+      Float axisY;
+      Point2f center;
+};

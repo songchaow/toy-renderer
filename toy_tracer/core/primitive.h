@@ -54,7 +54,9 @@ protected:
       std::vector<TriangleMesh*> _meshes;
       // TODO: don't use pointer, or modify the dctor
       std::vector<PBRMaterial> rt_m;
-      
+      Float referenceOffsetZ = 0.35; // maybe manually adjusted by artists
+      static constexpr Float flattenRatio = 10;
+      CamOrientedEllipse zRange;
 public:
       Primitive3D(Shape* shape, Material* m) : _shape(shape), material(m) {}
       Primitive3D(Shape* shape, PBRMaterial m, Transform t) : _shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
