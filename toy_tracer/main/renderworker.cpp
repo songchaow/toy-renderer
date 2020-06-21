@@ -38,16 +38,16 @@ void RenderWorker::processLoad() {
 
             // add/remove pending lights
             for (auto* d : pendingDelLights) {
-                  auto it = std::find(_pointLights.begin(), _pointLights.end(), d);
-                  if (it != _pointLights.end()) {
-                        _pointLights.erase(it);
+                  auto it = std::find(_scene._pointLights.begin(), _scene._pointLights.end(), d);
+                  if (it != _scene._pointLights.end()) {
+                        _scene._pointLights.erase(it);
                         // TODO: delete primitive if there is one, or add to pendingDelPrimitives
                   }
             }
             for (auto* l : pendingLights) {
-                  _pointLights.push_back(l);
+                  _scene._pointLights.push_back(l);
                   if (l->primitive()) {
-                        primitives.push_back(l->primitive());
+                        _scene.primitives.push_back(l->primitive());
                   }
             }
             pendingLights.clear();
@@ -59,7 +59,7 @@ void RenderWorker::processLoad() {
 
 void RenderWorker::calcXZBounds()
 {
-      for (auto* p : characters3D) {
+      for (auto* p : _scene.characters3D) {
             for (auto* m : p->meshes()) {
                   m->calcXZCircleBound();
             }
@@ -73,16 +73,16 @@ void RenderWorker::glLoadPrimitive() {
             if (o->is3D()) {
                   Primitive3D* p3d = static_cast<Primitive3D*>(o);
                   if (!p3d->isInstanced()) {
-                        primitives.push_back(p3d);
+                        _scene.primitives.push_back(p3d);
                   }
                   else {
                         static_cast<InstancedPrimitive*>(p3d)->GenInstancedArray();
-                        instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(p3d));
+                        _scene.instancedPrimitives.push_back(static_cast<InstancedPrimitive*>(p3d));
                   }
             }
             else {
                   Primitive2D* p2d = static_cast<Primitive2D*>(o);
-                  primitives2D.push_back(p2d);
+                  _scene.primitives2D.push_back(p2d);
             }
       }
       pendingAddPrimitives.clear();
@@ -90,7 +90,7 @@ void RenderWorker::glLoadPrimitive() {
             o->load();
             if (o->is3D()) {
                   Primitive3D* p3d = static_cast<Primitive3D*>(o);
-                  characters3D.push_back(p3d);
+                  _scene.characters3D.push_back(p3d);
             }
       }
       pendingChars.clear();
@@ -334,7 +334,7 @@ void RenderWorker::configPBRShader(Shader* shader) {
 
 void RenderWorker::GenCSM()
 {
-      csm.GenLightViews(_pointLights[0]->direction());
+      csm.GenLightViews(_scene._pointLights[0]->direction());
       glBindFramebuffer(GL_FRAMEBUFFER, depth_fbo);
       glBindTexture(GL_TEXTURE_2D_ARRAY, csm.tbo());
       glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, csm.tbo(), 0);
@@ -342,7 +342,7 @@ void RenderWorker::GenCSM()
       glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
       Shader* csmShader = LoadShader(ShaderType::CASCADED_DEPTH_MAP, true);
       csmShader->use();
-      csmShader->setUniformBool("directional", _pointLights[0]->isDirectionalLight());
+      csmShader->setUniformBool("directional", _scene._pointLights[0]->isDirectionalLight());
       csmShader->setUniformI("albedoSampler", 0);
       uint32_t u_pos = csmShader->getUniformLocation("world2ndcs[0]");
       for (int i = 0; i < NUM_CASCADED_SHADOW; i++) {
@@ -351,7 +351,7 @@ void RenderWorker::GenCSM()
       }
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
-      for (auto &p : primitives) {
+      for (auto &p : _scene.primitives) {
             p->draw(csmShader);
       }
       glViewport(0, 0, _canvas->width(), _canvas->height());
@@ -360,20 +360,20 @@ void RenderWorker::GenCSM()
 void RenderWorker::renderPassPBR() {
       Shader* monoShader = LoadShader(ShaderType::PBR, true);
       Shader* instanceShader = LoadShader(ShaderType::PBR_INSTANCED, true);
-      if (primitives.size() > 0) {
+      if (_scene.primitives.size() > 0) {
             monoShader->use();
             configPBRShader(monoShader);
-            for (auto &p : primitives) {
+            for (auto &p : _scene.primitives) {
                   for (auto& m : p->getPBRMaterial())
                         if (m.dirty())
                               m.update();
                   p->draw(monoShader);
             }
       }
-      if (instancedPrimitives.size() > 0) {
+      if (_scene.instancedPrimitives.size() > 0) {
             instanceShader->use();
             configPBRShader(instanceShader);
-            for (auto &p : instancedPrimitives) {
+            for (auto &p : _scene.instancedPrimitives) {
                   for (auto& m : p->getPBRMaterial())
                         if (m.dirty())
                               m.update();
@@ -385,10 +385,10 @@ void RenderWorker::renderPassPBR() {
 void RenderWorker::renderPassFlattenCharPBR()
 {
       Shader* monoShader = flattenCharacter ? LoadShader(ShaderType::PBR_FLATTEN, true) : LoadShader(ShaderType::PBR, true);
-      if (characters3D.size() > 0) {
+      if (_scene.characters3D.size() > 0) {
             monoShader->use();
             configPBRShader(monoShader);
-            for (auto& p : characters3D) {
+            for (auto& p : _scene.characters3D) {
                   p->draw(monoShader);
 
             }
@@ -402,11 +402,11 @@ void RenderWorker::renderPassCubeMapDepth() {
       glClearDepth(1.f);
       glClear(GL_DEPTH_BUFFER_BIT);
       shader->use();
-      for (auto &p : primitives) {
+      for (auto &p : _scene.primitives) {
             p->draw(shader);
       }
       shaderInstance->use();
-      for (auto &p : instancedPrimitives)
+      for (auto &p : _scene.instancedPrimitives)
             p->draw(shaderInstance);
 }
 
@@ -431,7 +431,7 @@ void RenderWorker::renderLoop() {
             processLoad();
             GLuint err = glGetError();
             // shadow map
-            if (enableShadowMap && _pointLights.size() > 0) {
+            if (enableShadowMap && _scene._pointLights.size() > 0) {
                   if (alreadyClear)
                         alreadyClear = false;
                   GenCSM();
@@ -538,6 +538,7 @@ void RenderWorker::renderLoop() {
             profiler.AddTimeStamp();
 #define RENDER_2DCHAR
 #ifdef RENDER_2DCHAR
+#if 0
             // 2D character prepass
             glDepthMask(GL_FALSE);
             glDisable(GL_DEPTH_TEST);
@@ -548,20 +549,21 @@ void RenderWorker::renderLoop() {
             glBindTexture(GL_TEXTURE_2D, object_id_buffer);
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, pp_depth);
-            primitives2D[0]->draw(char2d_prepass);
+            _scene.primitives2D[0]->draw(char2d_prepass);
             // barrier
             glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+#endif
             // 2D character render
             // write depth, but no depth test
             glDepthMask(GL_TRUE);
             glEnable(GL_DEPTH_TEST);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, char2d_fbo);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, taa_results[currTAAIdx], 0);
-            Shader* char2d = LoadShader(ShaderType::CHAR_2D, true);
+            Shader* char2d = LoadShader(ShaderType::CHAR_2D_NEW, true);
             glActiveTexture(GL_TEXTURE0);
 
-            primitives2D[0]->draw(char2d);
-            glEnable(GL_DEPTH_TEST);
+            _scene.primitives2D[0]->drawWithDynamicZ();
+            //glEnable(GL_DEPTH_TEST);
             // clear SSBO
             glClearBufferData(GL_SHADER_STORAGE_BUFFER, GL_R16UI, GL_RED, GL_BYTE, nullptr);
 #endif

@@ -109,14 +109,15 @@ void Primitive3D::draw(Shader* shader) {
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
             // TODO: calc actual z range (optimize: if the object moves)
-            Point2f centerLocal = m->cb().center;
-            
-            Point3f xzCam3 = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world(Point3f(centerLocal.x, centerLocal.y, 0)));
-            Point2f centerxzCam = Point2f(xzCam3.x, xzCam3.y);
-            centerxzCam[1] + m->cb().size * (1.0 - 1.0/flattenRatio);
-            zRange.center = centerxzCam;
-            zRange.axisX = m->cb().size;
-            zRange.axisY = m->cb().size / flattenRatio;
+            Point2f centerLocalXZ = m->cb().center;
+            Float sizeWorld = _obj2world.srt.scaleX * m->cb().size;
+            Point3f xzCam3 = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world(Point3f(centerLocalXZ.x, 0, centerLocalXZ.y)));
+            Point2f centerxzCam = Point2f(xzCam3.x, xzCam3.z);
+            centerxzCam[1] = centerxzCam[1] + sizeWorld * (1.0 - 1.0/flattenRatio);
+            _zRange.center = centerxzCam;
+            _zRange.axisX = sizeWorld;
+            _zRange.axisY = sizeWorld / flattenRatio;
+
       }
       if (drawReferencePoint)
             drawReference();
@@ -194,6 +195,54 @@ void Primitive2D::draw(Shader* s)
       e = glGetError();
       if (drawReferencePoint)
             drawReference();
+}
+
+void Primitive2D::drawWithDynamicZ()
+{
+      // test intersection
+      Point3f posCam = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world.pos());
+      Point2f xzCam = Point2f(posCam.x, posCam.z);
+      Point2f xzCamRight = xzCam + Vector2f(size.x, 0);
+      std::vector<Primitive3D*> chars_inrange;
+      //std::vector<CamOrientedEllipse::Location> locations_inrange;
+      bool hasFrontLocation = false;
+      for (auto* c : RenderWorker::Instance()->scene().characters3D) {
+            CamOrientedEllipse::Location l;
+            bool leftinRange = c->zRange().inRange(xzCam, l);
+            bool rightinRange = c->zRange().inRange(xzCamRight, l);
+            if (leftinRange || rightinRange) {
+                  if (l == CamOrientedEllipse::Location::FRONT)
+                        hasFrontLocation = true;
+                  chars_inrange.push_back(c);
+            }
+      }
+      Shader* char2d_dynamicZ = LoadShader(ShaderType::CHAR_2D_NEW, true);
+      char2d_dynamicZ->use();
+      if (chars_inrange.empty())
+            char2d_dynamicZ->setUniformBool("forceDepth", false);
+      else {
+            char2d_dynamicZ->setUniformBool("forceDepth", true);
+            Float depthCam;
+            if (hasFrontLocation) {
+                  // currently set to the most front z
+                  Float maxZ = chars_inrange[0]->zRange().FrontZ();
+                  for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
+                        if ((*it)->zRange().FrontZ() > maxZ)
+                              maxZ = (*it)->zRange().FrontZ();
+                  }
+                  depthCam = maxZ;
+            }
+            else {
+                  Float minZ = chars_inrange[0]->zRange().FrontZ();
+                  for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
+                        if ((*it)->zRange().FrontZ() < minZ)
+                              minZ = (*it)->zRange().FrontZ();
+                  }
+                  depthCam = minZ;
+            }
+            char2d_dynamicZ->setUniformF("depthCam", depthCam);
+      }
+      draw(char2d_dynamicZ);
 }
 
 void Primitive2D::load() {

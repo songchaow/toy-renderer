@@ -252,12 +252,13 @@ void TriangleMesh::calcXZCircleBound()
 
       calcAABB();
       Point3f center3 = _aabb.center();
-      _cb.center = Point2f(center3.x, center3.y);
+      _cb.center = Point2f(center3.x, center3.z);
       
       Float radius2 = 0;
       for (int i = 0; i < vertex_num; i++) {
-            Point2f* pos = reinterpret_cast<Point2f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
-            Float currRadius2 = (*pos - _cb.center).LengthSquared();
+            Point3f* pos = reinterpret_cast<Point3f*>(pVertexData + _layout.strip() * i + vertexPosOffset);
+            Point2f posXZ = Point2f(pos->x, pos->z);
+            Float currRadius2 = (posXZ - _cb.center).LengthSquared();
             if (currRadius2 > radius2)
                   radius2 = currRadius2;
       }

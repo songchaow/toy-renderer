@@ -18,13 +18,14 @@ Camera* CreateRTCamera(const Point2i& screen_size);
 
 class RenderWorker {
       QOpenGLContext* m_context;
-      TwoThreadQueue<Primitive3D*> primitiveQueue;
-      TwoThreadQueue<PointLight*> lightQueue;
-      std::vector<Primitive3D*> primitives;
-      std::vector<Primitive3D*> characters3D;
-      std::vector<Primitive2D*> primitives2D;
-      std::vector<InstancedPrimitive*> instancedPrimitives;
-      std::vector<PointLight*> _pointLights;
+      struct SceneObject {
+            std::vector<Primitive3D*> primitives;
+            std::vector<Primitive3D*> characters3D;
+            std::vector<Primitive2D*> primitives2D;
+            std::vector<InstancedPrimitive*> instancedPrimitives;
+            std::vector<PointLight*> _pointLights;
+      } _scene;
+      
       // intermediate storage
       std::vector<PointLight*> pendingLights, pendingDelLights;
       std::vector<PrimitiveBase*> pendingAddPrimitives, pendingDelPrimitives;
@@ -109,9 +110,10 @@ public:
       void setCamera(Camera* c) { cam = c; }
       Canvas* canvas() { return _canvas; }
       static inline RenderWorker* Instance() { return &_worker; }
-      const std::vector<PointLight*>& pointLights() const { return _pointLights; }
+      const std::vector<PointLight*>& pointLights() const { return _scene._pointLights; }
       void renderPassPBR();
       void renderPassFlattenCharPBR();
       void renderPassCubeMapDepth();
+      const SceneObject& scene() const { return _scene; }
 };
 

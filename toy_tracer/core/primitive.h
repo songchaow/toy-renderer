@@ -20,6 +20,7 @@ public:
             return RotateM(_obj2world.srt.rotationX, _obj2world.srt.rotationY, _obj2world.srt.rotationZ)(localOrientation);
       }
       PrimitiveBase(const Transform& obj2world);
+      PrimitiveBase(const Point3f& pos) : PrimitiveBase(Translate(Vector3f(pos))) {}
       PrimitiveBase();
       bool isLoad() const { return loaded; }
       virtual bool is3D() const = 0;
@@ -54,9 +55,9 @@ protected:
       std::vector<TriangleMesh*> _meshes;
       // TODO: don't use pointer, or modify the dctor
       std::vector<PBRMaterial> rt_m;
-      Float referenceOffsetZ = 0.35; // maybe manually adjusted by artists
+      Float referenceOffsetZ = 0.35f; // maybe manually adjusted by artists
       static constexpr Float flattenRatio = 10;
-      CamOrientedEllipse zRange;
+      CamOrientedEllipse _zRange;
 public:
       Primitive3D(Shape* shape, Material* m) : _shape(shape), material(m) {}
       Primitive3D(Shape* shape, PBRMaterial m, Transform t) : _shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
@@ -82,6 +83,7 @@ public:
             _meshes = _shape->GenMesh();
       }
       const std::vector<TriangleMesh*>& meshes() const { return _meshes; }
+      CamOrientedEllipse zRange() const { return _zRange; }
 };
 
 Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh);
@@ -112,13 +114,14 @@ public:
 // no vertex data is needed currently
 //
 class Primitive2D : public PrimitiveBase {
-      Point3f posWorld;
+      //Point3f posWorld; // cached!
       //Matrix4 _obj2world; // calculated from posWorld
       Point2f size;
       ImageTexture image;
 public:
       void load() override;
       void draw(Shader* s);
-      Primitive2D(Point3f pos, Point2f size, ImageTexture i) : posWorld(pos), size(size), image(i) {}
+      void drawWithDynamicZ();
+      Primitive2D(Point3f pos, Point2f size, ImageTexture i) : PrimitiveBase(pos), size(size), image(i) {}
       bool is3D() const { return false; }
 };
