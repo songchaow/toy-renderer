@@ -283,3 +283,33 @@ Transform Transform::operator*(const Transform& rhs) const {
       return Transform(this->m*rhs.m);
 }
 
+AABB Matrix4::operator() (const AABB& aabb) const {
+      Point3f points[8];
+      points[0] = Point3f(aabb.pMin.x, aabb.pMin.y, aabb.pMin.z);
+      points[1] = Point3f(aabb.pMin.x, aabb.pMin.y, aabb.pMax.z);
+      points[2] = Point3f(aabb.pMin.x, aabb.pMax.y, aabb.pMin.z);
+      points[3] = Point3f(aabb.pMin.x, aabb.pMax.y, aabb.pMax.z);
+      points[4] = Point3f(aabb.pMax.x, aabb.pMin.y, aabb.pMin.z);
+      points[5] = Point3f(aabb.pMax.x, aabb.pMin.y, aabb.pMax.z);
+      points[6] = Point3f(aabb.pMax.x, aabb.pMax.y, aabb.pMin.z);
+      points[7] = Point3f(aabb.pMax.x, aabb.pMax.y, aabb.pMax.z);
+      for (uint16_t i = 0; i < 8; i++) {
+            points[i] = operator()(points[i]);
+      }
+      Point3f pMax = points[0], pMin = points[0];
+      for (uint16_t i = 1; i < 8; i++) {
+            if (points[i].x > pMax.x)
+                  pMax.x = points[i].x;
+            if (points[i].y > pMax.y)
+                  pMax.y = points[i].y;
+            if (points[i].z > pMax.z)
+                  pMax.z = points[i].z;
+            if (points[i].x < pMin.x)
+                  pMin.x = points[i].x;
+            if (points[i].y < pMin.y)
+                  pMin.y = points[i].y;
+            if (points[i].z < pMin.z)
+                  pMin.z = points[i].z;
+      }
+      return AABB(pMax, pMin);
+}

@@ -121,6 +121,7 @@ public:
       };
 private:
       CircleBound _cb;
+      CircleBound _cbCam;
       AABB _aabb;
       bool glLoaded = false;
 private:

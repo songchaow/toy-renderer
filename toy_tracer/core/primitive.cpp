@@ -43,6 +43,14 @@ Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh) {
 //       return p;
 // }
 
+void Primitive3D::calcAABB()
+{
+      for (auto* m : _meshes) {
+            m->calcAABB();
+            _aabb += m->aabb();
+      }
+}
+
 void Primitive3D::load() {
       for (auto* mesh : _meshes) {
             mesh->load();
@@ -105,19 +113,29 @@ void Primitive3D::draw(Shader* shader) {
             auto& m = _meshes[i];
             glBindVertexArray(m->vao());
             shader->setUniformF("obj2world", _obj2world.getRowMajorData());
-            // no need to bind the ebo again
-            // eg: 2 faces => 6 element count
-            glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
-            // TODO: calc actual z range (optimize: if the object moves)
+            
+            // calc actual z range (optimize: if the object moves)
+            // first calculate cam oriented bb
+            _camAABB = (RenderWorker::Instance()->getCamera()->world2cam() * _obj2world.m)(_aabb);
             Point2f centerLocalXZ = m->cb().center;
             Float sizeWorld = _obj2world.srt.scaleX * m->cb().size;
             Point3f xzCam3 = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world(Point3f(centerLocalXZ.x, 0, centerLocalXZ.y)));
+            Float destinateZCam = xzCam3.z + sizeWorld * RenderWorker::Instance()->getCamera()->CosPitchAngle();
+            shader->setUniformF("destinateZCam", destinateZCam);
+            // flatten aabb
+            _camAABB.pMax.z = destinateZCam + (_camAABB.pMax.z - destinateZCam) / flattenRatio;
+            _camAABB.pMin.z = destinateZCam + (_camAABB.pMin.z - destinateZCam) / flattenRatio;
+
+            // not used now
             Point2f centerxzCam = Point2f(xzCam3.x, xzCam3.z);
             centerxzCam[1] = centerxzCam[1] + sizeWorld * (1.0 - 1.0/flattenRatio);
             _zRange.center = centerxzCam;
             _zRange.axisX = sizeWorld;
             _zRange.axisY = sizeWorld / flattenRatio;
 
+            // no need to bind the ebo again
+            // eg: 2 faces => 6 element count
+            glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
       }
       if (drawReferencePoint)
             drawReference();
@@ -201,6 +219,9 @@ void Primitive2D::drawWithDynamicZ()
 {
       // test intersection
       Point3f posCam = RenderWorker::Instance()->getCamera()->world2cam()(_obj2world.pos());
+      Point3f posCamRightUp = posCam;
+      posCamRightUp.x += size.x;
+      posCamRightUp.y += size.y;
       Point2f xzCam = Point2f(posCam.x, posCam.z);
       Point2f xzCamRight = xzCam + Vector2f(size.x, 0);
       std::vector<Primitive3D*> chars_inrange;
@@ -208,12 +229,15 @@ void Primitive2D::drawWithDynamicZ()
       bool hasFrontLocation = false;
       for (auto* c : RenderWorker::Instance()->scene().characters3D) {
             CamOrientedEllipse::Location l;
-            bool leftinRange = c->zRange().inRange(xzCam, l);
-            bool rightinRange = c->zRange().inRange(xzCamRight, l);
+            /*bool leftinRange = c->zRange().inRange(xzCam, l);
+            bool rightinRange = c->zRange().inRange(xzCamRight, l);*/
+            bool leftinRange = c->CamOrientedBB().In(posCam);
+            bool rightinRange = c->CamOrientedBB().In(posCamRightUp);
             if (leftinRange || rightinRange) {
-                  if (l == CamOrientedEllipse::Location::FRONT)
-                        hasFrontLocation = true;
+                  //if (l == CamOrientedEllipse::Location::FRONT)
+                    //    hasFrontLocation = true;
                   chars_inrange.push_back(c);
+                  hasFrontLocation = true;
             }
       }
       Shader* char2d_dynamicZ = LoadShader(ShaderType::CHAR_2D_NEW, true);
@@ -223,20 +247,32 @@ void Primitive2D::drawWithDynamicZ()
       else {
             char2d_dynamicZ->setUniformBool("forceDepth", true);
             Float depthCam;
-            if (hasFrontLocation) {
+            if (RenderWorker::Instance()->put2dcharatFront) {
                   // currently set to the most front z
-                  Float maxZ = chars_inrange[0]->zRange().FrontZ();
+                  /*Float maxZ = chars_inrange[0]->zRange().FrontZ();
                   for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
                         if ((*it)->zRange().FrontZ() > maxZ)
                               maxZ = (*it)->zRange().FrontZ();
                   }
+                  depthCam = maxZ;*/
+                  Float maxZ = chars_inrange[0]->CamOrientedBB().pMax.z;
+                  for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
+                        if ((*it)->CamOrientedBB().pMax.z > maxZ)
+                              maxZ = (*it)->CamOrientedBB().pMax.z;
+                  }
                   depthCam = maxZ;
             }
             else {
-                  Float minZ = chars_inrange[0]->zRange().FrontZ();
+                  /*Float minZ = chars_inrange[0]->zRange().FrontZ();
                   for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
                         if ((*it)->zRange().FrontZ() < minZ)
                               minZ = (*it)->zRange().FrontZ();
+                  }
+                  depthCam = minZ;*/
+                  Float minZ = chars_inrange[0]->CamOrientedBB().pMin.z;
+                  for (auto it = chars_inrange.begin() + 1; it < chars_inrange.end(); it++) {
+                        if ((*it)->CamOrientedBB().pMin.z > minZ)
+                              minZ = (*it)->CamOrientedBB().pMin.z;
                   }
                   depthCam = minZ;
             }

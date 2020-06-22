@@ -316,4 +316,11 @@ void addDefaultProperties(QWidget* parent) {
       QObject::connect(enableFlattenChar, &QCheckBox::stateChanged, [](int state) {
             RenderWorker::Instance()->flattenCharacter = state == Qt::Checked;
             });
+
+      QCheckBox* putatfront = new QCheckBox("Put 2d char at front when intersects");
+      putatfront->setCheckState(RenderWorker::Instance()->put2dcharatFront ? Qt::Checked : Qt::Unchecked);
+      parent->layout()->addWidget(putatfront);
+      QObject::connect(putatfront, &QCheckBox::stateChanged, [](int state) {
+            RenderWorker::Instance()->put2dcharatFront = state == Qt::Checked;
+            });
 }

@@ -17,14 +17,19 @@ out VertexOutput {
 
 void main() {
     vec4 posCam_org = world2cam * obj2world * vec4(0,0,0,1);
+    vec4 referenceP = vec4(0,0,posCam_org.z,1);
     if(forceDepth)
-        posCam_org.z = depthCam;
+        referenceP.z = depthCam;
     vec4 posCam_rightUp = posCam_org + vec4(size,0,0);
-    // the same z value in NDC
+
     vec4 posNDC_org = cam2ndc * posCam_org; // not clipped now!
     vec4 posNDC_rightUp = cam2ndc * posCam_rightUp;
-    gl_Position = posNDC_org;
+
+    // calc z value in NDC
+    vec4 referenceNDC = cam2ndc * referenceP;
     
+    gl_Position = posNDC_org;
+    gl_Position.z = referenceNDC.z / referenceNDC.w * posNDC_org.w;
     //VOutput.sizeNDC = (posNDC_rightUp - posNDC_org).xy / posNDC_org.w;
     VOutput.sizeNDC = (posNDC_rightUp - posNDC_org).xy;
 }

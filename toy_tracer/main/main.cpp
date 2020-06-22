@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/FlightHelmet/FlightHelmet.gltf");
       //glTFPrimitives = LoadGLTF("C:/Users/songc/Codes/toy_tracer/msvc.build_x64/toy_tracer/model/player/scene.gltf");
       
-      glTFPrimitives = LoadGLTF("model/playernew/player.gltf");
+      glTFPrimitives = LoadGLTF("model/player3/player.gltf");
       ImageTexture char2dAlbedo("texture/character/char2d.png");
       Primitive2D* char2d = new Primitive2D(Point3f(0, 0, 0), Point2f(0.5, 1), char2dAlbedo);
       cam->LookAt(char2d->pos() + Vector3f(2,2,2), Vector3f(-1,-1,-1));

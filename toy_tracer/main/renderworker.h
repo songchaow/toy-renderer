@@ -84,6 +84,7 @@ public:
       bool disableClampWhenStatic = true;
       bool enableTAA = false;
       bool flattenCharacter = true;
+      bool put2dcharatFront = true;
 public slots:
       void initialize();
       void renderLoop();

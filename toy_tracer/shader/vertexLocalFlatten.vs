@@ -11,6 +11,7 @@ uniform mat4 world2camPrev;
 uniform mat4 cam2ndc;
 uniform float flatRatio = 10.0;
 uniform float referenceOffsetZ = 0.35;
+uniform float destinateZCam;
 
 out vec2 TexCoord;
 out vec3 posWorld;
@@ -24,7 +25,8 @@ void main()
 {
       posWorld = vec3(obj2world * vec4(posLocal,1.0));
       vec4 referenceCam = world2cam * obj2world * vec4(0,0,0,1.0);
-      referenceCam.z = referenceCam.z + referenceOffsetZ;
+      //referenceCam.z = referenceCam.z + referenceOffsetZ;
+      referenceCam.z = destinateZCam;
       vec4 referenceNDC = cam2ndc * referenceCam;
       vec3 posCam = vec3(world2cam * vec4(posWorld, 1.0));
       // float zFlatten = referenceCam.z + (posCam.z-referenceCam.z) / flatRatio;

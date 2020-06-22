@@ -1,6 +1,7 @@
 #pragma once
 #include "core/common.h"
 #include "tracer/ray.h"
+#include "core/geometry.h"
 struct Matrix4;
 struct Matrix3 {
       Float m_matrix[3][3];
@@ -43,6 +44,7 @@ struct Matrix4 {
       Matrix4 operator*(const Matrix4& m) const;
       Vector3f operator()(const Vector3f& v) const;
       Point3f operator()(const Point3f& p) const;
+      AABB operator() (const AABB& aabb) const;
       SRT toSRT() const;
       void transpose();
 };
@@ -93,6 +95,7 @@ struct Transform {
       Ray operator()(const Ray& r) const;
       Vector3f operator() (const Vector3f& o) const;
       Normal3f operator() (const Normal3f& o) const;
+      AABB operator() (const AABB& aabb) const;
       Transform operator*(const Transform& rhs) const;
 
       static Transform Identity() { return Scale(1.f, 1.f, 1.f); }

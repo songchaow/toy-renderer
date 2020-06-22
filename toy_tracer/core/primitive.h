@@ -55,16 +55,24 @@ protected:
       std::vector<TriangleMesh*> _meshes;
       // TODO: don't use pointer, or modify the dctor
       std::vector<PBRMaterial> rt_m;
-      Float referenceOffsetZ = 0.35f; // maybe manually adjusted by artists
+      Float destinateZCam = 0.35f; // maybe manually adjusted by artists
       static constexpr Float flattenRatio = 10;
       CamOrientedEllipse _zRange;
+      AABB _aabb;
+      AABB _camAABB;
+
+      void calcAABB();
 public:
       Primitive3D(Shape* shape, Material* m) : _shape(shape), material(m) {}
       Primitive3D(Shape* shape, PBRMaterial m, Transform t) : _shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
       Primitive3D(Shape* shape, PBRMaterial m) : _shape(shape), rt_m(1, m), material(nullptr) {}
       Primitive3D(PBRMaterial m, Transform t) : Primitive3D(nullptr, m, t) {}
-      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), _meshes(meshes) {}
-      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), _meshes(meshes), PrimitiveBase(t) {}
+      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), _meshes(meshes) {
+            calcAABB();
+      }
+      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), _meshes(meshes), PrimitiveBase(t) {
+            calcAABB();
+      }
       Material* getMaterial() const { return material; }
       std::vector<PBRMaterial>& getPBRMaterial() { return rt_m; }
       //void setPBRMaterial(PBRMaterial m) { rt_m = m; }
@@ -84,6 +92,7 @@ public:
       }
       const std::vector<TriangleMesh*>& meshes() const { return _meshes; }
       CamOrientedEllipse zRange() const { return _zRange; }
+      AABB CamOrientedBB() const { return _camAABB; }
 };
 
 Primitive3D* CreatePrimitiveFromMeshes(TriangleMesh* mesh);

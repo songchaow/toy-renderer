@@ -1144,6 +1144,11 @@ struct AABB {
       AABB& operator+=(const AABB& rhs) {
             Add(rhs.pMax);
             Add(rhs.pMin);
+            return *this;
+      }
+      bool In(const Point3f& p) const {
+            return p.x<pMax.x && p.y<pMax.y && p.z<pMax.z &&
+                  p.x>pMin.x && p.y>pMin.y && p.z> pMin.z;
       }
 };
 
@@ -1156,25 +1161,12 @@ struct CamOrientedEllipse {
       Float axisX; // long
       Float axisY; // short
       Point2f center;
-      bool inRange(const Point2f& xzCam) const {
-            Point2f xzLocal = Point2f(xzCam - center);
-            // in xz, x is longer
-            Float val = axisY * axisY * xzCam.x * xzCam.x + axisX * axisX * xzCam.y * xzCam.y;
-            Float range_val = axisX * axisX + axisY * axisY;
-            return val < range_val;
-      }
+      bool inRange(const Point2f& xzCam) const;
       enum Location {
             FRONT,
             BACK
       };
-      bool inRange(const Point2f& xzCam, Location& loc) const {
-            Point2f xzLocal = Point2f(xzCam - center);
-            // in xz, x is longer
-            Float val = axisY * axisY * xzLocal.x * xzLocal.x + axisX * axisX * xzLocal.y * xzLocal.y;
-            Float range_val = axisX * axisX + axisY * axisY;
-            loc = xzLocal.y > 0 ? FRONT : BACK;
-            return val < range_val;
-      }
+      bool inRange(const Point2f& xzCam, Location& loc) const;
       Float FrontZ() const { return center.y + axisY; }
       Float BackZ() const { return center.y - axisY; }
 };
