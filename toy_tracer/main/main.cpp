@@ -74,10 +74,21 @@ int main(int argc, char *argv[])
       addKeyboardMoveControl(char2d, UP, DOWN, LEFT, RIGHT);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
-      
+      std::string otherCharPaths[] = { "model/1/person.gltf","model/3/person.gltf","model/4/person.gltf" };
+      //std::string otherCharPaths[] = { "model/4/person.gltf" };
+      Float shift = 0.f;
+      for (auto p : otherCharPaths) {
+            std::vector<Primitive3D*> ps = LoadGLTF(p);
+            for (auto* prim : ps) {
+                  prim->moveAlong(Vector3f(1, 0, 0), shift);
+                  RenderWorker::Instance()->loadCharacter(prim);
+                  shift += 0.1f;
+            }
+      }
+
       RenderWorker::Instance()->loadObject(glTFPrimitives[1]);
       Primitive3D* duplicateChar = new Primitive3D(*glTFPrimitives[0]);
-      duplicateChar->moveBackwardTick(1.0);
+      duplicateChar->moveBackwardTick(0.1);
       RenderWorker::Instance()->loadCharacter(glTFPrimitives[0]);
       RenderWorker::Instance()->loadCharacter(duplicateChar);
       RenderWorker::Instance()->loadObject(char2d);

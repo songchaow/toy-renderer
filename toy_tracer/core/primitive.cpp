@@ -85,7 +85,8 @@ void Primitive3D::drawPrepare(Shader* shader, int meshIndex) {
 }
 void Primitive3D::draw(Shader* shader) {
       // draw all meshes
-      // TODO: maybe different meshes' materials/textures are different.
+      // TODO: maybe different meshes' materials/textures are different.]
+      shader->use();
       for (int i = 0; i < _meshes.size(); i++) {
             PBRMaterial& mtl = rt_m[i];
             shader->setUniformF("globalEmission", mtl.globalEmission()[0], mtl.globalEmission()[1], mtl.globalEmission()[2]);
@@ -136,8 +137,6 @@ void Primitive3D::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
-            int err = glGetError();
-            err = glGetError();
       }
       if (drawReferencePoint)
             drawReference();
@@ -217,6 +216,17 @@ void Primitive2D::draw(Shader* s)
             drawReference();
 }
 
+void FindIntersect(const Point3f& posCam1, const Point3f& posCam2, std::vector<Primitive3D*>& chars_inrange) {
+      chars_inrange.clear();
+      for (auto* c : RenderWorker::Instance()->scene().characters3D) {
+            bool leftinRange = c->CamOrientedBB().In(posCam1);
+            bool rightinRange = c->CamOrientedBB().In(posCam2);
+            if (leftinRange || rightinRange) {
+                  chars_inrange.push_back(c);
+            }
+      }
+}
+
 void Primitive2D::drawWithDynamicZ()
 {
       // test intersection
@@ -227,7 +237,11 @@ void Primitive2D::drawWithDynamicZ()
       Point2f xzCam = Point2f(posCam.x, posCam.z);
       Point2f xzCamRight = xzCam + Vector2f(size.x, 0);
       std::vector<Primitive3D*> chars_inrange;
-      //std::vector<CamOrientedEllipse::Location> locations_inrange;
+      
+      do {
+            FindIntersect
+      } while ();
+
       bool hasFrontLocation = false;
       for (auto* c : RenderWorker::Instance()->scene().characters3D) {
             CamOrientedEllipse::Location l;
