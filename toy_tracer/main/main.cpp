@@ -76,7 +76,10 @@ int main(int argc, char *argv[])
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
       
       RenderWorker::Instance()->loadObject(glTFPrimitives[1]);
+      Primitive3D* duplicateChar = new Primitive3D(*glTFPrimitives[0]);
+      duplicateChar->moveBackwardTick(1.0);
       RenderWorker::Instance()->loadCharacter(glTFPrimitives[0]);
+      RenderWorker::Instance()->loadCharacter(duplicateChar);
       RenderWorker::Instance()->loadObject(char2d);
       MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));

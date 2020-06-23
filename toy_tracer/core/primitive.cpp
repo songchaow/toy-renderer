@@ -136,6 +136,8 @@ void Primitive3D::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
+            int err = glGetError();
+            err = glGetError();
       }
       if (drawReferencePoint)
             drawReference();
