@@ -54,7 +54,7 @@ void PBRMaterial_Ui::addProperties(QWidget* parent) const {
       QObject::connect(update, &QPushButton::clicked, this, &PBRMaterial_Ui::updateProperties);
 }
 
-void Primitive_Ui::addProperties(QWidget* parent) const {
+void Primitive3D_Ui::addProperties(QWidget* parent) const {
       RendererObject::addProperties(parent);
       QGroupBox* primitive_group = new QGroupBox("Primitive");
       // set current widget's layout

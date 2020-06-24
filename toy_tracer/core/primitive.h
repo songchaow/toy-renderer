@@ -67,10 +67,10 @@ public:
       Primitive3D(Shape* shape, PBRMaterial m, Transform t) : _shape(shape), rt_m(1, m), material(nullptr), PrimitiveBase(t) {}
       Primitive3D(Shape* shape, PBRMaterial m) : _shape(shape), rt_m(1, m), material(nullptr) {}
       Primitive3D(PBRMaterial m, Transform t) : Primitive3D(nullptr, m, t) {}
-      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), _meshes(meshes) {
+      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes) : rt_m(rt_ms), _meshes(meshes), _shape(nullptr) {
             calcAABB();
       }
-      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), _meshes(meshes), PrimitiveBase(t) {
+      Primitive3D(const std::vector<PBRMaterial> rt_ms, const std::vector<TriangleMesh*>& meshes, const Transform& t) : rt_m(rt_ms), _meshes(meshes), _shape(nullptr), PrimitiveBase(t) {
             calcAABB();
       }
       Material* getMaterial() const { return material; }

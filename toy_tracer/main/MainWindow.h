@@ -18,7 +18,7 @@ public slots:
       void addPointLight();
       void objLoadToggled(QTableWidgetItem* i);
       void refreshResource();
-      void showProperties(QTableWidgetItem* obj, QTableWidgetItem* p);
+      void sceneItemClicked(QTableWidgetItem* obj, QTableWidgetItem* p);
 
 public:
       void addPointLight(PointLight* pl);

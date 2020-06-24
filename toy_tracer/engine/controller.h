@@ -22,6 +22,9 @@ public:
       void AddItem(ControllerTableItem i) { table.push_back(i); }
       static void setKeyState(ToyTracerKey k, bool v);
       void Tick(Float delta);
+      // remove all items that contain key k
+      void ClearKey(ToyTracerKey k);
 };
 
-void addKeyboardMoveControl(PrimitiveBase* p, ToyTracerKey up, ToyTracerKey down, ToyTracerKey left, ToyTracerKey right);
+void addKeyboardMoveControl(PrimitiveBase* p, ToyTracerKey up = ToyTracerKey::UP, ToyTracerKey down = ToyTracerKey::DOWN,\
+      ToyTracerKey left = ToyTracerKey::LEFT, ToyTracerKey right = ToyTracerKey::RIGHT);

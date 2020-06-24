@@ -15,13 +15,13 @@ void ResourceManager::loadFile(QString path) {
       if (path.endsWith("gltf", Qt::CaseInsensitive)) {
             std::vector<Primitive3D*> ps = LoadGLTF(path.toStdString());
             for (auto& p : ps) {
-                  Primitive_Ui* p_ui = new Primitive_Ui(p);
+                  Primitive3D_Ui* p_ui = new Primitive3D_Ui(p);
                   _loadList.emplace_back(p_ui);
             }
       }
 }
 
 void ResourceManager::addPrimitive(Primitive3D* p) {
-      Primitive_Ui* p_ui = new Primitive_Ui(p);
+      Primitive3D_Ui* p_ui = new Primitive3D_Ui(p);
       _loadList.emplace_back(p_ui);
 }

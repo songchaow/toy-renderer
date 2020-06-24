@@ -27,6 +27,7 @@ public:
       enum class TypeID {
             Camera,
             Primitive3D,
+            Primitive2D,
             Light, // and other lights
             Shape,
             Image,

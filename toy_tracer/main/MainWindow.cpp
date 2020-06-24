@@ -2,6 +2,7 @@
 #include "main/ResourceManager.h"
 #include "main/renderworker.h"
 #include "main/uiwrapper.h"
+#include "engine/controller.h"
 #include <QFileDialog>
 #include <QMenu>
 #include <QScrollArea>
@@ -30,10 +31,11 @@ MainWindow::MainWindow(QWidget *parent/* = Q_NULLPTR*/) {
       QObject::connect(primitiveAdd, SIGNAL(triggered()), this, SLOT(importObj()));
       // TODO: make sure the slot is called directly. Change addPointLight
       QObject::connect(pointLightAdd, SIGNAL(triggered()), this, SLOT(addPointLight()), Qt::DirectConnection);
-      QObject::connect(resourceWidget, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem *)), this, SLOT(showProperties(QTableWidgetItem* ,QTableWidgetItem *)));
+      QObject::connect(resourceWidget, SIGNAL(currentItemChanged(QTableWidgetItem*, QTableWidgetItem *)), this, SLOT(sceneItemClicked(QTableWidgetItem* ,QTableWidgetItem *)));
       QObject::connect(resourceWidget, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(objLoadToggled(QTableWidgetItem *)));
       QObject::connect(controlObj, &QAbstractButton::toggled, this, &MainWindow::viewToggled);
       QObject::connect(controlCam, &QAbstractButton::toggled, this, &MainWindow::viewToggled);
+      QObject::connect(refreshButton, SIGNAL(clicked()), this, SLOT(refreshResource()));
 }
 
 void MainWindow::viewToggled(bool checked) {
@@ -64,7 +66,7 @@ void deleteContentCascaded(QWidget* parent) {
       parent->setLayout(globalLayout);
 }
 
-void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
+void MainWindow::sceneItemClicked(QTableWidgetItem* obj, QTableWidgetItem* p) {
       RendererObject* robj = static_cast<RendererObject*>(obj->data(Qt::UserRole).value<void*>());
       _currobj = robj;
       deleteContentCascaded(property_container);
@@ -72,14 +74,18 @@ void MainWindow::showProperties(QTableWidgetItem* obj, QTableWidgetItem* p) {
             robj->addProperties(property_container);
             if (robj->typeID() == RendererObject::TypeID::Primitive3D) {
                   // add to material panel
-                  Primitive_Ui* pUi = static_cast<Primitive_Ui*>(robj);
+                  Primitive3D_Ui* pUi = static_cast<Primitive3D_Ui*>(robj);
                   RenderWorker::Instance()->curr_primitive = pUi->m();
-                  if (static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial().size() > 0)
-                        pUi->setMaterialUi(&static_cast<Primitive_Ui*>(robj)->m()->getPBRMaterial()[0]);
-                  // TODO: list all the materials
+                  if (static_cast<Primitive3D_Ui*>(robj)->m()->getPBRMaterial().size() > 0)
+                        pUi->setMaterialUi(&static_cast<Primitive3D_Ui*>(robj)->m()->getPBRMaterial()[0]);
                   if (pUi->isValid() && pUi->materialUi().isValid()) {
                         pUi->materialUi().addProperties(materialWidget);
                   }
+                  addKeyboardMoveControl(pUi->m());
+            }
+            else if (robj->typeID() == RendererObject::TypeID::Primitive2D) {
+                  Primitive2D_Ui* pUi = static_cast<Primitive2D_Ui*>(robj);
+                  addKeyboardMoveControl(pUi->m());
             }
             else if (robj->typeID() == RendererObject::TypeID::Light) {
                   PointLight_Ui* lUi = static_cast<PointLight_Ui*>(robj);
@@ -121,7 +127,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
             {
             case RendererObject::TypeID::Primitive3D:
             {
-                  Primitive_Ui * pUi = static_cast<Primitive_Ui*>(o);
+                  Primitive3D_Ui * pUi = static_cast<Primitive3D_Ui*>(o);
                   if (toggled) {
                         RenderWorker::Instance()->loadObject(pUi->m());
                   }
@@ -152,6 +158,7 @@ void MainWindow::objLoadToggled(QTableWidgetItem* i)
 void MainWindow::refreshResource() {
       //resourceWidget->clear();
       resourceWidget->blockSignals(true);
+#if 0 
       std::vector<RendererObject*> rec_list = ResourceManager::getInstance()->getResourceList();
       resourceWidget->setRowCount(rec_list.size());
       int idx = 0;
@@ -164,6 +171,33 @@ void MainWindow::refreshResource() {
             resourceWidget->setItem(idx, 1, item_type);
             idx++;
       }
+#endif
+      int widgetTableIdx = 0;
+      // 3D characters
+      auto& scene = RenderWorker::Instance()->scene();
+      resourceWidget->setRowCount(scene.characters3D.size()+scene.primitives2D.size());
+      for(Primitive3D* p : scene.characters3D) {
+            Primitive3D_Ui* pUi = new Primitive3D_Ui(p);
+            auto* item_name = new QTableWidgetItem(pUi->name());
+            item_name->setData(Qt::UserRole, QVariant::fromValue((void*)pUi));
+            item_name->setCheckState(pUi->m()->isLoad()? Qt::Checked : Qt::Unchecked);
+            auto* item_type = new QTableWidgetItem(pUi->type_name());
+            resourceWidget->setItem(widgetTableIdx, 0, item_name);
+            resourceWidget->setItem(widgetTableIdx, 1, item_type);
+            widgetTableIdx++;
+      }
+      // 2d characters
+      for (Primitive2D* p : scene.primitives2D) {
+            Primitive2D_Ui* pUi = new Primitive2D_Ui(p);
+            auto* item_name = new QTableWidgetItem(pUi->name());
+            item_name->setData(Qt::UserRole, QVariant::fromValue((void*)pUi));
+            item_name->setCheckState(pUi->m()->isLoad() ? Qt::Checked : Qt::Unchecked);
+            auto* item_type = new QTableWidgetItem(pUi->type_name());
+            resourceWidget->setItem(widgetTableIdx, 0, item_name);
+            resourceWidget->setItem(widgetTableIdx, 1, item_type);
+            widgetTableIdx++;
+      }
+      
       resourceWidget->blockSignals(false);
 }
 

@@ -98,13 +98,13 @@ public slots:
       void updateProperties();
 };
 
-class Primitive_Ui : public RendererObject {
+class Primitive3D_Ui : public RendererObject {
       Primitive3D* _m = nullptr;
       // Child UI
       mutable PBRMaterial_Ui _materialUi;
       mutable Shape_Ui shape;
 public:
-      Primitive_Ui(Primitive3D* p) : _m(p), shape(p->shape()), RendererObject(TypeID::Primitive3D) {}
+      Primitive3D_Ui(Primitive3D* p) : _m(p), shape(p->shape()), RendererObject(TypeID::Primitive3D, "3DChar") {}
       void addProperties(QWidget * parent) const override;
       void reset(Primitive3D* _mIn) { _m = _mIn; }
       PBRMaterial_Ui& materialUi() { return  _materialUi; }
@@ -114,6 +114,13 @@ public:
       void setShapeUi(const Shape* s) { shape.reset(s); }
       Primitive3D* m() const { return _m; }
       bool isValid() const { return _m != nullptr; }
+};
+
+class Primitive2D_Ui : public RendererObject {
+      Primitive2D* _m = nullptr;
+public:
+      Primitive2D_Ui(Primitive2D* p) : _m(p), RendererObject(TypeID::Primitive2D, "2DChar") {}
+      Primitive2D* m() const { return _m; }
 };
 
 class PointLight_Ui : public RendererObject {

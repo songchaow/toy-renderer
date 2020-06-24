@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include "main/renderworker.h"
+#include <algorithm>
 
 static uint16_t pID_counter = 0;
 
@@ -238,10 +239,32 @@ void Primitive2D::drawWithDynamicZ()
       Point2f xzCamRight = xzCam + Vector2f(size.x, 0);
       std::vector<Primitive3D*> chars_inrange;
       
-      do {
-            FindIntersect
-      } while ();
+      Shader* char2d_dynamicZ = LoadShader(ShaderType::CHAR_2D_NEW, true);
+      char2d_dynamicZ->use();
 
+      bool forceDepth = false;
+      Float frontestZ;
+      while(true){
+            FindIntersect(posCam, posCamRightUp, chars_inrange);
+            if (chars_inrange.empty()) {
+                  char2d_dynamicZ->setUniformBool("forceDepth", forceDepth);
+                  if (forceDepth)
+                        char2d_dynamicZ->setUniformF("depthCam", frontestZ);
+                  break;
+            }
+            forceDepth = true;
+            char2d_dynamicZ->setUniformBool("forceDepth", true);
+            // find frontest z
+            frontestZ = (*std::max_element(chars_inrange.begin(), chars_inrange.end(),
+                  [](const Primitive3D* a, const Primitive3D* b) {
+                        return a->CamOrientedBB().pMax.z < b->CamOrientedBB().pMax.z;
+                  }))->CamOrientedBB().pMax.z;
+
+            posCam.z = posCamRightUp.z = frontestZ;
+
+
+      };
+#if 0
       bool hasFrontLocation = false;
       for (auto* c : RenderWorker::Instance()->scene().characters3D) {
             CamOrientedEllipse::Location l;
@@ -256,8 +279,7 @@ void Primitive2D::drawWithDynamicZ()
                   hasFrontLocation = true;
             }
       }
-      Shader* char2d_dynamicZ = LoadShader(ShaderType::CHAR_2D_NEW, true);
-      char2d_dynamicZ->use();
+      
       if (chars_inrange.empty())
             char2d_dynamicZ->setUniformBool("forceDepth", false);
       else {
@@ -294,10 +316,12 @@ void Primitive2D::drawWithDynamicZ()
             }
             char2d_dynamicZ->setUniformF("depthCam", depthCam);
       }
+#endif
       draw(char2d_dynamicZ);
 }
 
 void Primitive2D::load() {
       if (image.ready2Load())
             image.load();
+      loaded = true;
 }

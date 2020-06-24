@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
       addKeyboardMoveControl(char2d, UP, DOWN, LEFT, RIGHT);
       //ResourceManager::getInstance()->loadFile("model/Sponza/glTF/Sponza.gltf");
       //ResourceManager::getInstance()->loadFile("model/untitled.gltf");
-      std::string otherCharPaths[] = { "model/1/person.gltf","model/3/person.gltf","model/4/person.gltf" };
-      //std::string otherCharPaths[] = { "model/4/person.gltf" };
+      //std::string otherCharPaths[] = { "model/1/person.gltf","model/3/person.gltf","model/4/person.gltf" };
+      std::string otherCharPaths[] = { "model/1/person.gltf" };
       Float shift = 0.f;
       for (auto p : otherCharPaths) {
             std::vector<Primitive3D*> ps = LoadGLTF(p);
@@ -89,8 +89,8 @@ int main(int argc, char *argv[])
       RenderWorker::Instance()->loadObject(glTFPrimitives[1]);
       Primitive3D* duplicateChar = new Primitive3D(*glTFPrimitives[0]);
       duplicateChar->moveBackwardTick(0.1);
-      RenderWorker::Instance()->loadCharacter(glTFPrimitives[0]);
-      RenderWorker::Instance()->loadCharacter(duplicateChar);
+      //RenderWorker::Instance()->loadCharacter(glTFPrimitives[0]);
+      //RenderWorker::Instance()->loadCharacter(duplicateChar);
       RenderWorker::Instance()->loadObject(char2d);
       MainWindow::getInstance()->refreshResource();
       //PointLight* l = new PointLight(RGBSpectrum(50.f, 50.f, 50.f), Point3f(0.f, 5.f, 0.f));

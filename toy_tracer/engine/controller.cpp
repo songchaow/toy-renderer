@@ -1,4 +1,5 @@
 #include <engine/controller.h>
+#include <algorithm>
 
 static bool _keyState[ToyTracerKey::NUM_KEYS];
 
@@ -29,7 +30,21 @@ void Controller::Tick(Float delta) {
       }
 }
 
+void Controller::ClearKey(ToyTracerKey k) {
+      for(auto itemIt = table.begin(); itemIt != table.end();) {
+            auto it = std::find(itemIt->matchingKeys.begin(), itemIt->matchingKeys.end(), k);
+            if(it != itemIt->matchingKeys.end())
+                  itemIt = table.erase(itemIt);
+            else
+                  itemIt++;
+      }
+}
+
 void addKeyboardMoveControl(PrimitiveBase* p, ToyTracerKey up, ToyTracerKey down, ToyTracerKey left, ToyTracerKey right) {
+      _instance.ClearKey(up);
+      _instance.ClearKey(down);
+      _instance.ClearKey(left);
+      _instance.ClearKey(right);
       _instance.AddItem({ {up},p,&PrimitiveBase::moveForwardTick });
       _instance.AddItem({ {down},p,&PrimitiveBase::moveBackwardTick });
       _instance.AddItem({ {left},p,&PrimitiveBase::moveLeftTick });
