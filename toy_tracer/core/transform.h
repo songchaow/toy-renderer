@@ -47,6 +47,7 @@ struct Matrix4 {
       AABB operator() (const AABB& aabb) const;
       SRT toSRT() const;
       void transpose();
+      static const Matrix4& Identity();
 };
 
 extern Matrix4 Inverse(const Matrix4 &m);

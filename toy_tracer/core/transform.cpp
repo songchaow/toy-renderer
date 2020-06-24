@@ -1,5 +1,9 @@
 #include "core/transform.h"
 
+Matrix4 _matrix4Identity;
+
+const Matrix4& Matrix4::Identity() { return _matrix4Identity; }
+
 Matrix3::Matrix3() {
       m_matrix[0][0] = m_matrix[1][1] = m_matrix[2][2] = 1.f;
       m_matrix[0][1] = m_matrix[0][2] = m_matrix[1][0] = m_matrix[1][2]

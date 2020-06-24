@@ -21,11 +21,13 @@ void PrimitiveBase::drawReference()
       glPointSize(3.0f);
       Shader* pointShader = LoadShader(ShaderType::POINT, true);
       pointShader->use();
+      pointShader->setUniformF("localPos", 0.f, 0.f, 0.f);
       pointShader->setUniformF("obj2world", _obj2world.getRowMajorData());
       const Matrix4& w2c = RenderWorker::getCamera()->world2cam();
       const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
       pointShader->setUniformF("world2cam", &w2c);
       pointShader->setUniformF("cam2ndc", &c2ndc);
+      pointShader->setUniformF("color", 1.f, 0.f, 0.f);
       glDrawArrays(GL_POINTS, 0, 1);
 }
 
@@ -84,6 +86,19 @@ void Primitive3D::drawPrepare(Shader* shader, int meshIndex) {
       auto& m = _meshes[meshIndex];
       glBindVertexArray(m->vao());
 }
+
+void drawPointCameraSpace(Point3f posCam, Point3f color) {
+      glPointSize(3.0f);
+      Shader* pointShader = LoadShader(ShaderType::POINT, true);
+      pointShader->use();
+      pointShader->setUniformF("localPos", posCam.x, posCam.y, posCam.z);
+      pointShader->setUniformF("obj2world", &Matrix4::Identity());
+      pointShader->setUniformF("world2cam", &Matrix4::Identity());
+      pointShader->setUniformF("color", color.x, color.y, color.z);
+      const Matrix4& c2ndc = RenderWorker::getCamera()->Cam2NDC();
+      pointShader->setUniformF("cam2ndc", &c2ndc);
+}
+
 void Primitive3D::draw(Shader* shader) {
       // draw all meshes
       // TODO: maybe different meshes' materials/textures are different.]
@@ -138,6 +153,9 @@ void Primitive3D::draw(Shader* shader) {
             // no need to bind the ebo again
             // eg: 2 faces => 6 element count
             glDrawElements(m->primitiveMode(), 3 * m->face_count(), m->indexElementT(), 0);
+
+            // draw z destination point
+            //drawPointCameraSpace(Point3f(xzCam3.x, xzCam3.y, destinateZCam), Point3f(0.f,1.f,0.f));
       }
       if (drawReferencePoint)
             drawReference();
